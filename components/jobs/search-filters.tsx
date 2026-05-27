@@ -66,9 +66,10 @@ export function SearchFilters({
     } else {
       params.delete("category");
     }
-
+    
     const nextQuery = params.toString();
-    router.push(nextQuery ? `/jobs${pathname}?${nextQuery}` : `/jobs${pathname}`);
+    const url =  layout === "sidebar" ? `/jobs${pathname}` : `${pathname}`;
+    router.push(nextQuery ? `${url}?${nextQuery}` : `${url}`);
   }
 
   return (
