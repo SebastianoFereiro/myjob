@@ -68,7 +68,8 @@ export function SearchFilters({
     }
     
     const nextQuery = params.toString();
-    const url =  layout === "sidebar" ? `/jobs${pathname}` : `${pathname}`;
+    console.log('layout', layout, 'nextQuery', nextQuery);
+    const url =  layout === "sidebar" ? `${pathname}` : `/jobs${pathname}`;
     router.push(nextQuery ? `${url}?${nextQuery}` : `${url}`);
   }
 
