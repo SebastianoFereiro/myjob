@@ -1,62 +1,52 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import HeroSection from "./hero-section-01";
+﻿import { Button } from "@/components/ui/button";
 import { ToolsStackSection } from "./tools-stack-section";
-import { ProductList1 } from "./product-list1";
 import { Feature154 } from "./feature-list";
 import { BlogPost, BlogLatestTech } from "./blog-latest-tech";
 import { CategoryCatalog } from "./category-catalog";
+import { SearchFilters } from "./jobs/search-filters";
 
 const posts: BlogPost[] = [
   {
     href: "#",
-    imageSrc:
-      "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-1.svg",
-    imageAlt:
-      "The Future of AI: How Machine Learning is Transforming Industries",
-    title: "The Future of AI: How Machine Learning is Transforming Industries",
-    date: "June 15, 2024",
-    author: "Alex Johnson",
+    imageSrc: "/images/blog-1.png",
+    imageAlt: "Команда обсуждает рабочие задачи",
+    title: "Как быстро откликаться на вакансии и не терять хорошие предложения",
+    date: "26 мая 2026",
+    author: "MyJOB",
     excerpt:
-      "Explore how artificial intelligence and machine learning technologies are revolutionizing various industries, from healthcare to manufacturing, and learn about the latest innovations shaping our future.",
+      "Короткий чек-лист для соискателей: резюме, сопроводительное письмо, фильтры поиска и подписка на новые вакансии.",
   },
   {
     href: "#",
-    imageSrc:
-      "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-1.svg",
-    imageAlt: "Principles of Minimalist Design: Less is More in Modern UX/UI",
-    title: "Principles of Minimalist Design: Less is More in Modern UX/UI",
-    date: "June 12, 2024",
-    author: "Maya Patel",
+    imageSrc: "/images/blog-1.png",
+    imageAlt: "Рабочее место специалиста",
+    title: "Какие профессии чаще всего ищут работодатели",
+    date: "24 мая 2026",
+    author: "Редакция",
   },
   {
     href: "#",
-    imageSrc:
-      "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-1.svg",
-    imageAlt:
-      "Remote Work Revolution: How Companies are Adapting to the New Normal",
-    title:
-      "Remote Work Revolution: How Companies are Adapting to the New Normal",
-    date: "June 10, 2024",
-    author: "David Chen",
+    imageSrc: "/images/blog-1.png",
+    imageAlt: "Собеседование кандидата",
+    title: "Как подготовиться к первому разговору с рекрутером",
+    date: "22 мая 2026",
+    author: "Редакция",
   },
   {
     href: "#",
-    imageSrc:
-      "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-1.svg",
-    imageAlt: "Building Scalable Applications with Microservices Architecture",
-    title: "Building Scalable Applications with Microservices Architecture",
-    date: "June 8, 2024",
-    author: "Sarah Williams",
+    imageSrc: "/images/blog-1.png",
+    imageAlt: "Работа с документами",
+    title: "Что важно проверить в описании вакансии",
+    date: "20 мая 2026",
+    author: "MyJOB",
   },
   {
     href: "#",
-    imageSrc:
-      "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-1.svg",
-    imageAlt: "Content Marketing Strategies That Drive Organic Traffic in 2024",
-    title: "Content Marketing Strategies That Drive Organic Traffic in 2024",
-    date: "June 5, 2024",
-    author: "James Rodriguez",
+    imageSrc: "/images/blog-1.png",
+    imageAlt: "Команда в офисе",
+    title: "Как работодателю написать понятную вакансию",
+    date: "18 мая 2026",
+    author: "MyJOB",
   },
 ];
 
@@ -65,7 +55,6 @@ const PatternPlaceholder = () => {
     <div className="relative z-10">
       <div className="container py-28 md:py-32">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 text-center">
-          {/* <Badge variant="default">MyJOB.BY</Badge> */}
           <div className="max-w-3xl">
             <h1 className="mb-6 text-4xl font-medium tracking-tight text-pretty text-foreground md:text-5xl lg:text-6xl">
               Работа для людей, на которых все держится.
@@ -74,12 +63,16 @@ const PatternPlaceholder = () => {
               202 актуальные вакансии каждый день.
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button>Искать работу</Button>
-            <Button variant="secondary">Разместить резюме</Button>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <Button asChild>
+              <a href="#vacancies">Искать работу</a>
+            </Button>
+            <Button variant="secondary" asChild>
+              <a href="#resume">Разместить резюме</a>
+            </Button>
           </div>
+          <SearchFilters />
           <CategoryCatalog />
-          {/* <ProductList1 /> */}
           <Feature154 />
           <ToolsStackSection />
           <BlogLatestTech posts={posts} />

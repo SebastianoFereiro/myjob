@@ -1,11 +1,14 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
+
 import { proffesions } from "@/app/data/dictionary";
 
 type Chip = {
   id: string;
   label: string;
+  href: string;
   icon?: React.ReactNode;
 };
 
@@ -23,17 +26,17 @@ function ChipTab({
   onSelect: (id: string) => void;
 }) {
   return (
-    <button
-      type="button"
+    <Link
+      href={`/jobs?query=${chip.label}`}
       role="tab"
       aria-selected={active}
       onClick={() => onSelect(chip.id)}
       className={cx(
-        "flex items-center gap-2 rounded-full px-4 py-2 text-sm transition-colors border",
-        "focus-visible:outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:border-ring",
+        "flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-colors",
+        "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
         active
-          ? "bg-foreground text-background border-foreground/10 shadow-sm"
-          : "bg-muted text-muted-foreground border-transparent hover:bg-muted/80 hover:text-foreground",
+          ? "border-foreground/10 bg-foreground text-background shadow-sm"
+          : "border-transparent bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
       )}
     >
       {chip.icon && (
@@ -46,8 +49,9 @@ function ChipTab({
           {chip.icon}
         </span>
       )}
+
       {chip.label}
-    </button>
+    </Link>
   );
 }
 
@@ -65,10 +69,11 @@ function Marquee({
   duration?: string;
 }) {
   const anim = `animate-[marquee_${duration}_linear_infinite]`;
+
   return (
     <div
       className={cx(
-        "group flex overflow-hidden p-2 [--gap:1rem] [gap:var(--gap)] flex-row [--duration:80s]",
+        "group flex overflow-hidden p-2 [--gap:1rem] [gap:var(--gap)] flex-row",
         "[mask-image:linear-gradient(to_right,transparent,black_16%,black_84%,transparent)]",
       )}
     >
@@ -78,7 +83,8 @@ function Marquee({
           "flex shrink-0 justify-around [gap:var(--gap)] animate-marquee flex-row",
           anim,
           reverse && "[animation-direction:reverse]",
-          "group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]",
+          "group-hover:[animation-play-state:paused]",
+          "group-focus-within:[animation-play-state:paused]",
           "motion-reduce:animate-none",
         )}
       >
@@ -98,7 +104,8 @@ function Marquee({
           "flex shrink-0 justify-around [gap:var(--gap)] animate-marquee flex-row",
           anim,
           reverse && "[animation-direction:reverse]",
-          "group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]",
+          "group-hover:[animation-play-state:paused]",
+          "group-focus-within:[animation-play-state:paused]",
           "motion-reduce:animate-none",
         )}
         aria-hidden="true"
@@ -117,24 +124,36 @@ function Marquee({
 }
 
 export function Feature154() {
-  const chips: Chip[] = proffesions.slice(0, 10).map((profession) => ({
-    id: profession.href,
-    label: profession.name,
-  }));
-   const chips2: Chip[] = proffesions.slice(10, 20).map((profession) => ({
-    id: profession.href,
-    label: profession.name,
-  }));
+  const chips: Chip[] = proffesions
+    .slice(0, 10)
+    .map((profession) => ({
+      id: profession.href,
+      href: profession.href,
+      label: profession.name,
+    }));
 
-   const chips3: Chip[] = proffesions.slice(20, 30).map((profession) => ({
-    id: profession.href,
-    label: profession.name,
-  }));
+  const chips2: Chip[] = proffesions
+    .slice(10, 20)
+    .map((profession) => ({
+      id: profession.href,
+      href: profession.href,
+      label: profession.name,
+    }));
 
-  const [activeId, setActiveId] = React.useState(chips[0]?.id || "");
- 
+  const chips3: Chip[] = proffesions
+    .slice(20, 30)
+    .map((profession) => ({
+      id: profession.href,
+      href: profession.href,
+      label: profession.name,
+    }));
+
+  const [activeId, setActiveId] = React.useState(
+    chips[0]?.id || "",
+  );
+
   return (
-    <section className="py-16 w-full xl:w-[1600px]">
+    <section className="w-full py-16 xl:w-[1600px]">
       <div className="container">
         <div className="mx-auto flex max-w-3xl flex-col items-center justify-center gap-6 text-center">
           <h2 className="mb-6 text-4xl font-medium tracking-tight text-pretty text-foreground md:text-5xl lg:text-6xl">
@@ -142,7 +161,8 @@ export function Feature154() {
           </h2>
 
           <p className="mx-auto max-w-3xl text-lg text-muted-foreground">
-            Выберите интересующее направление из списка профессий.
+            Выберите интересующее направление из списка
+            профессий.
           </p>
         </div>
 
@@ -157,6 +177,7 @@ export function Feature154() {
             onSelect={setActiveId}
             duration="150s"
           />
+
           <Marquee
             items={chips2}
             activeId={activeId}
@@ -164,6 +185,7 @@ export function Feature154() {
             reverse
             duration="150s"
           />
+
           <Marquee
             items={chips3}
             activeId={activeId}

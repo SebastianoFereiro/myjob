@@ -1,5 +1,21 @@
 # Tech Context
 
+## Active Skills For Current Implementation
+
+Current primary skills:
+- `skills/next-js-react.md` - Next.js 16 App Router, Server Components, Client Components, route handlers, metadata, loading and error states.
+- `skills/shadcn-ui.md` - shadcn/ui, Tailwind CSS v4, accessible UI primitives, forms, buttons, cards, dialogs, responsive layout.
+- `skills/api-integration.md` - typed Strapi API client, pagination, filtering, error handling, auth tokens, shared API contracts.
+
+Required project settings for these skills:
+- Frontend code should follow App Router conventions and keep Server Components as the default.
+- Interactive UI should be isolated in Client Components with `"use client"`.
+- UI primitives should reuse `components/ui/` before adding new shadcn components.
+- API access should live in `lib/` or `services/`, not directly inside visual components.
+- Shared API types should move to `packages/types/` when the monorepo structure is created.
+- Page state such as search, filters, and pagination should be represented in URL search params.
+- All developer-facing communication and project comments should stay in Russian.
+
 ## Текущий стек технологий (обновлено 2026-04-27)
 
 ### Frontend

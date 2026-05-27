@@ -4,6 +4,22 @@
 **Always respond in Russian (Русский язык). All communication with the developer must be in Russian.**
 This project uses specialized skills to optimize development across different domains:
 
+## Active Skills For Frontend/API Work
+
+Use these skills by default when implementing the current project scope from `memory-bank/techContext.md`:
+
+1. `skills/next-js-react.md`
+   - Use for Next.js 16 App Router pages, layouts, route handlers, Server Components, Client Components, metadata, loading states, and error boundaries.
+   - Before changing Next.js APIs, read the relevant local Next.js docs in `node_modules/next/dist/docs/`.
+
+2. `skills/shadcn-ui.md`
+   - Use for all UI work: accessible controls, forms, buttons, cards, dialogs, mobile navigation, Tailwind styling, and shadcn/ui component conventions.
+   - Prefer existing local components in `components/ui/` before adding new primitives.
+
+3. `skills/api-integration.md`
+   - Use for frontend-backend integration: typed Strapi clients, shared response types, pagination, filters, auth tokens, retries, and error handling.
+   - Keep API code in `lib/` or `services/` and shared contracts in `packages/types/` when the monorepo structure is introduced.
+
 
 ### 1. **Next.js & React** (`skills/next-js-react.md`)
 **Use when:**

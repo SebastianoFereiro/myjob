@@ -2,6 +2,7 @@ import { Footer } from "@/components/footer";
 import Header from "@/components/header";
 import HeroSection from "@/components/hero-section-01";
 import { PatternPlaceholder } from "@/components/pattern-placeholder";
+import { navigationItems } from "./data/navigation";
 
 interface PageProps {
   searchParams: Promise<{
@@ -11,24 +12,6 @@ interface PageProps {
     page?: string;
   }>;
 }
-const navigationData = [
-  {
-    title: "Главная",
-    href: "#",
-  },
-  {
-    title: "Вакансии",
-    href: "#",
-  },
-  {
-    title: "Компании",
-    href: "#",
-  },
-  {
-    title: "Контакты",
-    href: "#",
-  },
-];
 
 export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
@@ -41,7 +24,7 @@ export default async function Home({ searchParams }: PageProps) {
     <>
       <section className="relative min-h-screen w-full">
         {/* Header Section */}
-        <Header navigationData={navigationData} />
+        <Header navigationData={navigationItems} />
         <PatternPlaceholder />
 
         {/* Background Pattern */}

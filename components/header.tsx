@@ -22,19 +22,21 @@ export type NavigationSection = {
   href: string;
 };
 
+import { navigationItems } from "@/app/data/navigation";
+
 type HeaderProps = {
-  navigationData: NavigationSection[];
+  navigationData?: NavigationSection[];
   className?: string;
 };
 
-const Header = ({ navigationData, className }: HeaderProps) => {
+const Header = ({ navigationData = navigationItems, className }: HeaderProps) => {
   return (
     <header
       className={cn("bg-background sticky top-0 z-50 h-16 border-b", className)}
     >
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <a href="#">
+        <a href="/">
           <img src="/images/logo-by.png" alt="Logo" className="w-auto" />
         </a>
 
