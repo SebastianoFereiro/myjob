@@ -74,7 +74,6 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Retry logic
 - Token management
 
----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
 
 ### 4. **PostgreSQL & Strapi ORM** (`skills/strapi-database.md`)
 **Use when:**
