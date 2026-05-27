@@ -39,6 +39,8 @@ const mockJobs: Job[] = [
     currency: "BYN",
     description: "Планирование маршрутов, контроль перевозок и работа с документами.",
     publishedAt: "2026-05-20",
+    deadline: "2026-06-30",
+    requirements: "Опыт работы от 1 года, знание логистических схем.",
     
   },
   {
@@ -54,6 +56,8 @@ const mockJobs: Job[] = [
     currency: "BYN",
     description: "Разработка интерфейсов на React и поддержка дизайн-системы продукта.",
     publishedAt: "2026-05-18",
+    deadline: "2026-06-15",
+    requirements: "Опыт с React, TypeScript и системами компонент.",
   },
   {
     id: "job-3",
@@ -68,6 +72,8 @@ const mockJobs: Job[] = [
     currency: "BYN",
     description: "Ведение первичной документации, сверки с контрагентами и отчетность.",
     publishedAt: "2026-05-16",
+    deadline: "2026-06-10",
+    requirements: "Знание 1С и налогового учета; опыт от 2 лет.",
   },
   {
     id: "job-4",
@@ -82,6 +88,8 @@ const mockJobs: Job[] = [
     currency: "BYN",
     description: "Работа с входящими заявками, консультации клиентов и ведение CRM.",
     publishedAt: "2026-05-14",
+    deadline: "2026-06-01",
+    requirements: "Навыки продаж и работа с CRM; коммуникабельность.",
   },
   {
     id: "job-5",
@@ -96,6 +104,8 @@ const mockJobs: Job[] = [
     currency: "BYN",
     description: "Подбор персонала, проведение интервью и сопровождение кандидатов.",
     publishedAt: "2026-05-12",
+    deadline: "2026-06-05",
+    requirements: "Опыт в HR от 1 года, знание методик подбора.",
   },
   {
     id: "job-6",
@@ -110,6 +120,8 @@ const mockJobs: Job[] = [
     currency: "BYN",
     description: "Комплектация заказов, приемка товара и поддержание порядка на складе.",
     publishedAt: "2026-05-10",
+    deadline: "2026-05-31",
+    requirements: "Физическая выносливость; опыт на складе приветствуется.",
   },
   {
     id: "job-7",
@@ -124,6 +136,8 @@ const mockJobs: Job[] = [
     currency: "BYN",
     description: "Работа с пациентами, помощь врачу и ведение медицинской документации.",
     publishedAt: "2026-05-09",
+    deadline: "2026-06-20",
+    requirements: "Медицинское образование и действующий сертификат.",
   },
   {
     id: "job-8",
@@ -138,6 +152,8 @@ const mockJobs: Job[] = [
     currency: "BYN",
     description: "Запуск рекламных кампаний, аналитика заявок и работа с контентом.",
     publishedAt: "2026-05-08",
+    deadline: "2026-06-12",
+    requirements: "Опыт в маркетинге, знание SMM и рекламных систем.",
   },
 ];
 
@@ -170,6 +186,8 @@ function mapStrapiJob(record: StrapiJobRecord): Job {
     currency: record.currency || "BYN",
     description: record.description || "",
     publishedAt: record.publishedAt || new Date().toISOString(),
+    deadline: record.deadline || undefined,
+    requirements: record.requirements || "",
   };
 }
 

@@ -30,8 +30,8 @@ export type Job = {
   currency: string;
   description: string;
   publishedAt: string;
-  deadline: string;
-  requirements: string;
+  deadline?: string;
+  requirements?: string;
 };
 
 export type JobFilters = {
