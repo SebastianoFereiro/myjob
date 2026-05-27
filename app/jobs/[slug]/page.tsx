@@ -17,6 +17,7 @@ import Header from "@/components/header";
 import { JobDetails } from "@/components/jobs/job-details";
 import type { Job } from "@/types/jobs";
 import { navigationItems } from "@/app/data/navigation";
+import { notFound } from "next/dist/client/components/navigation";
 
 export const metadata: Metadata = {
   title: "Детали вакансии | MyJOB",
@@ -87,7 +88,10 @@ export default async function JobDetailsPage({
   const { slug } = await params;
 
   const job = mockJob;
-
+  if(job == undefined) {
+    // Handle job not found (e.g., return 404 page)
+    return notFound();
+  }
   return (
     <>
       <Header navigationData={navigationItems} />
@@ -191,7 +195,7 @@ export default async function JobDetailsPage({
                 </div>
 
                 <div className="space-y-4">
-                  {job.requirements
+                  {job?.requirements && job.requirements
                     .split("\n")
                     .map((item, index) => (
                       <div
