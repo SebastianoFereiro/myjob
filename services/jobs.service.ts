@@ -39,6 +39,7 @@ const mockJobs: Job[] = [
     currency: "BYN",
     description: "Планирование маршрутов, контроль перевозок и работа с документами.",
     publishedAt: "2026-05-20",
+    
   },
   {
     id: "job-2",
