@@ -20,14 +20,14 @@ export function CategoriesDropdown() {
 //   if (isLoading || categories.length === 0) {
 //     return null;
 //   }
-  console.log('cat', categories)
+
 
     useEffect(() => {
     async function loadCategories() {
       try {
        
         const data = await getCategories();
-        console.log("Loaded categories:", data);
+      
         setCategories(data);
       } catch {
         console.log("Failed to load categories");
