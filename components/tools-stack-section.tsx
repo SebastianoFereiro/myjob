@@ -61,9 +61,9 @@ function DirectionCard({ direction }: { direction: Direction }) {
 
   return (
     <Card className="bg-hatch rounded-2xl p-2 border-0 shadow-none">
-      <div className="flex items-center justify-between gap-10">
+     <div className="flex items-center justify-between gap-2 md:gap-10">
         <div className="flex items-center gap-4">
-          <div className="flex size-20 items-center justify-center rounded-2xl bg-background/70 p-2">
+          <div className="flex  items-center justify-center rounded-2xl bg-background/70 p-2">
             <Icon className="size-8 text-foreground" aria-hidden="true" />
           </div>
 
@@ -71,13 +71,13 @@ function DirectionCard({ direction }: { direction: Direction }) {
             <h3 className="text-xl font-semibold tracking-tight">
               {direction.name}
             </h3>
-            <p className="text-sm uppercase text-foreground/50">
+            <p className="text-xs md:text-sm uppercase text-foreground/50">
               {direction.desc}
             </p>
           </div>
         </div>
 
-        <div className="pr-5 text-right font-semibold uppercase">
+        <div className="pr-2 md:pr-5 text-right font-semibold uppercase">
           <span className="block text-2xl leading-none">{direction.count}</span>
           <span className="text-xs text-foreground/50">вакансий</span>
         </div>
