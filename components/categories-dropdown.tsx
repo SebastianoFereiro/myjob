@@ -27,7 +27,7 @@ export function CategoriesDropdown() {
       try {
        
         const data = await getCategories();
-      
+        console.log('data',data[0])
         setCategories(data);
       } catch {
         console.log("Failed to load categories");

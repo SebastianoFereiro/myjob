@@ -77,7 +77,7 @@ export async function getCategories() {
     const categories = response.data
       .map((record) => mapStrapiCategory(unwrapStrapiRecord(record)))
       .filter((category) => Boolean(category.slug && category.name));
-    console.log('categories', categories)
+    
     return  categories 
   } catch {
     console.log('Failed to fetch categories from Strapi, using fallback data.');
