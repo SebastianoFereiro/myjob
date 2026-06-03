@@ -52,7 +52,7 @@ export async function fetchAPI<T>(
     ...options,
     headers,
   });
-
+ if(requestUrl.includes('categories res') ){console.log('response', response);}
   const payload = (await response.json().catch(() => null)) as
     | T
     | StrapiErrorResponse
