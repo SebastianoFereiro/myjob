@@ -17,7 +17,7 @@ type StrapiErrorResponse = {
 export function getStrapiURL() {
   return ( 
     process.env.STRAPI_URL ||
-    "http://10.0.15.202:1337"
+    "https://atlantis.myjob.by"
   ).replace(/\/$/, "");
 }
 
