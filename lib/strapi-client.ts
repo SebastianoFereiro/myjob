@@ -47,12 +47,12 @@ export async function fetchAPI<T>(
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
   }
-  if(requestUrl.includes('categories') ){console.log('fetching', requestUrl, 'with options', options, headers , requestUrl);}
+ 
   const response = await fetch(requestUrl, {
     ...options,
     headers,
   });
- if(requestUrl.includes('categories res') ){console.log('response', response);}
+
   const payload = (await response.json().catch(() => null)) as
     | T
     | StrapiErrorResponse
