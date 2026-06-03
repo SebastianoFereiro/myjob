@@ -1,137 +1,148 @@
-"use client";
-
 import { Badge } from "@/components/ui/badge";
-import {
-  MapPin,
-  Layers3,
-  CheckCircle2,
-  Sparkles,
-} from "lucide-react";
+import type { EmploymentType, Job } from "@/types/jobs";
+import { CheckCircle2, Layers3, MapPin, Sparkles } from "lucide-react";
 
-import type { Job } from "@/types/jobs";
+const employmentLabels: Record<EmploymentType, string> = {
+  "full-time": "Полная занятость",
+  "part-time": "Частичная занятость",
+  contract: "Проектная работа",
+  internship: "Стажировка",
+  remote: "Удаленно",
+};
+
+function splitLines(value?: string) {
+  return (value || "")
+    .split(/\n|•|-/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
 
 export function JobDetails({ job }: { job: Job }) {
+  const requirements = splitLines(job.requirements);
+  const conditions = splitLines(job.conditions);
+  const categories = job.categories?.length ? job.categories : [job.category];
+
   return (
     <div className="space-y-8">
-      {/* ABOUT */}
       <section>
         <div className="mb-5 flex items-center gap-2">
-          <Sparkles className="h-5 w-5" />
-
-          <h2 className="text-2xl font-semibold tracking-tight">
-            О вакансии
-          </h2>
+          <Sparkles className="size-5" />
+          <h2 className="text-2xl font-semibold tracking-tight">О вакансии</h2>
         </div>
 
-        <div className="rounded-3xl border bg-white p-5 md:p-7">
+        <div className="rounded-lg border bg-background p-5 md:p-7">
           <div className="flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <Badge
+                key={category.slug}
+                variant="outline"
+                className="rounded-full px-4 py-1 text-xs font-medium"
+              >
+                {category.name}
+              </Badge>
+            ))}
             <Badge
-              variant="outline"
+              variant={job.employmentType === "remote" ? "secondary" : "outline"}
               className="rounded-full px-4 py-1 text-xs font-medium"
             >
-              {job.category.name}
+              {employmentLabels[job.employmentType]}
             </Badge>
-
-            <Badge
-              variant={
-                job.employmentType === "remote"
-                  ? "secondary"
-                  : "outline"
-              }
-              className="rounded-full px-4 py-1 text-xs font-medium"
-            >
-              {job.employmentType}
-            </Badge>
+            {job.level && (
+              <Badge
+                variant="outline"
+                className="rounded-full px-4 py-1 text-xs font-medium"
+              >
+                {job.level}
+              </Badge>
+            )}
+            {job.experience && (
+              <Badge
+                variant="outline"
+                className="rounded-full px-4 py-1 text-xs font-medium"
+              >
+                {job.experience}
+              </Badge>
+            )}
           </div>
 
           <div className="mt-5 flex flex-wrap gap-4 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1.5">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
               <MapPin className="size-4" />
               {job.location}
             </span>
-
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1.5">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
               <Layers3 className="size-4" />
               {job.category.name}
             </span>
           </div>
 
-          <div className="mt-8">
-            <p className="whitespace-pre-line text-[15px] leading-8 text-muted-foreground md:text-base">
-              {job.description}
-            </p>
-          </div>
+          <p className="mt-8 whitespace-pre-line text-[15px] leading-8 text-muted-foreground md:text-base">
+            {job.description || "Описание вакансии готовится к публикации."}
+          </p>
         </div>
       </section>
 
-      {/* RESPONSIBILITIES */}
-      <section>
-        <div className="mb-5 flex items-center gap-2">
-          <CheckCircle2 className="h-5 w-5" />
+      {(requirements.length > 0 || job.requirements) && (
+        <section>
+          <div className="mb-5 flex items-center gap-2">
+            <CheckCircle2 className="size-5" />
+            <h2 className="text-2xl font-semibold tracking-tight">Требования</h2>
+          </div>
 
-          <h2 className="text-2xl font-semibold tracking-tight">
-            Что нужно будет делать
-          </h2>
-        </div>
-
-        <div className="rounded-3xl border bg-white p-5 md:p-7">
-          <div className="space-y-4">
-            {[
-              "Разработка современных пользовательских интерфейсов",
-              "Интеграция API и взаимодействие с backend",
-              "Оптимизация производительности приложения",
-              "Работа с командой дизайнеров и разработчиков",
-              "Поддержка и развитие текущего проекта",
-            ].map((item, index) => (
-              <div
-                key={index}
-                className="flex gap-3 rounded-2xl border border-zinc-100 bg-zinc-50 p-4 transition hover:bg-zinc-100"
-              >
-                <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black text-white">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                </div>
-
-                <p className="text-sm leading-7 text-muted-foreground md:text-base">
-                  {item}
-                </p>
+          <div className="rounded-lg border bg-background p-5 md:p-7">
+            {requirements.length > 0 ? (
+              <div className="space-y-3">
+                {requirements.map((item) => (
+                  <div
+                    key={item}
+                    className="flex gap-3 rounded-lg border bg-muted/40 p-4"
+                  >
+                    <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-600" />
+                    <p className="text-sm leading-7 text-muted-foreground md:text-base">
+                      {item}
+                    </p>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <p className="text-muted-foreground">
+                Подробные требования будут добавлены позже.
+              </p>
+            )}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* TECH STACK */}
-      <section>
-        <div className="mb-5 flex items-center gap-2">
-          <Layers3 className="h-5 w-5" />
+      {(conditions.length > 0 || job.conditions) && (
+        <section>
+          <div className="mb-5 flex items-center gap-2">
+            <CheckCircle2 className="size-5" />
+            <h2 className="text-2xl font-semibold tracking-tight">Условия</h2>
+          </div>
 
-          <h2 className="text-2xl font-semibold tracking-tight">
-            Технологии и стек
-          </h2>
-        </div>
-
-        <div className="rounded-3xl border bg-white p-5 md:p-7">
-          <div className="flex flex-wrap gap-3">
-            {[
-              "React",
-              "Next.js",
-              "TypeScript",
-              "TailwindCSS",
-              "REST API",
-              "Git",
-              "Figma",
-              "Vercel",
-            ].map((tech) => (
-              <div
-                key={tech}
-                className="rounded-2xl border bg-zinc-50 px-4 py-2 text-sm font-medium transition hover:border-black hover:bg-black hover:text-white"
-              >
-                {tech}
+          <div className="rounded-lg border bg-background p-5 md:p-7">
+            {conditions.length > 0 ? (
+              <div className="space-y-3">
+                {conditions.map((item) => (
+                  <div
+                    key={item}
+                    className="flex gap-3 rounded-lg border bg-muted/40 p-4"
+                  >
+                    <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-blue-600" />
+                    <p className="text-sm leading-7 text-muted-foreground md:text-base">
+                      {item}
+                    </p>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <p className="text-muted-foreground">
+                Условия не указаны.
+              </p>
+            )}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

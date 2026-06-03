@@ -12,13 +12,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import type { JobFilters } from "@/types/jobs";
+import type { JobCategory, JobFilters } from "@/types/jobs";
 
 type JobFiltersPanelProps = {
   filters: JobFilters;
+  categories: JobCategory[];
 };
 
-function FilterContent({ filters }: JobFiltersPanelProps) {
+function FilterContent({ filters, categories }: JobFiltersPanelProps) {
   return (
     <div className="space-y-5">
       <div>
@@ -27,17 +28,21 @@ function FilterContent({ filters }: JobFiltersPanelProps) {
           Уточните категорию, город, формат работы или должность.
         </p>
       </div>
-      <SearchFilters initialFilters={filters} layout="sidebar" />
+      <SearchFilters
+        initialFilters={filters}
+        layout="sidebar"
+        categories={categories}
+      />
     </div>
   );
 }
 
-export function JobFiltersPanel({ filters }: JobFiltersPanelProps) {
+export function JobFiltersPanel({ filters, categories }: JobFiltersPanelProps) {
   return (
     <>
       <aside className="hidden lg:block">
         <div className="sticky top-20 rounded-lg border bg-background p-4 shadow-sm">
-          <FilterContent filters={filters} />
+          <FilterContent filters={filters} categories={categories} />
         </div>
       </aside>
 
@@ -57,7 +62,11 @@ export function JobFiltersPanel({ filters }: JobFiltersPanelProps) {
               </SheetDescription>
             </SheetHeader>
             <div className="px-4 pb-6">
-              <SearchFilters initialFilters={filters} layout="sidebar" />
+              <SearchFilters
+                initialFilters={filters}
+                layout="sidebar"
+                categories={categories}
+              />
             </div>
           </SheetContent>
         </Sheet>

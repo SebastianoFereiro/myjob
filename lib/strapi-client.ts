@@ -15,11 +15,22 @@ type StrapiErrorResponse = {
 };
 
 export function getStrapiURL() {
-  return (
-    process.env.NEXT_PUBLIC_STRAPI_URL ||
+  return ( 
     process.env.STRAPI_URL ||
-    "http://localhost:1337"
+    "http://10.0.15.202:1337"
   ).replace(/\/$/, "");
+}
+
+export function getStrapiMediaURL(url?: string | null) {
+  if (!url) {
+    return undefined;
+  }
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  return `${getStrapiURL()}${url.startsWith("/") ? url : `/${url}`}`;
 }
 
 export async function fetchAPI<T>(

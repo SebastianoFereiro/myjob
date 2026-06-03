@@ -1,7 +1,7 @@
-﻿import { jobCategories } from "@/app/data/job-categories";
 import { JobCard } from "@/components/jobs/job-card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { getCategoriesWithCounts } from "@/services/categories.service";
 import { getJobs } from "@/services/jobs.service";
 import type { JobFilters } from "@/types/jobs";
 
@@ -24,17 +24,18 @@ function pageHref(filters: JobFilters, page: number, basePath: string) {
   return query ? `${basePath}?${query}#vacancies` : `${basePath}#vacancies`;
 }
 
-function getCategoryName(slug?: string) {
-  return jobCategories.find((category) => category.slug === slug)?.name;
-}
-
 export async function JobList({
   filters,
   basePath = "/jobs",
   contained = true,
 }: JobListProps) {
-  const { jobs, pagination } = await getJobs(filters);
-  const categoryName = getCategoryName(filters.category);
+  const [{ jobs, pagination }, categories] = await Promise.all([
+    getJobs(filters),
+    getCategoriesWithCounts(),
+  ]);
+  const categoryName = categories.find(
+    (category) => category.slug === filters.category,
+  )?.name;
 
   return (
     <section
@@ -104,3 +105,4 @@ export async function JobList({
     </section>
   );
 }
+

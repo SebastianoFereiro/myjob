@@ -4,6 +4,7 @@ import { Footer } from "@/components/footer";
 import Header from "@/components/header";
 import { JobFiltersPanel } from "@/components/jobs/job-filters-panel";
 import { JobList } from "@/components/jobs/job-list";
+import { getCategoriesWithCounts } from "@/services/categories.service";
 import type { EmploymentType, JobFilters } from "@/types/jobs";
 
 export const metadata: Metadata = {
@@ -38,6 +39,7 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
     category: params.category || "",
     page: normalizePage(params.page),
   };
+  const categories = await getCategoriesWithCounts();
 
   return (
     <>
@@ -59,7 +61,7 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
 
         <section className="container py-6 lg:py-8">
           <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[320px_minmax(0,1fr)]">
-            <JobFiltersPanel filters={filters} />
+            <JobFiltersPanel filters={filters} categories={categories} />
             <div className="min-w-0">
               <JobList filters={filters} basePath="/jobs" contained={false} />
             </div>

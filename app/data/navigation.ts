@@ -1,11 +1,12 @@
 export type NavigationItem = {
-  title: string;
-  href: string;
+  slug: string;
+  name: string;
 };
 
 export const navigationItems: NavigationItem[] = [
-  { title: "Главная", href: "/" },
-  { title: "Вакансии", href: "/jobs" },
-  { title: "Компании", href: "/companies" },
-  { title: "Контакты", href: "/contacts" },
+ 
+  { name: "Вакансии", slug: "/jobs" },
+ 
+  { name: "Компании", slug: "/companies" },
+  { name: "Контакты", slug: "/contacts" },
 ];

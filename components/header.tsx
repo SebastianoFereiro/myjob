@@ -1,5 +1,6 @@
 "use client";
 import { MenuIcon } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,10 +17,11 @@ import {
 } from "@/components/ui/navigation-menu";
 
 import { cn } from "@/lib/utils";
+import { CategoriesDropdown, CategoriesMobileDropdown } from "@/components/categories-dropdown";
 
 export type NavigationSection = {
-  title: string;
-  href: string;
+  name: string;
+  slug: string;
 };
 
 import { navigationItems } from "@/app/data/navigation";
@@ -36,24 +38,28 @@ const Header = ({ navigationData = navigationItems, className }: HeaderProps) =>
     >
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <a href="/">
+        <Link href="/">
           <img src="/images/logo-by.png" alt="Logo" className="w-auto" />
-        </a>
+        </Link>
 
         {/* Navigation */}
         <NavigationMenu className="max-md:hidden">
           <NavigationMenuList className="flex-wrap justify-start gap-0">
+              <NavigationMenuItem>
+              <CategoriesDropdown />
+            </NavigationMenuItem>
+       
             {navigationData.map((navItem) => (
-              <NavigationMenuItem key={navItem.title}>
+              <NavigationMenuItem key={navItem.name}>
                 <NavigationMenuLink
-                  href={navItem.href}
+                  href={navItem.slug}
                   className="text-muted-foreground hover:text-primary px-3 py-1.5 text-base! font-medium hover:bg-transparent"
                 >
-                  {navItem.title}
+                  {navItem.name}
                 </NavigationMenuLink>
               </NavigationMenuItem>
             ))}
-          </NavigationMenuList>
+             </NavigationMenuList>
         </NavigationMenu>
 
         {/* Login Button */}
@@ -76,10 +82,13 @@ const Header = ({ navigationData = navigationItems, className }: HeaderProps) =>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end">
               {navigationData.map((item, index) => (
-                <DropdownMenuItem key={index}>
-                  <a href={item.href}>{item.title}</a>
+                <DropdownMenuItem key={index} asChild>
+                  <Link href={item.slug}>{item.name}</Link>
                 </DropdownMenuItem>
               ))}
+              <div className="border-t my-1">
+                <CategoriesMobileDropdown />
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

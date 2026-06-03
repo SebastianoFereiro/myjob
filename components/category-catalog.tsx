@@ -1,6 +1,6 @@
 ﻿import * as React from "react";
 
-import { getCategoryCounts } from "@/services/jobs.service";
+import { getCategoriesWithCounts } from "@/services/categories.service";
 
 type CategoryLayout = "default" | "wide" | "tall";
 
@@ -34,15 +34,21 @@ const layoutClasses: Record<CategoryLayout, string> = {
 
 const layouts: CategoryLayout[] = ["default", "wide", "tall", "wide", "default", "default"];
 
-const defaultItems: CategoryItem[] = getCategoryCounts().map((category, index) => ({
-  title: category.name,
-  meta: `${category.count} вакансий`,
-  image: `/cat/cat-${index}.png`,
-  alt: `Раздел ${category.name}`,
-  href: `/jobs?category=${category.slug}#vacancies`,
-  slug: category.slug,
-  layout: layouts[index] || "default",
-})).slice(0, 5); // Ограничиваем до 6 категорий для отображения
+function mapCategoriesToItems(
+  categories: Awaited<ReturnType<typeof getCategoriesWithCounts>>,
+) {
+  return categories
+    .map((category, index) => ({
+      title: category.name,
+      meta: `${category.count || 0} вакансий`,
+      image: category.imageUrl || `/cat/cat-${index % 5}.png`,
+      alt: `Раздел ${category.name}`,
+      href: `/jobs?category=${category.slug}#vacancies`,
+      slug: category.slug,
+      layout: layouts[index] || "default",
+    }))
+    .slice(0, 6);
+}
 
 function CategoryCard({
   item,
@@ -106,13 +112,15 @@ function CategoryCard({
   return <div className={cardClassName}>{content}</div>;
 }
 
-export function CategoryCatalog({
+export async function CategoryCatalog({
   eyebrow = "Разделы",
   title = "Популярные направления",
   description = "Выберите направление, чтобы сразу отфильтровать список вакансий ниже.",
-  items = defaultItems,
+  items,
   activeCategory,
 }: CategoryCatalogProps) {
+  const catalogItems = items || mapCategoriesToItems(await getCategoriesWithCounts());
+
   return (
     <section className="relative h-full w-full overflow-hidden py-16">
       <div className="container relative flex h-full w-full flex-col items-center justify-center">
@@ -127,7 +135,7 @@ export function CategoryCatalog({
         </div>
 
         <div className="relative mt-[34px] grid w-full grid-cols-1 justify-center gap-[10px] sm:grid-cols-2 lg:grid-cols-4 lg:auto-rows-[17.5rem]">
-          {items.map((item) => (
+          {catalogItems.map((item) => (
             <CategoryCard
               key={item.title}
               item={item}

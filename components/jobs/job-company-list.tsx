@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function CompanyListingPage() {
   const companies = [
@@ -110,10 +110,6 @@ export default function CompanyListingPage() {
     currentPage * itemsPerPage
   );
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, selectedIndustry, verifiedOnly]);
-
   return (
     <div className="min-h-screen bg-[#fafafa]">
       <div className="container mx-auto px-4 py-8 md:px-6 lg:px-8">
@@ -160,7 +156,10 @@ export default function CompanyListingPage() {
                 type="text"
                 placeholder="Введите название компании"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="h-12 w-full rounded-2xl border bg-zinc-50 px-4 outline-none transition focus:border-black"
               />
             </div>
@@ -173,9 +172,10 @@ export default function CompanyListingPage() {
 
               <select
                 value={selectedIndustry}
-                onChange={(e) =>
-                  setSelectedIndustry(e.target.value)
-                }
+                onChange={(e) => {
+                  setSelectedIndustry(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="h-12 w-full rounded-2xl border bg-zinc-50 px-4 outline-none transition focus:border-black"
               >
                 {industries.map((industry) => (
@@ -193,9 +193,10 @@ export default function CompanyListingPage() {
               </label>
 
               <button
-                onClick={() =>
-                  setVerifiedOnly(!verifiedOnly)
-                }
+                onClick={() => {
+                  setVerifiedOnly(!verifiedOnly);
+                  setCurrentPage(1);
+                }}
                 className={`h-12 w-full rounded-2xl border px-4 font-medium transition ${
                   verifiedOnly
                     ? "border-black bg-black text-white"

@@ -1,56 +1,35 @@
-﻿import { Button } from "@/components/ui/button";
-import { ToolsStackSection } from "./tools-stack-section";
+import { CategoryCatalog } from "@/components/category-catalog";
+import { BlogLatestTech, type BlogPost } from "@/components/blog-latest-tech";
+import { Button } from "@/components/ui/button";
+import { getBlogArticles } from "@/services/blog.service";
+import { getCategoriesWithCounts } from "@/services/categories.service";
 import { Feature154 } from "./feature-list";
-import { BlogPost, BlogLatestTech } from "./blog-latest-tech";
-import { CategoryCatalog } from "./category-catalog";
 import { SearchFilters } from "./jobs/search-filters";
+import { ToolsStackSection } from "./tools-stack-section";
 
-const posts: BlogPost[] = [
-  {
-    href: "#",
-    imageSrc: "/images/blog-1.png",
-    imageAlt: "Команда обсуждает рабочие задачи",
-    title: "Как быстро откликаться на вакансии и не терять хорошие предложения",
-    date: "26 мая 2026",
-    author: "MyJOB",
-    excerpt:
-      "Короткий чек-лист для соискателей: резюме, сопроводительное письмо, фильтры поиска и подписка на новые вакансии.",
-  },
-  {
-    href: "#",
-    imageSrc: "/images/blog-1.png",
-    imageAlt: "Рабочее место специалиста",
-    title: "Какие профессии чаще всего ищут работодатели",
-    date: "24 мая 2026",
-    author: "Редакция",
-  },
-  {
-    href: "#",
-    imageSrc: "/images/blog-1.png",
-    imageAlt: "Собеседование кандидата",
-    title: "Как подготовиться к первому разговору с рекрутером",
-    date: "22 мая 2026",
-    author: "Редакция",
-  },
-  {
-    href: "#",
-    imageSrc: "/images/blog-1.png",
-    imageAlt: "Работа с документами",
-    title: "Что важно проверить в описании вакансии",
-    date: "20 мая 2026",
-    author: "MyJOB",
-  },
-  {
-    href: "#",
-    imageSrc: "/images/blog-1.png",
-    imageAlt: "Команда в офисе",
-    title: "Как работодателю написать понятную вакансию",
-    date: "18 мая 2026",
-    author: "MyJOB",
-  },
-];
+function formatDate(date: string) {
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(date));
+}
 
-const PatternPlaceholder = () => {
+const PatternPlaceholder = async () => {
+  const [articles, categories] = await Promise.all([
+    getBlogArticles(5),
+    getCategoriesWithCounts(),
+  ]);
+  const posts: BlogPost[] = articles.map((article) => ({
+    href: `/blog/${article.slug}`,
+    imageSrc: article.imageUrl,
+    imageAlt: article.imageAlt,
+    title: article.title,
+    date: formatDate(article.publishedAt),
+    author: article.author,
+    excerpt: article.excerpt,
+  }));
+
   return (
     <div className="relative z-10">
       <div className="container py-28 md:py-32">
@@ -71,7 +50,7 @@ const PatternPlaceholder = () => {
               <a href="#resume">Разместить резюме</a>
             </Button>
           </div>
-          <SearchFilters />
+          <SearchFilters categories={categories} />
           <CategoryCatalog />
           <Feature154 />
           <ToolsStackSection />
@@ -83,3 +62,4 @@ const PatternPlaceholder = () => {
 };
 
 export { PatternPlaceholder };
+

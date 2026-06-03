@@ -3,6 +3,7 @@ import Header from "@/components/header";
 import HeroSection from "@/components/hero-section-01";
 import { PatternPlaceholder } from "@/components/pattern-placeholder";
 import { navigationItems } from "./data/navigation";
+import { getCategories } from "@/services/categories.service";
 
 interface PageProps {
   searchParams: Promise<{

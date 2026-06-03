@@ -1,17 +1,19 @@
 ﻿"use client";
 
 import { BriefcaseBusiness, Layers3, MapPin, Search } from "lucide-react";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { jobCategories } from "@/app/data/job-categories";
-import type { EmploymentType, JobFilters } from "@/types/jobs";
+import { jobCategories as fallbackCategories } from "@/app/data/job-categories";
+import type { EmploymentType, JobCategory, JobFilters } from "@/types/jobs";
 
 type SearchFiltersProps = {
   initialFilters?: JobFilters;
   layout?: "bar" | "sidebar";
+  categories?: JobCategory[];
 };
 
 const employmentOptions: Array<{ value: EmploymentType | ""; label: string }> = [
@@ -26,6 +28,7 @@ const employmentOptions: Array<{ value: EmploymentType | ""; label: string }> = 
 export function SearchFilters({
   initialFilters,
   layout = "bar",
+  categories = fallbackCategories,
 }: SearchFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -68,8 +71,7 @@ export function SearchFilters({
     }
     
     const nextQuery = params.toString();
-    console.log('layout', layout, 'nextQuery', nextQuery);
-    const url =  layout === "sidebar" ? `${pathname}` : `/jobs${pathname}`;
+    const url = layout === "sidebar" ? pathname : "/jobs";
     router.push(nextQuery ? `${url}?${nextQuery}` : `${url}`);
   }
 
@@ -113,7 +115,7 @@ export function SearchFilters({
           className="h-10 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           <option value="">Все категории</option>
-          {jobCategories.map((option) => (
+          {categories.map((option) => (
             <option key={option.slug} value={option.slug}>
               {option.name}
             </option>
@@ -142,7 +144,7 @@ export function SearchFilters({
       </Button>
       {layout === "sidebar" ? (
         <Button type="button" variant="outline" className="h-10" asChild>
-          <a href="/jobs">Сбросить фильтры</a>
+          <Link href="/jobs">Сбросить фильтры</Link>
         </Button>
       ) : null}
     </form>

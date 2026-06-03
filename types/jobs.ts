@@ -8,6 +8,9 @@
 export type JobCategory = {
   slug: string;
   name: string;
+  description?: string;
+  imageUrl?: string;
+  count?: number;
 };
 
 export type JobCompany = {
@@ -18,20 +21,55 @@ export type JobCompany = {
 };
 
 export type Job = {
+  // ID и идентификаторы
   id: string;
+  documentId: string;
   slug: string;
+  
+  // Базовая информация
   title: string;
+  description: string;
   company: JobCompany;
+  
+  // Категории и типы
   category: JobCategory;
+  categories?: JobCategory[];
+  jobType?: string;
+  level?: string;
+  education?: string;
+  experience?: string;
+  
+  // Локация
+  region?: string;
+  cities?: string[];
+  city?: string;
   location: string;
   employmentType: EmploymentType;
+  
+  // Зарплата
   salaryFrom?: number;
   salaryTo?: number;
+  salary?: string | number;
   currency: string;
-  description: string;
-  publishedAt: string;
-  deadline?: string;
+  
+  // Требования
   requirements?: string;
+  conditions?: string;
+  
+  // Даты
+  publishedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
+  deadline?: string;
+  startDate?: string;
+  finishDate?: string;
+  
+  // Статус
+  isActive?: boolean;
+  
+  // Дополнительно
+  sortOrder?: number;
+  image?: string;
 };
 
 export type JobFilters = {

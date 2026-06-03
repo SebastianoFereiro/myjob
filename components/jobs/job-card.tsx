@@ -35,6 +35,8 @@ function formatSalary(job: Job) {
 }
 
 export function JobCard({ job }: { job: Job }) {
+  const categories = job.categories?.length ? job.categories : [job.category];
+
   return (
     <Card className="rounded-lg border bg-background shadow-sm">
       <CardHeader>
@@ -52,6 +54,36 @@ export function JobCard({ job }: { job: Job }) {
           {job.description}
         </p>
 
+        {/* Категории как фильтры */}
+        <div className="flex flex-wrap gap-2">
+          {categories.map((cat) => (
+            <a
+              key={cat.slug}
+              href={`/jobs?category=${cat.slug}`}
+              className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted-foreground/20"
+            >
+              {cat.name}
+            </a>
+          ))}
+        </div>
+
+        {/* Доп. информация */}
+        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+          {job.level && (
+            <span className="inline-flex items-center gap-1.5">
+              <Layers3 className="size-4" />
+              {job.level}
+            </span>
+          )}
+          {job.experience && (
+            <span className="inline-flex items-center gap-1.5">
+              <Layers3 className="size-4" />
+              {job.experience}
+            </span>
+          )}
+        </div>
+
+        {/* Локация, зарплата */}
         <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <MapPin className="size-4" />
@@ -60,10 +92,6 @@ export function JobCard({ job }: { job: Job }) {
           <span className="inline-flex items-center gap-1.5">
             <BriefcaseBusiness className="size-4" />
             {formatSalary(job)}
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Layers3 className="size-4" />
-            {job.category.name}
           </span>
         </div>
 
