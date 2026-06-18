@@ -1,28 +1,21 @@
-﻿import { BriefcaseBusiness, Layers3, MapPin } from "lucide-react";
+import { BriefcaseBusiness, Layers3, MapPin } from 'lucide-react';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import type { EmploymentType, Job } from "@/types/jobs";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { EmploymentType, Job } from '@/types/jobs';
 
 const employmentLabels: Record<EmploymentType, string> = {
-  "full-time": "Полная занятость",
-  "part-time": "Частичная занятость",
-  contract: "Проектная работа",
-  internship: "Стажировка",
-  remote: "Удаленно",
+  'full-time': 'Полная занятость',
+  'part-time': 'Частичная занятость',
+  contract: 'Проектная работа',
+  internship: 'Стажировка',
+  remote: 'Удаленно',
 };
 
 function formatSalary(job: Job) {
   if (!job.salaryFrom && !job.salaryTo) {
-    return "Зарплата по договоренности";
+    return 'По договоренности';
   }
 
   if (job.salaryFrom && job.salaryTo) {
@@ -35,69 +28,81 @@ function formatSalary(job: Job) {
 }
 
 export function JobCard({ job }: { job: Job }) {
-  const categories = job.categories?.length ? job.categories : [job.category];
-
   return (
-    <Card className="rounded-lg border bg-background shadow-sm">
-      <CardHeader>
-        <CardTitle className="text-xl">{job.title}</CardTitle>
-        <CardDescription>{job.company.name}</CardDescription>
-        <CardAction>
-          <Badge variant={job.employmentType === "remote" ? "secondary" : "outline"}>
-            {employmentLabels[job.employmentType]}
-          </Badge>
-        </CardAction>
+    <Card className="shadow-sm transition-shadow hover:shadow-md">
+      <CardHeader className="p-3 sm:p-5">
+        <div className="space-y-2">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <CardTitle className="text-[15px] leading-snug font-semibold sm:text-lg">
+                {job.title}
+              </CardTitle>
+            </div>
+            <Badge
+              variant={job.employmentType === 'remote' ? 'secondary' : 'outline'}
+              className="shrink-0 rounded-full text-[11px] px-2.5 py-0 font-normal"
+            >
+              {employmentLabels[job.employmentType]}
+            </Badge>
+          </div>
+          <p className="text-[13px] text-muted-foreground truncate">
+            {job.company.name}
+          </p>
+        </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        <p className="line-clamp-2 text-sm text-muted-foreground">
+      <CardContent className="px-3 pb-0 sm:px-5 space-y-3">
+        <p className="line-clamp-2 text-[13px] text-muted-foreground leading-relaxed">
           {job.description}
         </p>
 
-        {/* Категории как фильтры */}
-        <div className="flex flex-wrap gap-2">
-          {categories.map((cat) => (
-            <a
-              key={cat.slug}
-              href={`/jobs?category=${cat.slug}`}
-              className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted-foreground/20"
-            >
-              {cat.name}
+        {job.category && (
+          <div className="flex flex-wrap gap-1.5">
+            <a href={`/jobs?category=${job.category.slug}`}>
+              <Badge
+                variant="secondary"
+                className="rounded-full text-[11px] px-2.5 py-0 font-normal cursor-pointer hover:bg-muted-foreground/20 transition-colors"
+              >
+                {job.category.name}
+              </Badge>
             </a>
-          ))}
-        </div>
+          </div>
+        )}
 
-        {/* Доп. информация */}
-        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
           {job.level && (
             <span className="inline-flex items-center gap-1.5">
-              <Layers3 className="size-4" />
-              {job.level}
+              <Layers3 className="size-3.5 shrink-0" />
+              <span className="truncate">{job.level}</span>
             </span>
           )}
           {job.experience && (
             <span className="inline-flex items-center gap-1.5">
-              <Layers3 className="size-4" />
-              {job.experience}
+              <Layers3 className="size-3.5 shrink-0" />
+              <span className="truncate">{job.experience}</span>
             </span>
           )}
         </div>
 
-        {/* Локация, зарплата */}
-        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
-            <MapPin className="size-4" />
-            {job.location}
+            <MapPin className="size-3.5 shrink-0" />
+            <span className="truncate">{job.location}</span>
           </span>
-          <span className="inline-flex items-center gap-1.5">
-            <BriefcaseBusiness className="size-4" />
-            {formatSalary(job)}
+          <span className="inline-flex items-center gap-1.5 font-medium text-foreground/80">
+            <BriefcaseBusiness className="size-3.5 shrink-0" />
+            <span className="truncate">{formatSalary(job)}</span>
           </span>
         </div>
 
-        <Button asChild>
-          <a href={`/jobs/${job.slug}`}>Открыть вакансию</a>
-        </Button>
+        <div className="flex gap-2 pt-1">
+          <Button asChild className="flex-1 h-9 text-[13px] shadow-sm">
+            <a href={`/jobs/${job.slug}-${job.id}`}>Открыть вакансию</a>
+          </Button>
+          <Button variant="outline" asChild className="flex-1 h-9 text-[13px]">
+            <a href={`/companies/${job.company.slug}`}>Компания</a>
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

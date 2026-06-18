@@ -59,7 +59,7 @@ export async function JobList({
       </div>
 
       {jobs.length > 0 ? (
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {jobs.map((job) => (
             <JobCard key={job.id} job={job} />
           ))}

@@ -12,28 +12,16 @@ import type { JobCategory } from "@/types/jobs";
 import { getCategories } from "@/services/categories.service";
 
 export function CategoriesDropdown() {
-  const [categories, setCategories] = useState<JobCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-
-
-//   if (isLoading || categories.length === 0) {
-//     return null;
-//   }
-
+    const [categories, setCategories] = useState<JobCategory[]>([]);
 
     useEffect(() => {
     async function loadCategories() {
       try {
-       
         const data = await getCategories();
-       
         setCategories(data);
       } catch {
         console.log("Failed to load categories");
         setCategories([]);
-      } finally {
-        setIsLoading(false);
       }
     }
 
@@ -63,26 +51,22 @@ export function CategoriesDropdown() {
 }
 
 export function CategoriesMobileDropdown() {
-  const [categories, setCategories] = useState<JobCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+    const [categories, setCategories] = useState<JobCategory[]>([]);
 
   useEffect(() => {
     async function loadCategories() {
       try {
-    
         const data = await getCategories();
         setCategories(data);
       } catch {
         setCategories([]);
-      } finally {
-        setIsLoading(false);
       }
     }
 
     loadCategories();
   }, []);
 
-  if (isLoading || categories.length === 0) {
+  if (categories.length === 0) {
     return null;
   }
 

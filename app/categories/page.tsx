@@ -1,7 +1,9 @@
 import { Metadata } from "next";
+
+export const dynamic = 'force-dynamic';
+
 import Link from "next/link";
-import { getCategories, getCategoriesWithCounts } from "@/services/categories.service";
-import { Button } from "@/components/ui/button";
+import { getCategoriesWithCounts } from "@/services/categories.service";
 import { ArrowRight } from "lucide-react";
 import { Footer } from "@/components/footer";
 import Header from "@/components/header";
@@ -14,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CVSPage() {
-  const categories = await getCategoriesWithCounts();
+  const categories = (await getCategoriesWithCounts()) || [];
 
   return (
     <>

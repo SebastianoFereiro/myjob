@@ -4,6 +4,14 @@
 **Always respond in Russian (Русский язык). All communication with the developer must be in Russian.**
 This project uses specialized skills to optimize development across different domains:
 
+## Rules for DeepSeek
+
+1. **No emojis** - never use emojis in responses or code comments
+2. **Be concise** - answer briefly, no fluff
+3. **No obvious explanations** - don't explain basic concepts
+4. **No intro/outro phrases** - get straight to the point
+5. **Minimum words** - use shortest possible answer. One word > two words. No sentences unless impossible.
+
 ## Active Skills For Frontend/API Work
 
 Use these skills by default when implementing the current project scope from `memory-bank/techContext.md`:

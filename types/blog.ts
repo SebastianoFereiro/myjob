@@ -1,12 +1,13 @@
-export type BlogArticle = {
+export type { BlogPost, Author, Category } from '../types/strapi-collections';
+
+export interface BlogArticle {
   id: string;
   slug: string;
+  imageUrl?: string;
+  imageAlt?: string;
   title: string;
-  excerpt?: string;
-  content?: string;
-  author: string;
-  imageUrl: string;
-  imageAlt: string;
   publishedAt: string;
-};
-
+  author: string;
+  excerpt?: string;
+  content: string;
+}

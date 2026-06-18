@@ -1,4 +1,7 @@
 import { notFound } from "next/navigation";
+
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from "next";
 import { getCategories } from "@/services/categories.service";
 import { JobList } from "@/components/jobs/job-list";
@@ -33,13 +36,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${categoryName} - Резюме и вакансии | MyJOB`,
     description: `Профессионалы и вакансии в категории "${categoryName}". Найди свою идеальную работу на MyJOB.`,
   };
-}
-
-export async function generateStaticParams() {
-  const categories = await getCategories();
-  return categories.map((category) => ({
-    category: category.slug,
-  }));
 }
 
 export default async function CategoryPage({ params }: Props) {

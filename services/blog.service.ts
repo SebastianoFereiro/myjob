@@ -129,7 +129,7 @@ function mapStrapiBlog(record: StrapiBlogRecord): BlogArticle {
     slug: record.slug || slugify(record.title || id),
     title: record.title || "Статья",
     excerpt: record.excerpt,
-    content: record.content,
+    content: record.content || "",
     author: record.author || "MyJOB",
     imageUrl: image.url || "/images/blog-1.png",
     imageAlt: image.alt,

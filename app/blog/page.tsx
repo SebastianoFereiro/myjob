@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 
+export const dynamic = 'force-dynamic';
+
+import Image from "next/image";
+
 import { Footer } from "@/components/footer";
 import Header from "@/components/header";
 import { Badge } from "@/components/ui/badge";
@@ -43,13 +47,17 @@ export default async function BlogPage() {
               <a
                 key={article.id}
                 href={`/blog/${article.slug}`}
-                className="group overflow-hidden rounded-lg border bg-background shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                className="group relative block h-56 overflow-hidden rounded-lg border bg-background shadow-sm transition hover:-translate-y-1 hover:shadow-md"
               >
-                <img
-                  src={article.imageUrl}
-                  alt={article.imageAlt}
-                  className="h-56 w-full object-cover transition group-hover:opacity-90"
-                />
+                {article.imageUrl && (
+                  <Image
+                    src={article.imageUrl}
+                    alt={article.imageAlt ?? ""}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover transition group-hover:opacity-90"
+                  />
+                )}
                 <div className="p-5">
                   <div className="mb-3 flex items-center gap-1 text-sm text-muted-foreground">
                     <time>{formatDate(article.publishedAt)}</time>

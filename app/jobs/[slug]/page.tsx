@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
 import {
   ArrowLeft,
   BriefcaseBusiness,
@@ -8,16 +9,16 @@ import {
   Clock3,
   MapPin,
   Wallet,
-} from "lucide-react";
-import { notFound } from "next/navigation";
+} from 'lucide-react';
+import { notFound } from 'next/navigation';
 
-import { Footer } from "@/components/footer";
-import Header from "@/components/header";
-import { JobDetails } from "@/components/jobs/job-details";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { getJobBySlug } from "@/services/jobs.service";
-import type { EmploymentType, Job } from "@/types/jobs";
+import { Footer } from '@/components/footer';
+import Header from '@/components/header';
+import { JobDetails } from '@/components/jobs/job-details';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { getJobById } from '@/services/jobs.service';
+import type { EmploymentType, Job } from '@/types/jobs';
 
 type JobDetailsPageProps = {
   params: Promise<{
@@ -26,16 +27,16 @@ type JobDetailsPageProps = {
 };
 
 const employmentLabels: Record<EmploymentType, string> = {
-  "full-time": "Полная занятость",
-  "part-time": "Частичная занятость",
-  contract: "Проектная работа",
-  internship: "Стажировка",
-  remote: "Удаленно",
+  'full-time': 'Полная занятость',
+  'part-time': 'Частичная занятость',
+  contract: 'Проектная работа',
+  internship: 'Стажировка',
+  remote: 'Удаленно',
 };
 
 function formatSalary(job: Job) {
   if (!job.salaryFrom && !job.salaryTo) {
-    return "По договоренности";
+    return 'По договоренности';
   }
 
   if (job.salaryFrom && job.salaryTo) {
@@ -49,25 +50,30 @@ function formatSalary(job: Job) {
 
 function formatDate(date?: string) {
   if (!date) {
-    return "Не указано";
+    return 'Не указано';
   }
 
-  return new Intl.DateTimeFormat("ru-RU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
   }).format(new Date(date));
 }
 
-export async function generateMetadata({
-  params,
-}: JobDetailsPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const job = await getJobBySlug(slug);
+function parseSlugId(rawSlug: string) {
+  const parts = rawSlug.split('-');
+  const id = parts.pop()!;
+  return { id, slug: parts.join('-') };
+}
+
+export async function generateMetadata({ params }: JobDetailsPageProps): Promise<Metadata> {
+  const rawSlug = (await params).slug;
+  const { id } = parseSlugId(rawSlug);
+  const job = await getJobById(id);
 
   if (!job) {
     return {
-      title: "Вакансия не найдена | MyJOB",
+      title: 'Вакансия не найдена | MyJOB',
     };
   }
 
@@ -78,8 +84,9 @@ export async function generateMetadata({
 }
 
 export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
-  const { slug } = await params;
-  const job = await getJobBySlug(slug);
+  const rawSlug = (await params).slug;
+  const { id } = parseSlugId(rawSlug);
+  const job = await getJobById(id);
 
   if (!job) {
     notFound();
@@ -94,8 +101,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
           <div className="container py-6 md:py-10">
             <Button variant="ghost" className="mb-5 gap-2 px-0" asChild>
               <Link href="/jobs">
-                <ArrowLeft className="size-4" />
-                К списку вакансий
+                <ArrowLeft className="size-4" />К списку вакансий
               </Link>
             </Button>
 
@@ -104,9 +110,11 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                 <div className="flex flex-col gap-5 sm:flex-row">
                   <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border bg-muted">
                     {job.company.logoUrl ? (
-                      <img
+                      <Image
                         src={job.company.logoUrl}
                         alt={job.company.name}
+                        width={48}
+                        height={48}
                         className="h-12 w-12 object-contain"
                       />
                     ) : (
@@ -115,18 +123,21 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                   </div>
 
                   <div>
-                    <Badge variant="secondary" className="mb-3">
-                      {job.category.name}
-                    </Badge>
-                    <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-                      {job.title}
-                    </h1>
+                    {job.category && (
+                      <Badge variant="secondary" className="mb-3">
+                        {job.category.name}
+                      </Badge>
+                    )}
+                    <h1 className="text-3xl font-bold tracking-tight md:text-5xl">{job.title}</h1>
 
                     <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                      <span className="inline-flex items-center gap-2">
+                      <Link
+                        href={`/companies/${job.company.slug}`}
+                        className="inline-flex items-center gap-2 hover:text-foreground hover:underline"
+                      >
                         <Building2 className="size-4" />
                         {job.company.name}
-                      </span>
+                      </Link>
                       <span className="inline-flex items-center gap-2">
                         <MapPin className="size-4" />
                         {job.location}
@@ -171,7 +182,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                   <div className="flex items-start gap-3">
                     <CalendarDays className="mt-0.5 size-5 text-muted-foreground" />
                     <div>
-                      <p className="text-muted-foreground">Дедлайн</p>
+                      <p className="text-muted-foreground">Завершение</p>
                       <p className="font-medium">{formatDate(job.deadline)}</p>
                     </div>
                   </div>
@@ -179,9 +190,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                     <BriefcaseBusiness className="mt-0.5 size-5 text-muted-foreground" />
                     <div>
                       <p className="text-muted-foreground">Тип занятости</p>
-                      <p className="font-medium">
-                        {employmentLabels[job.employmentType]}
-                      </p>
+                      <p className="font-medium">{employmentLabels[job.employmentType]}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -191,6 +200,15 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                       <p className="font-medium">{formatSalary(job)}</p>
                     </div>
                   </div>
+                </div>
+
+                <div className="mt-5 border-t pt-5">
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href={`/companies/${job.company.slug}`}>
+                      <Building2 className="mr-2 size-4" />
+                      Просмотреть компанию
+                    </Link>
+                  </Button>
                 </div>
               </div>
             </aside>

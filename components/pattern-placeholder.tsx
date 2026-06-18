@@ -1,29 +1,27 @@
-import { CategoryCatalog } from "@/components/category-catalog";
-import { BlogLatestTech, type BlogPost } from "@/components/blog-latest-tech";
-import { Button } from "@/components/ui/button";
-import { getBlogArticles } from "@/services/blog.service";
-import { getCategoriesWithCounts } from "@/services/categories.service";
-import { Feature154 } from "./feature-list";
-import { SearchFilters } from "./jobs/search-filters";
-import { ToolsStackSection } from "./tools-stack-section";
+import { Suspense } from 'react';
+import { CategoryCatalog } from '@/components/category-catalog';
+import { BlogLatestTech, type BlogPost } from '@/components/blog-latest-tech';
+import { Button } from '@/components/ui/button';
+import { getBlogArticles } from '@/services/blog.service';
+import { getCategoriesWithCounts } from '@/services/categories.service';
+import { Feature154 } from './feature-list';
+import { SearchFilters } from './jobs/search-filters';
+import { ToolsStackSection } from './tools-stack-section';
 
 function formatDate(date: string) {
-  return new Intl.DateTimeFormat("ru-RU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
   }).format(new Date(date));
 }
 
 const PatternPlaceholder = async () => {
-  const [articles, categories] = await Promise.all([
-    getBlogArticles(5),
-    getCategoriesWithCounts(),
-  ]);
+  const [articles, categories] = await Promise.all([getBlogArticles(5), getCategoriesWithCounts()]);
   const posts: BlogPost[] = articles.map((article) => ({
     href: `/blog/${article.slug}`,
-    imageSrc: article.imageUrl,
-    imageAlt: article.imageAlt,
+    imageSrc: article.imageUrl || '/images/blog-1.png',
+    imageAlt: article.imageAlt || '',
     title: article.title,
     date: formatDate(article.publishedAt),
     author: article.author,
@@ -50,7 +48,9 @@ const PatternPlaceholder = async () => {
               <a href="#resume">Разместить резюме</a>
             </Button>
           </div>
-          <SearchFilters categories={categories} />
+          <Suspense fallback={null}>
+            <SearchFilters categories={categories} />
+          </Suspense>
           <CategoryCatalog />
           <Feature154 />
           <ToolsStackSection />
@@ -62,4 +62,3 @@ const PatternPlaceholder = async () => {
 };
 
 export { PatternPlaceholder };
-

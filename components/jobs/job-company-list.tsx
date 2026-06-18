@@ -1,109 +1,91 @@
-"use client";
-import { useState } from "react";
+'use client';
+import Image from 'next/image';
+import { useState } from 'react';
 
 export default function CompanyListingPage() {
   const companies = [
     {
       id: 1,
-      name: "TechCorp",
-      industry: "IT & Software",
-      employees: "120+",
-      location: "Минск",
+      name: 'TechCorp',
+      industry: 'IT & Software',
+      employees: '120+',
+      location: 'Минск',
       openJobs: 14,
       verified: true,
-      logo: "https://placehold.co/100x100?text=T",
+      logo: 'https://placehold.co/100x100?text=T',
     },
     {
       id: 2,
-      name: "NovaSoft",
-      industry: "Fintech",
-      employees: "80+",
-      location: "Варшава",
+      name: 'NovaSoft',
+      industry: 'Fintech',
+      employees: '80+',
+      location: 'Варшава',
       openJobs: 8,
       verified: true,
-      logo: "https://placehold.co/100x100?text=N",
+      logo: 'https://placehold.co/100x100?text=N',
     },
     {
       id: 3,
-      name: "PixelLab",
-      industry: "Design",
-      employees: "40+",
-      location: "Remote",
+      name: 'PixelLab',
+      industry: 'Design',
+      employees: '40+',
+      location: 'Remote',
       openJobs: 4,
       verified: false,
-      logo: "https://placehold.co/100x100?text=P",
+      logo: 'https://placehold.co/100x100?text=P',
     },
     {
       id: 4,
-      name: "CloudBase",
-      industry: "Cloud",
-      employees: "200+",
-      location: "Берлин",
+      name: 'CloudBase',
+      industry: 'Cloud',
+      employees: '200+',
+      location: 'Берлин',
       openJobs: 21,
       verified: true,
-      logo: "https://placehold.co/100x100?text=C",
+      logo: 'https://placehold.co/100x100?text=C',
     },
     {
       id: 5,
-      name: "StartupX",
-      industry: "Startup",
-      employees: "15+",
-      location: "Киев",
+      name: 'StartupX',
+      industry: 'Startup',
+      employees: '15+',
+      location: 'Киев',
       openJobs: 3,
       verified: false,
-      logo: "https://placehold.co/100x100?text=S",
+      logo: 'https://placehold.co/100x100?text=S',
     },
     {
       id: 6,
-      name: "DevSolutions",
-      industry: "Outsource",
-      employees: "300+",
-      location: "Прага",
+      name: 'DevSolutions',
+      industry: 'Outsource',
+      employees: '300+',
+      location: 'Прага',
       openJobs: 17,
       verified: true,
-      logo: "https://placehold.co/100x100?text=D",
+      logo: 'https://placehold.co/100x100?text=D',
     },
   ];
 
-  const industries = [
-    "Все",
-    "IT & Software",
-    "Fintech",
-    "Design",
-    "Cloud",
-    "Startup",
-    "Outsource",
-  ];
+  const industries = ['Все', 'IT & Software', 'Fintech', 'Design', 'Cloud', 'Startup', 'Outsource'];
 
-  const [search, setSearch] = useState("");
-  const [selectedIndustry, setSelectedIndustry] = useState("Все");
+  const [search, setSearch] = useState('');
+  const [selectedIndustry, setSelectedIndustry] = useState('Все');
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   const itemsPerPage = 4;
 
   const filteredCompanies = companies.filter((company) => {
-    const matchesSearch = company.name
-      .toLowerCase()
-      .includes(search.toLowerCase());
+    const matchesSearch = company.name.toLowerCase().includes(search.toLowerCase());
 
-    const matchesIndustry =
-      selectedIndustry === "Все" ||
-      company.industry === selectedIndustry;
+    const matchesIndustry = selectedIndustry === 'Все' || company.industry === selectedIndustry;
 
-    const matchesVerified =
-      !verifiedOnly || company.verified;
+    const matchesVerified = !verifiedOnly || company.verified;
 
-    return (
-      matchesSearch &&
-      matchesIndustry &&
-      matchesVerified
-    );
+    return matchesSearch && matchesIndustry && matchesVerified;
   });
 
-  const totalPages = Math.ceil(
-    filteredCompanies.length / itemsPerPage
-  );
+  const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
 
   const paginatedCompanies = filteredCompanies.slice(
     (currentPage - 1) * itemsPerPage,
@@ -121,24 +103,17 @@ export default function CompanyListingPage() {
                 COMPANY DIRECTORY
               </div>
 
-              <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-                Компании
-              </h1>
+              <h1 className="text-3xl font-bold tracking-tight md:text-5xl">Компании</h1>
 
               <p className="mt-3 max-w-2xl text-muted-foreground">
-                Найдите лучшие компании для работы, изучите открытые вакансии
-                и условия.
+                Найдите лучшие компании для работы, изучите открытые вакансии и условия.
               </p>
             </div>
 
             <div className="rounded-3xl bg-black p-6 text-white shadow-xl">
-              <p className="text-sm text-zinc-400">
-                Всего компаний
-              </p>
+              <p className="text-sm text-zinc-400">Всего компаний</p>
 
-              <h2 className="mt-2 text-4xl font-bold">
-                {filteredCompanies.length}
-              </h2>
+              <h2 className="mt-2 text-4xl font-bold">{filteredCompanies.length}</h2>
             </div>
           </div>
         </div>
@@ -148,9 +123,7 @@ export default function CompanyListingPage() {
           <div className="grid gap-4 lg:grid-cols-[1fr_220px_180px]">
             {/* SEARCH */}
             <div>
-              <label className="mb-2 block text-sm font-medium">
-                Поиск компании
-              </label>
+              <label className="mb-2 block text-sm font-medium">Поиск компании</label>
 
               <input
                 type="text"
@@ -166,9 +139,7 @@ export default function CompanyListingPage() {
 
             {/* INDUSTRY */}
             <div>
-              <label className="mb-2 block text-sm font-medium">
-                Индустрия
-              </label>
+              <label className="mb-2 block text-sm font-medium">Индустрия</label>
 
               <select
                 value={selectedIndustry}
@@ -188,9 +159,7 @@ export default function CompanyListingPage() {
 
             {/* VERIFIED */}
             <div>
-              <label className="mb-2 block text-sm font-medium">
-                Фильтр
-              </label>
+              <label className="mb-2 block text-sm font-medium">Фильтр</label>
 
               <button
                 onClick={() => {
@@ -198,14 +167,10 @@ export default function CompanyListingPage() {
                   setCurrentPage(1);
                 }}
                 className={`h-12 w-full rounded-2xl border px-4 font-medium transition ${
-                  verifiedOnly
-                    ? "border-black bg-black text-white"
-                    : "bg-zinc-50 hover:bg-zinc-100"
+                  verifiedOnly ? 'border-black bg-black text-white' : 'bg-zinc-50 hover:bg-zinc-100'
                 }`}
               >
-                {verifiedOnly
-                  ? "Только verified"
-                  : "Все компании"}
+                {verifiedOnly ? 'Только verified' : 'Все компании'}
               </button>
             </div>
           </div>
@@ -221,7 +186,7 @@ export default function CompanyListingPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex gap-4">
                   <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl border bg-zinc-50">
-                    <img
+                    <Image
                       src={company.logo}
                       alt={company.name}
                       className="h-12 w-12 object-contain"
@@ -241,14 +206,10 @@ export default function CompanyListingPage() {
                       )}
                     </div>
 
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {company.industry}
-                    </p>
+                    <p className="mt-2 text-sm text-muted-foreground">{company.industry}</p>
 
                     <div className="mt-5 flex flex-wrap gap-2 text-sm">
-                      <div className="rounded-full bg-zinc-100 px-3 py-1.5">
-                        {company.location}
-                      </div>
+                      <div className="rounded-full bg-zinc-100 px-3 py-1.5">{company.location}</div>
 
                       <div className="rounded-full bg-zinc-100 px-3 py-1.5">
                         {company.employees}
@@ -260,16 +221,15 @@ export default function CompanyListingPage() {
 
               <div className="mt-6 flex items-center justify-between gap-4 border-t pt-5">
                 <div>
-                  <p className="text-sm text-muted-foreground">
-                    Открытые вакансии
-                  </p>
+                  <p className="text-sm text-muted-foreground">Открытые вакансии</p>
 
-                  <h3 className="text-2xl font-bold">
-                    {company.openJobs}
-                  </h3>
+                  <h3 className="text-2xl font-bold">{company.openJobs}</h3>
                 </div>
 
-                <a href={`/companies/${company.id}`} className="rounded-2xl bg-black px-5 py-3 text-sm font-medium text-white transition hover:scale-[1.02]">
+                <a
+                  href={`/companies/${company.id}`}
+                  className="rounded-2xl bg-black px-5 py-3 text-sm font-medium text-white transition hover:scale-[1.02]"
+                >
                   Смотреть компанию
                 </a>
               </div>
@@ -280,13 +240,9 @@ export default function CompanyListingPage() {
         {/* EMPTY */}
         {filteredCompanies.length === 0 && (
           <div className="rounded-[32px] border bg-white p-16 text-center shadow-sm">
-            <h3 className="text-2xl font-semibold">
-              Компании не найдены
-            </h3>
+            <h3 className="text-2xl font-semibold">Компании не найдены</h3>
 
-            <p className="mt-3 text-muted-foreground">
-              Попробуйте изменить параметры фильтрации.
-            </p>
+            <p className="mt-3 text-muted-foreground">Попробуйте изменить параметры фильтрации.</p>
           </div>
         )}
 
@@ -295,9 +251,7 @@ export default function CompanyListingPage() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <button
               disabled={currentPage === 1}
-              onClick={() =>
-                setCurrentPage((prev) => prev - 1)
-              }
+              onClick={() => setCurrentPage((prev) => prev - 1)}
               className="h-11 rounded-2xl border px-5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-40 hover:bg-zinc-100"
             >
               Назад
@@ -312,8 +266,8 @@ export default function CompanyListingPage() {
                   onClick={() => setCurrentPage(page)}
                   className={`flex h-11 w-11 items-center justify-center rounded-2xl text-sm font-medium transition ${
                     currentPage === page
-                      ? "bg-black text-white"
-                      : "border bg-white hover:bg-zinc-100"
+                      ? 'bg-black text-white'
+                      : 'border bg-white hover:bg-zinc-100'
                   }`}
                 >
                   {page}
@@ -323,9 +277,7 @@ export default function CompanyListingPage() {
 
             <button
               disabled={currentPage === totalPages}
-              onClick={() =>
-                setCurrentPage((prev) => prev + 1)
-              }
+              onClick={() => setCurrentPage((prev) => prev + 1)}
               className="h-11 rounded-2xl border px-5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-40 hover:bg-zinc-100"
             >
               Далее

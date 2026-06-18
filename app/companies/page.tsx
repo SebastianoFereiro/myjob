@@ -1,28 +1,27 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
-import Header from "@/components/header";
-import { Footer } from "@/components/footer";
+export const dynamic = 'force-dynamic';
 
-
-
-import { navigationItems } from "@/app/data/navigation";
-import CompanyListingPage from "@/components/jobs/job-company-list";
+import Header from '@/components/header';
+import { Footer } from '@/components/footer';
+import { navigationItems } from '@/app/data/navigation';
+import { getCompanies } from '@/services/companies.service';
+import CompanyListingClient from './CompanyListingClient';
 
 export const metadata: Metadata = {
-  title: "Компании | MyJOB",
-  description:
-    "Каталог компаний с открытыми вакансиями, фильтрацией и поиском.",
+  title: 'Компании | MyJOB',
+  description: 'Каталог компаний с открытыми вакансиями, фильтрацией и поиском.',
 };
 
-export default function CompaniesPage() {
+export default async function CompaniesPage() {
+  const companies = await getCompanies();
+
   return (
     <>
       <Header navigationData={navigationItems} />
-
       <main className="flex-1">
-        <CompanyListingPage />
+        <CompanyListingClient companies={companies} />
       </main>
-
       <Footer />
     </>
   );

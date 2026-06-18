@@ -1,4 +1,3 @@
-import { jobCategories as fallbackCategories } from "@/app/data/job-categories";
 import { getStrapiMediaURL, fetchAPI } from "@/lib/strapi-client";
 import {
   type StrapiListResponse,

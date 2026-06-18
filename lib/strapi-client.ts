@@ -39,7 +39,9 @@ export async function fetchAPI<T>(
 ): Promise<T> {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   const requestUrl = `${getStrapiURL()}/api${normalizedPath}`;
-  const token = options.authToken ?? process.env.STRAPI_API_TOKEN;
+  // Для мутаций используем write-токен, для чтения — read-токен
+  const isMutation = options.method && options.method !== "GET" && options.method !== "HEAD";
+  const token = options.authToken ?? (isMutation ? process.env.STRAPI_API_WRITE_TOKEN : process.env.STRAPI_API_TOKEN);
 
   const headers = new Headers(options.headers);
   headers.set("Content-Type", "application/json");

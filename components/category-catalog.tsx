@@ -1,4 +1,5 @@
-﻿import * as React from "react";
+import * as React from "react";
+import Image from "next/image";
 
 import { getCategoriesWithCounts } from "@/services/categories.service";
 
@@ -75,12 +76,12 @@ function CategoryCard({
       />
 
       <div className="relative h-full w-full bg-muted">
-        <img
+        <Image
           src={item.image}
           alt={item.alt ?? item.title}
-          width={1000}
-          height={1000}
-          className="h-full w-full scale-[1.15] object-cover transition-transform duration-700 group-hover/card:scale-105 group-focus-within/card:scale-105"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+          className="scale-[1.15] object-cover transition-transform duration-700 group-hover/card:scale-105 group-focus-within/card:scale-105"
         />
       </div>
 

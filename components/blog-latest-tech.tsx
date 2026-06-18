@@ -1,4 +1,5 @@
-﻿import * as React from "react";
+import * as React from "react";
+import Image from "next/image";
 
 export type BlogPost = {
   href: string;
@@ -43,11 +44,15 @@ export function BlogLatestTech({
                 href={featured.href}
                 className="block h-fit rounded-lg p-3 md:top-0"
               >
-                <img
-                  alt={featured.imageAlt}
-                  src={featured.imageSrc}
-                  className="h-48 w-full rounded-lg object-cover hover:opacity-80 md:h-80 lg:h-96"
-                />
+                <div className="relative h-48 w-full md:h-80 lg:h-96">
+                  <Image
+                    alt={featured.imageAlt}
+                    src={featured.imageSrc}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
+                    className="rounded-lg object-cover hover:opacity-80"
+                  />
+                </div>
                 <div className="mt-5 text-left">
                   <Meta date={featured.date} author={featured.author} />
                   <h3 className="text-lg md:text-3xl lg:text-4xl">
@@ -65,11 +70,15 @@ export function BlogLatestTech({
 
           {rest.map((post) => (
             <a key={post.title} href={post.href} className="rounded-lg p-3">
-              <img
-                alt={post.imageAlt}
-                src={post.imageSrc}
-                className="h-48 w-full rounded-lg object-cover hover:opacity-80"
-              />
+              <div className="relative h-48 w-full">
+                <Image
+                  alt={post.imageAlt}
+                  src={post.imageSrc}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  className="rounded-lg object-cover hover:opacity-80"
+                />
+              </div>
               <div className="mt-5 text-left">
                 <Meta date={post.date} author={post.author} />
                 <h3 className="text-lg">{post.title}</h3>

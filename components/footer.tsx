@@ -1,4 +1,5 @@
-﻿import * as React from "react";
+import * as React from "react";
+import Image from "next/image";
 
 type FooterLink = { label: string; href: string };
 
@@ -69,11 +70,13 @@ export function Footer({
             <div className="col-span-2 mb-8 lg:mb-0">
               <div className="flex items-center lg:justify-start">
                 <a href={logoHref} className="inline-flex items-center">
-                  <img
+                  <Image
                     alt={logoAlt}
                     title={logoAlt}
-                    className="h-7"
+                    className="h-7 w-auto"
                     src={logoSrc}
+                    width={161}
+                    height={26}
                   />
                 </a>
               </div>

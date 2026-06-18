@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 const HeroSection = () => {
   return (
     <section className="flex  flex-1 flex-col justify-between gap-12 overflow-x-hidden pt-8 sm:gap-16 sm:pt-16 lg:gap-18 lg:pt-18">
@@ -57,7 +59,7 @@ const HeroSection = () => {
       </div> */}
 
       {/* Image */}
-      <img
+      <Image
         src="https://cdn.shadcnstudio.com/ss-assets/blocks/marketing/hero/image-19.png"
         alt="Dishes"
         className="min-h-67 w-full object-cover"

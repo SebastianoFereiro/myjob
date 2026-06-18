@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
 
-import { Footer } from "@/components/footer";
-import Header from "@/components/header";
-import { Badge } from "@/components/ui/badge";
-import { getBlogArticleBySlug } from "@/services/blog.service";
+import { Footer } from '@/components/footer';
+import Header from '@/components/header';
+import { Badge } from '@/components/ui/badge';
+import { getBlogArticleBySlug } from '@/services/blog.service';
 
 type BlogArticlePageProps = {
   params: Promise<{
@@ -13,29 +14,27 @@ type BlogArticlePageProps = {
 };
 
 function formatDate(date: string) {
-  return new Intl.DateTimeFormat("ru-RU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
   }).format(new Date(date));
 }
 
 function splitContent(content?: string) {
-  return (content || "")
+  return (content || '')
     .split(/\n{2,}|\r\n{2,}/)
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);
 }
 
-export async function generateMetadata({
-  params,
-}: BlogArticlePageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: BlogArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
   const article = await getBlogArticleBySlug(slug);
 
   if (!article) {
     return {
-      title: "Статья не найдена | MyJOB",
+      title: 'Статья не найдена | MyJOB',
     };
   }
 
@@ -45,7 +44,7 @@ export async function generateMetadata({
     openGraph: {
       title: article.title,
       description: article.excerpt || article.title,
-      images: [article.imageUrl],
+      images: article.imageUrl ? [{ url: article.imageUrl }] : [],
     },
   };
 }
@@ -81,17 +80,21 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
 
           <section className="container py-8 md:py-12">
             <div className="mx-auto max-w-3xl">
-              <img
-                src={article.imageUrl}
-                alt={article.imageAlt}
-                className="mb-8 aspect-video w-full rounded-lg object-cover"
-              />
+              {article.imageUrl && (
+                <div className="relative mb-8 aspect-video w-full overflow-hidden rounded-lg">
+                  <Image
+                    src={article.imageUrl}
+                    alt={article.imageAlt ?? ""}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 768px"
+                    className="object-cover"
+                  />
+                </div>
+              )}
 
               <div className="space-y-5 text-base leading-8 text-muted-foreground md:text-lg">
                 {paragraphs.length > 0 ? (
-                  paragraphs.map((paragraph) => (
-                    <p key={paragraph}>{paragraph}</p>
-                  ))
+                  paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)
                 ) : (
                   <p>Материал готовится к публикации.</p>
                 )}
@@ -104,4 +107,3 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
     </>
   );
 }
-
