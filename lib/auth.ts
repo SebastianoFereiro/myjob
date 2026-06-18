@@ -34,4 +34,5 @@ export const auth = betterAuth({
     window: 60, // 1 minute
     max: 100,   // 100 requests per window
   },
+   trustedOrigins: [process.env.BETTER_AUTH_URL || "http://m.izrukvruki.by"],
 });
