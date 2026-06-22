@@ -54,14 +54,9 @@ const Header = ({ navigationData = navigationItems, className }: HeaderProps) =>
     router.refresh();
   }
 
-  const authLinks = isAuthenticated
-    ? [
-        {
-          name: isCompany ? 'Мои вакансии' : 'Мои резюме',
-          slug: isCompany ? '/company/dashboard' : '/dashboard',
-        },
-      ]
-    : [];
+  const showAuthLink = isAuthenticated;
+  const authLinkName = isCompany ? 'Мои вакансии' : 'Мои резюме';
+  const authLinkHref = isCompany ? '/company/dashboard' : '/dashboard';
 
   return (
     <header className={cn('bg-background sticky top-0 z-50 h-16 border-b', className)}>
@@ -78,7 +73,7 @@ const Header = ({ navigationData = navigationItems, className }: HeaderProps) =>
               <CategoriesDropdown />
             </NavigationMenuItem>
 
-            {[...navigationData, ...authLinks].map((navItem) => (
+            {navigationData.map((navItem) => (
               <NavigationMenuItem key={navItem.name}>
                 <NavigationMenuLink
                   href={navItem.slug}
@@ -88,6 +83,17 @@ const Header = ({ navigationData = navigationItems, className }: HeaderProps) =>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             ))}
+
+            <NavigationMenuItem
+              className={cn(!showAuthLink && 'hidden')}
+            >
+              <NavigationMenuLink
+                href={authLinkHref}
+                className="text-muted-foreground hover:text-primary px-3 py-1.5 text-base! font-medium hover:bg-transparent"
+              >
+                {authLinkName}
+              </NavigationMenuLink>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 
