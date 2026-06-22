@@ -223,7 +223,7 @@ function cvToJob(record: StrapiCVRecord): Job {
     level: record.level_job || undefined,
     education: record.education_job || undefined,
     experience: record.experience_job || undefined,
-
+    position: record.position || undefined,
     region: record.city || record.location || undefined,
     cities: record.city ? [record.city] : [],
     city: record.city || undefined,

@@ -284,6 +284,7 @@ export interface Job {
   cities?: string[];
   city?: string;
   location: string;
+  position?: string;
   employmentType: EmploymentType;
   salaryFrom?: number;
   salaryTo?: number;
