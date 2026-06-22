@@ -30,7 +30,7 @@ export function getStrapiMediaURL(url?: string | null) {
     return url;
   }
 
-  return `${getStrapiURL()}${url.startsWith("/") ? url : `/${url}`}`;
+  return `https://atlantis.myjob.by${url.startsWith("/") ? url : `/${url}`}`;
 }
 
 export async function fetchAPI<T>(
