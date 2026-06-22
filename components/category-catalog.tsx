@@ -1,14 +1,13 @@
-import * as React from "react";
-import Image from "next/image";
+import Image from 'next/image';
 
-import { getCategoriesWithCounts } from "@/services/categories.service";
+import { getCategoriesWithCounts } from '@/services/categories.service';
 
-type CategoryLayout = "default" | "wide" | "tall";
+type CategoryLayout = 'default' | 'wide' | 'tall';
 
 export type CategoryItem = {
   title: string;
   meta?: string;
-  image: string;
+  image?: string;
   alt?: string;
   href?: string;
   slug?: string;
@@ -24,71 +23,71 @@ type CategoryCatalogProps = {
 };
 
 function cx(...classes: Array<string | false | null | undefined>) {
-  return classes.filter(Boolean).join(" ");
+  return classes.filter(Boolean).join(' ');
 }
 
 const layoutClasses: Record<CategoryLayout, string> = {
-  default: "",
-  wide: "lg:col-span-2",
-  tall: "lg:row-span-2",
+  default: '',
+  wide: 'lg:col-span-2',
+  tall: 'lg:row-span-2',
 };
 
-const layouts: CategoryLayout[] = ["default", "wide", "tall", "wide", "default", "default"];
+const layouts: CategoryLayout[] = ['default', 'wide', 'tall', 'wide', 'default', 'wide', 'wide'];
 
-function mapCategoriesToItems(
-  categories: Awaited<ReturnType<typeof getCategoriesWithCounts>>,
-) {
+function mapCategoriesToItems(categories: Awaited<ReturnType<typeof getCategoriesWithCounts>>) {
   return categories
     .map((category, index) => ({
       title: category.name,
       meta: `${category.count || 0} вакансий`,
-      image: category.imageUrl || `/cat/cat-${index % 5}.png`,
+      image: category.imageUrl || `/cat/default.jpg`,
       alt: `Раздел ${category.name}`,
       href: `/jobs?category=${category.slug}#vacancies`,
       slug: category.slug,
-      layout: layouts[index] || "default",
+      layout: layouts[index] || 'default',
     }))
-    .slice(0, 6);
+    .slice(0, 7);
 }
 
-function CategoryCard({
-  item,
-  active,
-}: {
-  item: CategoryItem;
-  active: boolean;
-}) {
-  const layout = item.layout ?? "default";
+function CategoryCard({ item, active }: { item: CategoryItem; active: boolean }) {
+  const layout = item.layout ?? 'default';
 
   const cardClassName = cx(
-    "group/card relative h-60 w-full overflow-hidden rounded-3xl bg-transparent md:h-[17.5rem] lg:h-full",
-    active && "ring-4 ring-primary/70 ring-offset-2 ring-offset-background",
-    layoutClasses[layout],
+    'group/card relative h-60 w-full overflow-hidden rounded-3xl bg-transparent md:h-[17.5rem] lg:h-full',
+    active && 'ring-4 ring-primary/70 ring-offset-2 ring-offset-background',
+    layoutClasses[layout]
   );
 
   const content = (
     <div className="relative h-full w-full">
       <div
         className={cx(
-          "absolute inset-0 z-10 bg-black/40 transition-opacity duration-500 group-hover/card:opacity-100 group-focus-within/card:opacity-100",
-          active ? "opacity-100" : "opacity-0",
+          'absolute inset-0 z-10 bg-black/40 transition-opacity duration-500 group-hover/card:opacity-100 group-focus-within/card:opacity-100',
+          active ? 'opacity-100' : 'opacity-0'
         )}
       />
 
       <div className="relative h-full w-full bg-muted">
-        <Image
-          src={item.image}
-          alt={item.alt ?? item.title}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-          className="scale-[1.15] object-cover transition-transform duration-700 group-hover/card:scale-105 group-focus-within/card:scale-105"
-        />
+        {item.image ? (
+          <img
+            src={item.image}
+            alt={item.title}
+            className="h-full w-full scale-[1.15] object-cover transition-transform duration-700 group-hover/card:scale-105 group-focus-within/card:scale-105"
+          />
+        ) : (
+          <Image
+            src="/cat/default.jpg"
+            alt={item.title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            className="scale-[1.15] object-cover transition-transform duration-700 group-hover/card:scale-105 group-focus-within/card:scale-105"
+          />
+        )}
       </div>
 
       <div
         className={cx(
-          "absolute bottom-4 left-4 z-20 text-white transition-all duration-500 group-hover/card:translate-y-0 group-hover/card:opacity-100 group-focus-within/card:translate-y-0 group-focus-within/card:opacity-100",
-          active ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
+          'absolute bottom-4 left-4 z-20 text-white transition-all duration-500 group-hover/card:translate-y-0 group-hover/card:opacity-100 group-focus-within/card:translate-y-0 group-focus-within/card:opacity-100',
+          active ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'
         )}
       >
         <p className="text-xl font-bold">{item.title}</p>
@@ -102,7 +101,7 @@ function CategoryCard({
       <a
         href={item.href}
         className={cardClassName}
-        aria-current={active ? "true" : undefined}
+        aria-current={active ? 'true' : undefined}
         aria-label={`Показать вакансии: ${item.title}`}
       >
         {content}
@@ -114,16 +113,16 @@ function CategoryCard({
 }
 
 export async function CategoryCatalog({
-  eyebrow = "Разделы",
-  title = "Популярные направления",
-  description = "Выберите направление, чтобы сразу отфильтровать список вакансий ниже.",
+  eyebrow = 'Разделы',
+  title = 'Популярные направления',
+  description = 'Выберите направление, чтобы сразу отфильтровать список вакансий ниже.',
   items,
   activeCategory,
 }: CategoryCatalogProps) {
   const catalogItems = items || mapCategoriesToItems(await getCategoriesWithCounts());
 
   return (
-    <section className="relative h-full w-full overflow-hidden py-16">
+    <section className="relative h-full w-full overflow-hidden py-8">
       <div className="container relative flex h-full w-full flex-col items-center justify-center">
         <div className="relative z-10 flex max-w-3xl flex-col items-center justify-center gap-5 text-center">
           <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">

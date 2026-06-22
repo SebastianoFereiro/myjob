@@ -25,6 +25,7 @@ type StrapiCategoryRecord = {
   slug?: string;
   description?: string;
   image?: StrapiMediaField;
+  count?: number;
 };
 
 const CATEGORY_ENDPOINT = "/categories";
@@ -37,24 +38,21 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-function resolveMediaURL(media?: StrapiMediaField) {
-  if (typeof media === "string") {
-    return getStrapiMediaURL(media);
-  }
-
-  return getStrapiMediaURL(
-    media?.url || media?.data?.attributes?.url || undefined,
-  );
+function getImageUrl(image?: StrapiMediaField): string | undefined {
+  if (!image) return undefined;
+  if (typeof image === "string") return getStrapiMediaURL(image);
+  return getStrapiMediaURL(image.url);
 }
 
-function  mapStrapiCategory(record: StrapiCategoryRecord): JobCategory {
+function mapStrapiCategory(record: StrapiCategoryRecord): JobCategory {
   const name = record.name || record.title || "Категория";
 
   return {
     slug: record.slug || slugify(name),
     name,
-    description: record.description,
-    imageUrl: resolveMediaURL(record.image),
+    description: record.description || "",
+    imageUrl: getImageUrl(record.image),
+    count: record.count ?? 0,
   };
 }
 
@@ -72,12 +70,15 @@ export async function getCategories() {
       `${CATEGORY_ENDPOINT}?${params.toString()}`,
       { next: { revalidate: 1, tags: ["categories"] } },
     );
-   
     const categories = response.data
       .map((record) => mapStrapiCategory(unwrapStrapiRecord(record)))
-      .filter((category) => Boolean(category.slug && category.name));
+      .sort((a, b) => {
+        if (a.imageUrl && !b.imageUrl) return -1;
+        if (!a.imageUrl && b.imageUrl) return 1;
+        return 0;
+      });
     
-    return  categories 
+    return  categories
   } catch {
     console.log('Failed to fetch categories from Strapi, using fallback data.');
     return [];

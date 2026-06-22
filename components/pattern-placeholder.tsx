@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { CategoryCatalog } from '@/components/category-catalog';
+import { CategoryCatalog, type CategoryItem } from '@/components/category-catalog';
 import { BlogLatestTech, type BlogPost } from '@/components/blog-latest-tech';
 import { Button } from '@/components/ui/button';
 import { getBlogArticles } from '@/services/blog.service';
@@ -16,8 +16,22 @@ function formatDate(date: string) {
   }).format(new Date(date));
 }
 
+const layouts: Array<'default' | 'wide' | 'tall'> = ['default', 'wide', 'tall', 'wide', 'default', 'wide', 'wide'];
+
 const PatternPlaceholder = async () => {
-  const [articles, categories] = await Promise.all([getBlogArticles(5), getCategoriesWithCounts()]);
+  const [articles, categories] = await Promise.all([
+    getBlogArticles(5),
+    getCategoriesWithCounts(),
+  ]);
+  const cat: CategoryItem[] = categories.slice(0, 7).map((category, index) => ({
+    title: category.name,
+    meta: `${category.count || 0} вакансий`,
+    image: category.imageUrl || `/cat/default.jpg`,
+    alt: `Раздел ${category.name}`,
+    href: `/jobs?category=${category.slug}#vacancies`,
+    slug: category.slug,
+    layout: layouts[index] || 'default',
+  }));
   const posts: BlogPost[] = articles.map((article) => ({
     href: `/blog/${article.slug}`,
     imageSrc: article.imageUrl || '/images/blog-1.png',
@@ -27,7 +41,6 @@ const PatternPlaceholder = async () => {
     author: article.author,
     excerpt: article.excerpt,
   }));
-
   return (
     <div className="relative z-10">
       <div className="container py-28 md:py-32">
@@ -51,7 +64,7 @@ const PatternPlaceholder = async () => {
           <Suspense fallback={null}>
             <SearchFilters categories={categories} />
           </Suspense>
-          <CategoryCatalog />
+          <CategoryCatalog items={cat} />
           <Feature154 />
           <ToolsStackSection />
           <BlogLatestTech posts={posts} />

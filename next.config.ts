@@ -8,6 +8,12 @@ const nextConfig: NextConfig = {
         hostname: "atlantis.myjob.by",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "http",
+        hostname: "10.0.15.202",
+        port: "1337",
+        pathname: "/uploads/**",
+      },
     ],
   },
 };

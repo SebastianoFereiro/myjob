@@ -1,103 +1,52 @@
-﻿import {
-  BriefcaseBusiness,
-  Calculator,
-  Code2,
-  HeartPulse,
-  Megaphone,
-  Truck,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import Link from 'next/link';
 
-import { Card } from "@/components/ui/card";
+import { Card } from '@/components/ui/card';
+import { getCategoriesWithCounts } from '@/services/categories.service';
 
-type Direction = {
-  name: string;
-  desc: string;
-  count: string;
-  icon: LucideIcon;
-};
+export async function ToolsStackSection() {
+  const categories = await getCategoriesWithCounts();
+  const top = categories
+    .filter((c) => (c.count ?? 0) > 0)
+    .sort((a, b) => (b.count ?? 0) - (a.count ?? 0))
+    .slice(0, 6);
 
-const directions: Direction[] = [
-  {
-    name: "Логистика",
-    desc: "склад, транспорт, закупки",
-    count: "38",
-    icon: Truck,
-  },
-  {
-    name: "Продажи",
-    desc: "клиенты, retail, b2b",
-    count: "44",
-    icon: BriefcaseBusiness,
-  },
-  {
-    name: "IT",
-    desc: "разработка, аналитика, поддержка",
-    count: "27",
-    icon: Code2,
-  },
-  {
-    name: "Финансы",
-    desc: "бухгалтерия, аудит, экономика",
-    count: "31",
-    icon: Calculator,
-  },
-  {
-    name: "Медицина",
-    desc: "клиники, уход, специалисты",
-    count: "22",
-    icon: HeartPulse,
-  },
-  {
-    name: "Маркетинг",
-    desc: "реклама, PR, контент",
-    count: "18",
-    icon: Megaphone,
-  },
-];
-
-function DirectionCard({ direction }: { direction: Direction }) {
-  const Icon = direction.icon;
+  if (top.length === 0) return null;
 
   return (
-    <Card className="bg-hatch rounded-2xl p-2 border-0 shadow-none">
-     <div className="flex items-center justify-between gap-2 md:gap-10">
-        <div className="flex items-center gap-4">
-          <div className="flex  items-center justify-center rounded-2xl bg-background/70 p-2">
-            <Icon className="size-8 text-foreground" aria-hidden="true" />
-          </div>
-
-          <div>
-            <h3 className="text-xl font-semibold tracking-tight">
-              {direction.name}
-            </h3>
-            <p className="text-xs md:text-sm uppercase text-foreground/50">
-              {direction.desc}
-            </p>
-          </div>
-        </div>
-
-        <div className="pr-2 md:pr-5 text-right font-semibold uppercase">
-          <span className="block text-2xl leading-none">{direction.count}</span>
-          <span className="text-xs text-foreground/50">вакансий</span>
-        </div>
-      </div>
-    </Card>
-  );
-}
-
-export function ToolsStackSection() {
-  return (
-    <section id="vacancies" className="py-16 sm:py-18 lg:py-18 w-full">
-      <div className="mx-auto max-w-6xl px-4 space-y-10">
+    <section id="vacancies" className="w-full py-8">
+      <div className="mx-auto max-w-6xl space-y-10 px-4">
         <h2 className="mb-6 pb-6 text-4xl font-medium tracking-tight text-pretty text-foreground md:text-5xl lg:text-6xl">
           Вакансии по направлениям
         </h2>
 
         <ul className="relative grid w-full gap-3 lg:grid-cols-2">
-          {directions.map((direction) => (
-            <li key={direction.name}>
-              <DirectionCard direction={direction} />
+          {top.map((category) => (
+            <li key={category.slug}>
+              <Link href={`/jobs?category=${category.slug}#vacancies`} className="block">
+                <Card className="bg-hatch rounded-2xl border-0 p-2 shadow-none transition-colors hover:bg-accent/50">
+                  <div className="flex items-center justify-between gap-2 md:gap-10">
+                    <div className="flex items-center gap-4">
+                      <div className="flex size-12 items-center justify-center rounded-2xl bg-background/70 text-lg font-bold text-foreground">
+                        {category.name.charAt(0).toUpperCase()}
+                      </div>
+
+                      <div>
+                        <h3 className="text-xl font-semibold tracking-tight">{category.name}</h3>
+                        {category.description ? (
+                          <p className="text-xs uppercase text-foreground/50 md:text-sm">
+                            {category.description}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    <div className="pr-2 text-right font-semibold uppercase md:pr-5">
+                      <span className="block text-2xl leading-none">{category.count ?? 0}</span>
+                      <span className="text-xs text-foreground/50">вакансий</span>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
             </li>
           ))}
         </ul>
