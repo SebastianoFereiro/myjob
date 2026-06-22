@@ -63,12 +63,16 @@ const educationOptions: { value: CvEducationJob; label: string }[] = [
 ];
 
 interface Props {
-  company: CompanyRef;
+  company?: CompanyRef;
 }
 
-export function CvForm({ company }: Props) {
+export function CvForm({ company: initialCompany }: Props) {
   const router = useRouter();
   const { data: session } = authClient.useSession();
+  const [company] = useState<CompanyRef | null>(
+    initialCompany ?? ((session?.user as { company?: CompanyRef } | undefined)?.company ?? null),
+  );
+  if (!company) return <div className="flex justify-center py-8"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -92,7 +96,7 @@ export function CvForm({ company }: Props) {
     education_job: '',
     deadline: '',
     isActive: true,
-    companyDocumentId: company.documentId,
+    companyDocumentId: company!.documentId,
     categoryDocumentId: null,
   });
 
@@ -182,7 +186,7 @@ export function CvForm({ company }: Props) {
             >
               <Building2 className="size-4 shrink-0" />
               <span className="font-medium text-foreground">
-                {company.name || 'Загрузка...'}
+                {company!.name || 'Загрузка...'}
               </span>
             </div>
             <p className="text-xs text-muted-foreground">

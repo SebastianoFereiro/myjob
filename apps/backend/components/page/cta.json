@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_page_ctas",
+  "info": {
+    "displayName": "CTA",
+    "icon": "arrow-right",
+    "description": "Призыв к действию"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "button_text": {
+      "type": "string",
+      "required": true
+    },
+    "button_url": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

@@ -153,6 +153,101 @@ export interface ResumeEducation {
   end_date: string | null;
 }
 
+// ========================================================================
+// PAGE
+// ========================================================================
+export interface PageHeroBlock {
+  __component: 'page.hero';
+  id: string;
+  title: string;
+  subtitle: string | null;
+  image: string | null;
+}
+
+export interface PageRichTextBlock {
+  __component: 'page.rich-text';
+  id: string;
+  content: string;
+}
+
+export interface PageFaqBlock {
+  __component: 'page.faq';
+  id: string;
+  title: string | null;
+  items: Array<{ question: string; answer: string }>;
+}
+
+export interface PageContactInfoBlock {
+  __component: 'page.contact-info';
+  id: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  work_hours: string | null;
+}
+
+export interface PagePricingTableBlock {
+  __component: 'page.pricing-table';
+  id: string;
+  title: string | null;
+  items: Array<{
+    name: string;
+    price: string;
+    period: string;
+    features: string[];
+    highlighted: boolean;
+    button_text: string;
+    button_url: string;
+  }>;
+}
+
+export interface PageTeamBlock {
+  __component: 'page.team';
+  id: string;
+  title: string | null;
+  members: Array<{
+    name: string;
+    role: string;
+    bio: string;
+    photo_url: string;
+  }>;
+}
+
+export interface PageCtaBlock {
+  __component: 'page.cta';
+  id: string;
+  title: string;
+  description: string | null;
+  button_text: string;
+  button_url: string;
+}
+
+export type PageBlock =
+  | PageHeroBlock
+  | PageRichTextBlock
+  | PageFaqBlock
+  | PageContactInfoBlock
+  | PagePricingTableBlock
+  | PageTeamBlock
+  | PageCtaBlock;
+
+export type FooterGroup = 'seekers' | 'employers' | 'company' | 'bottom' | 'none';
+
+export interface Page {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  meta_description: string | null;
+  blocks: PageBlock[];
+  footer_group: FooterGroup;
+  footer_order: number | null;
+  footer_label: string | null;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type Currency = 'BYN' | 'USD' | 'EUR';
 
 // ========================================================================

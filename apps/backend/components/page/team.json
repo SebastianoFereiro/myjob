@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_page_teams",
+  "info": {
+    "displayName": "Team",
+    "icon": "people",
+    "description": "Блок команды"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "members": {
+      "type": "json"
+    }
+  }
+}

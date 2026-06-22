@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_page_pricing_tables",
+  "info": {
+    "displayName": "Pricing Table",
+    "icon": "price-tag",
+    "description": "Таблица тарифов"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "items": {
+      "type": "json"
+    }
+  }
+}

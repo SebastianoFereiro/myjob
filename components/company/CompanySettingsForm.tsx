@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -8,25 +8,55 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { authClient } from "@/lib/auth-client";
 import type { CompanyPublic } from "@/services/companies.service";
 
 interface CompanySettingsFormProps {
-  company: CompanyPublic;
+  company?: CompanyPublic;
 }
 
-export function CompanySettingsForm({ company }: CompanySettingsFormProps) {
-  const [name, setName] = useState(company.name || "");
-  const [description, setDescription] = useState(company.description || "");
-  const [siteUrl, setSiteUrl] = useState(company.siteUrl || "");
-  const [address, setAddress] = useState(company.location || company.address || "");
-  const [phone, setPhone] = useState(company.phone || "");
-  const [email, setEmail] = useState(company.email || "");
+export function CompanySettingsForm({ company: initialCompany }: CompanySettingsFormProps) {
+  const { data: session } = authClient.useSession();
+  const [company, setCompany] = useState<CompanyPublic | null>(initialCompany ?? null);
+  const [loadingCompany, setLoadingCompany] = useState(!initialCompany);
+  if (loadingCompany) return <div className="flex justify-center py-8"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>;
+  if (!company) return <p className="text-center text-muted-foreground py-8">Данные компании не найдены</p>;
+
+  const [name, setName] = useState(initialCompany?.name || "");
+  const [description, setDescription] = useState(initialCompany?.description || "");
+  const [siteUrl, setSiteUrl] = useState(initialCompany?.siteUrl || "");
+  const [address, setAddress] = useState(initialCompany?.location || initialCompany?.address || "");
+  const [phone, setPhone] = useState(initialCompany?.phone || "");
+  const [email, setEmail] = useState(initialCompany?.email || "");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  useEffect(() => {
+    if (initialCompany) return;
+    const companyId = (session?.user as { companyId?: string } | undefined)?.companyId;
+    if (!companyId) {
+      setLoadingCompany(false);
+      return;
+    }
+    fetch(`/api/strapi/companies/${companyId}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setCompany(data);
+        setName(data.name || "");
+        setDescription(data.description || "");
+        setSiteUrl(data.siteUrl || "");
+        setAddress(data.location || data.address || "");
+        setPhone(data.phone || "");
+        setEmail(data.email || "");
+      })
+      .catch(() => {})
+      .finally(() => setLoadingCompany(false));
+  }, [initialCompany, session]);
+
   function resetForm() {
+    if (!company) return;
     setName(company.name || "");
     setDescription(company.description || "");
     setSiteUrl(company.siteUrl || "");

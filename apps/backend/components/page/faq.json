@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_page_faqs",
+  "info": {
+    "displayName": "FAQ",
+    "icon": "question-answer",
+    "description": "Блок вопрос-ответ"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "items": {
+      "type": "json"
+    }
+  }
+}

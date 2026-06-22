@@ -1,5 +1,8 @@
 import * as React from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { getFooterPages } from "@/services/pages.service";
+import type { Page, FooterGroup } from "@/types/strapi-collections";
 
 type FooterLink = { label: string; href: string };
 
@@ -13,55 +16,82 @@ type FooterProps = {
   logoAlt?: string;
   logoHref?: string;
   description?: string;
-  columns?: FooterColumn[];
   copyright?: string;
-  bottomLinks?: FooterLink[];
 };
 
-const defaultColumns: FooterColumn[] = [
-  {
-    title: "Соискателям",
-    links: [
-      { label: "Найти работу", href: "#vacancies" },
-      { label: "Разместить резюме", href: "#resume" },
-      { label: "Каталог профессий", href: "#vacancies" },
-      { label: "Советы по поиску", href: "#" },
-    ],
-  },
-  {
-    title: "Работодателям",
-    links: [
-      { label: "Разместить вакансию", href: "#" },
-      { label: "Найти кандидатов", href: "#" },
-      { label: "Тарифы", href: "#" },
-      { label: "Поддержка", href: "#" },
-    ],
-  },
-  {
-    title: "MyJOB",
-    links: [
-      { label: "О проекте", href: "#" },
-      { label: "Компании", href: "#" },
-      { label: "Контакты", href: "#" },
-      { label: "Помощь", href: "#" },
-    ],
-  },
-];
+// Slug -> href mapping for footer-only pages (no public URL)
+const footerHrefMap: Record<string, string> = {
+  "find-job": "/jobs",
+  "submit-resume": "/resume/submit",
+  professions: "/categories",
+  tips: "/help",
+  "post-vacancy": "/company/dashboard",
+  "find-candidates": "/companies",
+  support: "/contacts",
+  companies: "/companies",
+  contacts: "/contacts",
+};
 
-const defaultBottomLinks: FooterLink[] = [
-  { label: "Пользовательское соглашение", href: "#" },
-  { label: "Политика конфиденциальности", href: "#" },
-];
+function getPageHref(page: Page): string {
+  return footerHrefMap[page.slug] ?? `/${page.slug}`;
+}
 
-export function Footer({
+const groupLabels: Record<Exclude<FooterGroup, "none">, string> = {
+  seekers: "Соискателям",
+  employers: "Работодателям",
+  company: "MyJOB",
+  bottom: "",
+};
+
+function groupPages(pages: Page[]): FooterColumn[] {
+  const groups: Record<string, Page[]> = {};
+
+  for (const page of pages) {
+    const group = page.footer_group;
+    if (group === "none") continue;
+    if (!groups[group]) groups[group] = [];
+    groups[group].push(page);
+  }
+
+  const columns: FooterColumn[] = [];
+
+  // Non-bottom groups
+  for (const group of ["seekers", "employers", "company"] as const) {
+    const items = groups[group];
+    if (!items?.length) continue;
+    columns.push({
+      title: groupLabels[group],
+      links: items.map((p) => ({
+        label: p.footer_label ?? p.title,
+        href: getPageHref(p),
+      })),
+    });
+  }
+
+  return columns;
+}
+
+function getBottomLinks(pages: Page[]): FooterLink[] {
+  return (pages
+    .filter((p) => p.footer_group === "bottom")
+    .sort((a, b) => (a.footer_order ?? 0) - (b.footer_order ?? 0))
+    .map((p) => ({
+      label: p.footer_label ?? p.title,
+      href: getPageHref(p),
+    })));
+}
+
+export async function Footer({
   logoSrc = "/images/logo-by.png",
   logoAlt = "MyJOB",
   logoHref = "/",
   description = "Вакансии, компании и карьерные возможности для людей, на которых все держится.",
-  columns = defaultColumns,
   copyright = "© 2026 MyJOB. Все права защищены.",
-  bottomLinks = defaultBottomLinks,
 }: FooterProps) {
+  const pages = await getFooterPages();
+  const columns = groupPages(pages);
+  const bottomLinks = getBottomLinks(pages);
+
   return (
     <section className="w-full bg-muted">
       <div className="container mx-auto py-16 lg:py-20">
@@ -95,7 +125,7 @@ export function Footer({
                 <ul className="space-y-4 text-sm text-muted-foreground">
                   {col.links.map((link) => (
                     <li key={link.label} className="font-medium hover:text-primary">
-                      <a href={link.href}>{link.label}</a>
+                      <Link href={link.href}>{link.label}</Link>
                     </li>
                   ))}
                 </ul>
@@ -109,13 +139,15 @@ export function Footer({
         <div className="container mx-auto flex flex-col justify-between gap-4 py-4 text-xs font-medium text-muted-foreground md:flex-row md:items-center">
           <p>{copyright}</p>
 
-          <ul className="flex flex-wrap gap-x-4 gap-y-2">
-            {bottomLinks.map((link) => (
-              <li key={link.label} className="underline hover:text-primary">
-                <a href={link.href}>{link.label}</a>
-              </li>
-            ))}
-          </ul>
+          {bottomLinks.length > 0 ? (
+            <ul className="flex flex-wrap gap-x-4 gap-y-2">
+              {bottomLinks.map((link) => (
+                <li key={link.label} className="underline hover:text-primary">
+                  <Link href={link.href}>{link.label}</Link>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </div>
       </div>
     </section>

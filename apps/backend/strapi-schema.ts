@@ -481,6 +481,70 @@ export const ResumeSchema = {
 } as const;
 
 // ========================================================================
+// 7. КОЛЛЕКЦИЯ: Page
+// ========================================================================
+// Тип: Collection Type
+// API ID: page, pages
+// Атрибуты: title, slug, meta_description, blocks (dynamic zone), footer_*
+// ========================================================================
+
+export const PageSchema = {
+  collectionName: 'pages',
+  info: {
+    singularName: 'page',
+    pluralName: 'pages',
+    displayName: 'Page',
+    description: 'Статические страницы с динамическими блоками',
+  },
+  options: {
+    draftAndPublish: true,
+  },
+  pluginOptions: {},
+  attributes: {
+    title: {
+      type: 'string',
+      required: true,
+      maxLength: 200,
+    },
+    slug: {
+      type: 'uid',
+      targetField: 'title',
+      required: true,
+    },
+    meta_description: {
+      type: 'text',
+      maxLength: 320,
+    },
+    blocks: {
+      type: 'dynamiczone',
+      components: [
+        'page.hero',
+        'page.rich-text',
+        'page.faq',
+        'page.contact-info',
+        'page.pricing-table',
+        'page.team',
+        'page.cta',
+      ],
+    },
+    footer_group: {
+      type: 'enumeration',
+      enum: ['seekers', 'employers', 'company', 'bottom', 'none'],
+      required: true,
+      default: 'none',
+    },
+    footer_order: {
+      type: 'integer',
+      min: 0,
+    },
+    footer_label: {
+      type: 'string',
+      maxLength: 100,
+    },
+  },
+} as const;
+
+// ========================================================================
 // ВСПОМОГАТЕЛЬНЫЕ JSON-ТИПЫ (не коллекции, а структуры внутри JSON полей)
 // ========================================================================
 
