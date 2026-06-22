@@ -45,9 +45,7 @@ export function JobCard({ job }: { job: Job }) {
               {employmentLabels[job.employmentType]}
             </Badge>
           </div>
-          <p className="text-[13px] text-muted-foreground truncate">
-            {job.company.name}
-          </p>
+          <p className="text-[13px] text-muted-foreground truncate">{job.company.name}</p>
         </div>
       </CardHeader>
 
@@ -87,7 +85,10 @@ export function JobCard({ job }: { job: Job }) {
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <MapPin className="size-3.5 shrink-0" />
-            <span className="truncate">{job.location}</span>
+            <span className="truncate">
+              {' '}
+              {job.city} {job.location}
+            </span>
           </span>
           <span className="inline-flex items-center gap-1.5 font-medium text-foreground/80">
             <BriefcaseBusiness className="size-3.5 shrink-0" />

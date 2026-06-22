@@ -61,7 +61,7 @@ export function JobDetails({ job }: { job: Job }) {
           <div className="mt-5 flex flex-wrap gap-4 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
               <MapPin className="size-4" />
-              {job.location}
+              {job.city ? `${job.city},` : ''} {job.location}
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
               <Layers3 className="size-4" />

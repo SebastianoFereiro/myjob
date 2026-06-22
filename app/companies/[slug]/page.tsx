@@ -193,7 +193,7 @@ export default async function CompanyDetailsPage({ params }: Props) {
                                 </div>
                               )}
                               <div className="rounded-full bg-zinc-100 px-3 py-1.5">
-                                {job.location}
+                                {job.city ? `${job.city},` : ''} {job.location}
                               </div>
                               <div className="rounded-full bg-zinc-100 px-3 py-1.5">
                                 {job.employmentType === 'full-time'

@@ -140,7 +140,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                       </Link>
                       <span className="inline-flex items-center gap-2">
                         <MapPin className="size-4" />
-                        {job.location}
+                        {job.city ? `${job.city},` : ''} {job.location}
                       </span>
                       <span className="inline-flex items-center gap-2">
                         <BriefcaseBusiness className="size-4" />
