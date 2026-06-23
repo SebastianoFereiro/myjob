@@ -1,22 +1,14 @@
-import type { Metadata } from "next";
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Globe,
-  Clock3,
-  Send,
-} from "lucide-react";
+import type { Metadata } from 'next';
+import { Mail, Phone, MapPin, Globe, Clock3, Send } from 'lucide-react';
 
-import Header from "@/components/header";
-import { Footer } from "@/components/footer";
+import Header from '@/components/header';
+import { Footer } from '@/components/footer';
 
-import { navigationItems } from "@/app/data/navigation";
+import { navigationItems } from '@/app/data/navigation';
 
 export const metadata: Metadata = {
-  title: "Контакты | MyJOB",
-  description:
-    "Свяжитесь с командой MyJOB для сотрудничества, поддержки и размещения вакансий.",
+  title: 'Контакты | MyJOB',
+  description: 'Свяжитесь с командой MyJOB для сотрудничества, поддержки и размещения вакансий.',
 };
 
 export default function ContactsPage() {
@@ -34,13 +26,10 @@ export default function ContactsPage() {
                   CONTACT MYJOB
                 </div>
 
-                <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
-                  Контакты
-                </h1>
+                <h1 className="text-4xl font-bold tracking-tight md:text-6xl">Контакты</h1>
 
                 <p className="mt-5 text-base leading-8 text-muted-foreground md:text-lg">
-                  Свяжитесь с командой MyJOB по вопросам
-                  сотрудничества, размещения вакансий,
+                  Свяжитесь с командой MyJOB по вопросам сотрудничества, размещения вакансий,
                   поддержки или рекламы.
                 </p>
               </div>
@@ -54,21 +43,15 @@ export default function ContactsPage() {
             {/* LEFT */}
             <div className="rounded-[32px] border bg-white p-6 shadow-sm md:p-8">
               <div className="mb-8">
-                <h2 className="text-2xl font-semibold md:text-3xl">
-                  Напишите нам
-                </h2>
+                <h2 className="text-2xl font-semibold md:text-3xl">Напишите нам</h2>
 
-                <p className="mt-3 text-muted-foreground">
-                  Мы отвечаем в течение 24 часов.
-                </p>
+                <p className="mt-3 text-muted-foreground">Мы отвечаем в течение 24 часов.</p>
               </div>
 
               <form className="space-y-5">
                 <div className="grid gap-5 md:grid-cols-2">
                   <div>
-                    <label className="mb-2 block text-sm font-medium">
-                      Ваше имя
-                    </label>
+                    <label className="mb-2 block text-sm font-medium">Ваше имя</label>
 
                     <input
                       type="text"
@@ -78,9 +61,7 @@ export default function ContactsPage() {
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-sm font-medium">
-                      Email
-                    </label>
+                    <label className="mb-2 block text-sm font-medium">Email</label>
 
                     <input
                       type="email"
@@ -91,9 +72,7 @@ export default function ContactsPage() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium">
-                    Тема
-                  </label>
+                  <label className="mb-2 block text-sm font-medium">Тема</label>
 
                   <input
                     type="text"
@@ -103,9 +82,7 @@ export default function ContactsPage() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium">
-                    Сообщение
-                  </label>
+                  <label className="mb-2 block text-sm font-medium">Сообщение</label>
 
                   <textarea
                     rows={6}
@@ -128,9 +105,7 @@ export default function ContactsPage() {
             <aside className="space-y-6">
               {/* CONTACT INFO */}
               <div className="rounded-[32px] border bg-white p-6 shadow-sm md:p-7">
-                <h3 className="mb-6 text-2xl font-semibold">
-                  Контактная информация
-                </h3>
+                <h3 className="mb-6 text-2xl font-semibold">Контактная информация</h3>
 
                 <div className="space-y-5">
                   <div className="flex items-start gap-4">
@@ -139,15 +114,10 @@ export default function ContactsPage() {
                     </div>
 
                     <div>
-                      <p className="text-sm text-muted-foreground">
-                        Email
-                      </p>
+                      <p className="text-sm text-muted-foreground">Email</p>
 
-                      <a
-                        href="mailto:contact@myjob.com"
-                        className="font-medium hover:underline"
-                      >
-                        contact@myjob.com
+                      <a href="mailto:contact@myJOB.by" className="font-medium hover:underline">
+                        contact@myJOB.by
                       </a>
                     </div>
                   </div>
@@ -158,14 +128,9 @@ export default function ContactsPage() {
                     </div>
 
                     <div>
-                      <p className="text-sm text-muted-foreground">
-                        Телефон
-                      </p>
+                      <p className="text-sm text-muted-foreground">Телефон</p>
 
-                      <a
-                        href="tel:+375291234567"
-                        className="font-medium hover:underline"
-                      >
+                      <a href="tel:+375291234567" className="font-medium hover:underline">
                         +375 (29) 123-45-67
                       </a>
                     </div>
@@ -177,13 +142,9 @@ export default function ContactsPage() {
                     </div>
 
                     <div>
-                      <p className="text-sm text-muted-foreground">
-                        Адрес
-                      </p>
+                      <p className="text-sm text-muted-foreground">Адрес</p>
 
-                      <p className="font-medium">
-                        Минск, Беларусь
-                      </p>
+                      <p className="font-medium">Минск, Беларусь</p>
                     </div>
                   </div>
 
@@ -193,16 +154,14 @@ export default function ContactsPage() {
                     </div>
 
                     <div>
-                      <p className="text-sm text-muted-foreground">
-                        Сайт
-                      </p>
+                      <p className="text-sm text-muted-foreground">Сайт</p>
 
                       <a
-                        href="https://myjob.com"
+                        href="https://myJOB.by"
                         target="_blank"
                         className="font-medium hover:underline"
                       >
-                        myjob.com
+                        myJOB.by
                       </a>
                     </div>
                   </div>
@@ -213,13 +172,9 @@ export default function ContactsPage() {
                     </div>
 
                     <div>
-                      <p className="text-sm text-muted-foreground">
-                        Время работы
-                      </p>
+                      <p className="text-sm text-muted-foreground">Время работы</p>
 
-                      <p className="font-medium">
-                        Пн–Пт • 09:00–18:00
-                      </p>
+                      <p className="font-medium">Пн–Пт • 09:00–18:00</p>
                     </div>
                   </div>
                 </div>
@@ -227,13 +182,11 @@ export default function ContactsPage() {
 
               {/* CTA */}
               <div className="rounded-[32px] bg-black p-6 text-white shadow-xl md:p-7">
-                <h3 className="text-2xl font-semibold">
-                  Разместить вакансию
-                </h3>
+                <h3 className="text-2xl font-semibold">Разместить вакансию</h3>
 
                 <p className="mt-3 text-sm leading-7 text-zinc-400">
-                  Свяжитесь с нами для публикации вакансий,
-                  брендирования компании и premium размещения.
+                  Свяжитесь с нами для публикации вакансий, брендирования компании и premium
+                  размещения.
                 </p>
 
                 <button className="mt-6 w-full rounded-2xl bg-white px-5 py-3 font-medium text-black transition hover:scale-[1.02]">
