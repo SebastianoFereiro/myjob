@@ -202,7 +202,7 @@ function cvToJob(record: StrapiCVRecord): Job {
   const company = extractCompany(record);
   const primaryCategory = extractCategory(record) ?? null;
 
-  const id = String(record.id ?? record.documentId ?? record.slug ?? record.title);
+  const id = String(record.documentId ?? record.id ?? record.slug ?? record.title);
 
   return {
     id,
@@ -340,12 +340,12 @@ export async function getJobBySlug(slug: string) {
   }
 }
 
-export async function getJobById(id: string | number) {
-  if (!id) return null;
+export async function getJobByDocumentId(documentId: string) {
+  if (!documentId) return null;
 
   try {
     const params = buildPopulateParams();
-    params.set("filters[id][$eq]", String(id));
+    params.set("filters[documentId][$eq]", documentId);
 
     const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
       `${CV_ENDPOINT}?${params.toString()}`,

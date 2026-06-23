@@ -17,7 +17,7 @@ import Header from '@/components/header';
 import { JobDetails } from '@/components/jobs/job-details';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { getJobById } from '@/services/jobs.service';
+import { getJobByDocumentId } from '@/services/jobs.service';
 import type { EmploymentType, Job } from '@/types/jobs';
 
 type JobDetailsPageProps = {
@@ -69,7 +69,7 @@ function parseSlugId(rawSlug: string) {
 export async function generateMetadata({ params }: JobDetailsPageProps): Promise<Metadata> {
   const rawSlug = (await params).slug;
   const { id } = parseSlugId(rawSlug);
-  const job = await getJobById(id);
+  const job = await getJobByDocumentId(id);
 
   if (!job) {
     return {
@@ -86,7 +86,7 @@ export async function generateMetadata({ params }: JobDetailsPageProps): Promise
 export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
   const rawSlug = (await params).slug;
   const { id } = parseSlugId(rawSlug);
-  const job = await getJobById(id);
+  const job = await getJobByDocumentId(id);
 
   if (!job) {
     notFound();

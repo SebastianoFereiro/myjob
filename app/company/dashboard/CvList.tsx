@@ -186,7 +186,7 @@ export function CvList() {
               </Button>
               <Button variant="ghost" size="sm" asChild className="h-8 px-2.5 sm:h-9 sm:px-3">
                 <Link
-                  href={`/jobs/${vacancy.slug}-${vacancy.strapiId || vacancy.id}`}
+                  href={`/jobs/${vacancy.slug}-${vacancy.documentId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
