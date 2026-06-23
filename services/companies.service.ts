@@ -78,6 +78,7 @@ export async function getCompanies(): Promise<CompanyPublic[]> {
     const params = new URLSearchParams();
     params.set("sort[0]", "name:asc");
     params.set("pagination[pageSize]", "100");
+    params.set("populate[logo]", "true");
 
     const response = await fetchAPI<StrapiListResponse<StrapiCompanyRecord>>(
       `${COMPANY_ENDPOINT}?${params.toString()}`,
@@ -99,6 +100,7 @@ export async function getCompanyBySlug(slug: string): Promise<CompanyPublic | nu
     const params = new URLSearchParams();
     params.set("filters[slug][$eq]", slug);
     params.set("pagination[pageSize]", "1");
+    params.set("populate[logo]", "true");
 
     const response = await fetchAPI<StrapiListResponse<StrapiCompanyRecord>>(
       `${COMPANY_ENDPOINT}?${params.toString()}`,
@@ -119,7 +121,7 @@ export async function getCompanyByDocumentId(documentId: string): Promise<Compan
 
   try {
     const response = await fetchAPI<StrapiSingleResponse<StrapiCompanyRecord>>(
-      `${COMPANY_ENDPOINT}/${documentId}`,
+      `${COMPANY_ENDPOINT}/${documentId}?populate[logo]=true`,
       { next: { revalidate: 1, tags: ["companies"] } },
     );
 

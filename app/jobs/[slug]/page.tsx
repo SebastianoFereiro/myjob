@@ -109,13 +109,13 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
               <div className="flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
                 <div className="flex flex-col gap-5 sm:flex-row">
                   <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border bg-muted">
-                    {job.company.logoUrl ? (
+                    {job.image ? (
                       <Image
-                        src={job.company.logoUrl}
+                        src={job.image}
                         alt={job.company.name}
-                        width={48}
-                        height={48}
-                        className="h-12 w-12 object-contain"
+                        fill
+                        className="object-cover !relative rounded-lg"
+                        sizes="80px"
                       />
                     ) : (
                       <Building2 className="size-9 text-muted-foreground" />

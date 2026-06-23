@@ -27,13 +27,20 @@ type StrapiMediaField =
   | {
       url?: string;
       alternativeText?: string;
-      data?: {
-        attributes?: {
-          url?: string;
-          alternativeText?: string;
-        };
-      };
+      data?:
+        | {
+            url?: string;
+            alternativeText?: string;
+          }
+        | {
+            attributes?: {
+              url?: string;
+              alternativeText?: string;
+            };
+          };
     };
+
+type StrapiMediaArray = StrapiMediaField[];
 
 type StrapiCompanyRef = {
   id?: number;
@@ -95,9 +102,9 @@ const CV_ENDPOINT = "/cvs";
 
 function buildPopulateParams(): URLSearchParams {
   const params = new URLSearchParams();
-  params.append("populate", "company");
-  params.append("populate", "category");
-  params.append("populate", "image");
+  params.append("populate[company][populate][logo]", "true");
+  params.append("populate[category]", "true");
+  params.append("populate[image]", "true");
   return params;
 }
 
@@ -123,11 +130,29 @@ function getRecordSlug(value?: string | NamedRecord | null) {
   return value.slug || (name ? slugify(name) : "");
 }
 
-function resolveMediaURL(media?: StrapiMediaField | null) {
+function resolveMediaURL(media?: StrapiMediaField | StrapiMediaArray | null) {
+  if (!media) return undefined;
+
+  // Handle array (multiple media) — take first
+  if (Array.isArray(media)) {
+    return resolveMediaURL(media[0] ?? null);
+  }
+
   if (typeof media === "string") return getStrapiMediaURL(media);
-  return getStrapiMediaURL(
-    media?.url || media?.data?.attributes?.url || undefined,
-  );
+
+  if (media.url) return getStrapiMediaURL(media.url);
+
+  const data = media.data;
+  if (data) {
+    if ("attributes" in data && data.attributes?.url) {
+      return getStrapiMediaURL(data.attributes.url);
+    }
+    if ("url" in data && data.url) {
+      return getStrapiMediaURL(data.url);
+    }
+  }
+
+  return undefined;
 }
 
 function normalizeCategoryTag(tag: StrapiCategoryRef | string): JobCategory | null {
