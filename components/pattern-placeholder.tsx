@@ -19,7 +19,7 @@ function formatDate(date: string) {
 const layouts: Array<'default' | 'wide' | 'tall'> = ['default', 'wide', 'tall', 'wide', 'default', 'wide', 'wide'];
 
 const PatternPlaceholder = async () => {
-  const [articles, categories] = await Promise.all([
+  const [{ articles }, categories] = await Promise.all([
     getBlogArticles(5),
     getCategoriesWithCounts(),
   ]);

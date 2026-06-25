@@ -62,21 +62,42 @@ function mapStrapiBlog(record: StrapiBlogRecord): BlogArticle {
   };
 }
 
-export async function getBlogArticles(limit?: number) {
+export type BlogListResult = {
+  articles: BlogArticle[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    pageCount: number;
+    total: number;
+  };
+};
+
+export async function getBlogArticles(
+  page = 1,
+  pageSize = 20,
+): Promise<BlogListResult> {
   const params = new URLSearchParams();
   params.set("populate", "*");
   params.set("sort[0]", "publishedAt:desc");
-  params.set("pagination[page]", "1");
-  params.set("pagination[pageSize]", String(limit || 24));
+  params.set("pagination[page]", String(page));
+  params.set("pagination[pageSize]", String(pageSize));
 
   const response = await fetchAPI<StrapiListResponse<StrapiBlogRecord>>(
     `${BLOG_ENDPOINT}?${params.toString()}`,
     { next: { revalidate: 300, tags: ["blog"] } },
   );
 
-  return response.data
-    .map((record) => mapStrapiBlog(unwrapStrapiRecord(record)))
-    .filter((article) => Boolean(article.slug && article.title));
+  return {
+    articles: response.data
+      .map((record) => mapStrapiBlog(unwrapStrapiRecord(record)))
+      .filter((article) => Boolean(article.slug && article.title)),
+    pagination: response.meta?.pagination || {
+      page: 1,
+      pageSize,
+      pageCount: 0,
+      total: 0,
+    },
+  };
 }
 
 export async function getBlogArticleBySlug(slug: string) {
