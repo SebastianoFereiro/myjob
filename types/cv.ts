@@ -1,3 +1,5 @@
+import type { SeoMetadata } from '@/types/seo';
+
 export type CvEmploymentType =
   | 'Полная занятость'
   | 'Частичная занятость'
@@ -84,7 +86,7 @@ export interface CvVacancy {
   category: CategoryRef | null;
 
   image?: unknown;
-  SEO?: unknown[];
+  SEO?: SeoMetadata | null;
   Profile?: unknown[];
 
   createdAt: string;

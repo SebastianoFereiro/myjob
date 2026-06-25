@@ -9,6 +9,7 @@ import type { JobFilters } from "@/types/jobs";
 import Header from "@/components/header";
 import { navigationItems } from "@/app/data/navigation";
 import { Footer } from "@/components/footer";
+import { extractSeoMetadata } from "@/lib/extract-seo";
 
 type Props = {
   params: Promise<{
@@ -27,15 +28,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const categoryName = await getCategoryName(category);
 
   if (!categoryName) {
-    return {
-      title: "Категория не найдена",
-    };
+    return { title: "Категория не найдена" };
   }
 
-  return {
-    title: `${categoryName} - Резюме и вакансии | MyJOB`,
-    description: `Профессионалы и вакансии в категории "${categoryName}". Найди свою идеальную работу на MyJOB.`,
-  };
+  return extractSeoMetadata({
+    fallbackTitle: `${categoryName} - Резюме и вакансии`,
+    fallbackDescription: `Профессионалы и вакансии в категории "${categoryName}". Найди свою идеальную работу на MyJOB.`,
+  });
 }
 
 export default async function CategoryPage({ params }: Props) {

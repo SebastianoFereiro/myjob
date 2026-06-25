@@ -34,12 +34,12 @@ const PatternPlaceholder = async () => {
   }));
   const posts: BlogPost[] = articles.map((article) => ({
     href: `/blog/${article.slug}`,
-    imageSrc: article.imageUrl || '/images/blog-1.png',
-    imageAlt: article.imageAlt || '',
+    imageSrc: article.coverUrl,
+    imageAlt: article.coverAlt,
     title: article.title,
     date: formatDate(article.publishedAt),
     author: article.author,
-    excerpt: article.excerpt,
+    excerpt: article.excerpt ?? undefined,
   }));
   return (
     <div className="relative z-10">

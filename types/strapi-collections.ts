@@ -5,6 +5,8 @@
 // Источник истины: apps/backend/strapi-schema.ts
 // ========================================================================
 
+import type { SeoMetadata } from '@/types/seo';
+
 // ========================================================================
 // COMPANY
 // ========================================================================
@@ -89,26 +91,20 @@ export interface Category {
 // ========================================================================
 export interface BlogPost {
   id: number;
+  documentId: string;
   title: string;
   slug: string;
-  excerpt: string;
+  excerpt: string | null;
   content: string;
-  cover_image: string | null;
-  categories: Category[];
-  author: Author;
+  images: Array<{
+    id: number;
+    url: string;
+    alternativeText: string | null;
+  }>;
+  author: string;
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
-}
-
-// ========================================================================
-// AUTHOR
-// ========================================================================
-export interface Author {
-  id: number;
-  name: string;
-  avatar: string | null;
-  bio: string | null;
 }
 
 // ========================================================================
@@ -238,8 +234,8 @@ export interface Page {
   documentId: string;
   title: string;
   slug: string;
-  meta_description: string | null;
   blocks: PageBlock[];
+  SEO?: SeoMetadata | null;
   footer_group: FooterGroup;
   footer_order: number | null;
   footer_label: string | null;
@@ -301,6 +297,7 @@ export interface Job {
   isActive?: boolean;
   sortOrder?: number;
   image?: string;
+  SEO?: SeoMetadata | null;
 }
 
 export interface JobFilters {

@@ -4,6 +4,7 @@ import {
   unwrapStrapiRecord,
 } from '@/lib/strapi-record';
 import type { Page, FooterGroup } from '@/types/strapi-collections';
+import type { SeoMetadata } from '@/types/seo';
 
 const PAGE_ENDPOINT = '/pages';
 
@@ -15,7 +16,7 @@ function mapPage(raw: Record<string, unknown>): Page {
     documentId: String(record.documentId ?? ''),
     title: String(record.title ?? ''),
     slug: String(record.slug ?? ''),
-    meta_description: (record.meta_description as string) ?? null,
+    SEO: (record.SEO as SeoMetadata) ?? null,
     blocks: blocks.map((b) => ({
       ...b,
       id: String(b.id),
@@ -37,7 +38,7 @@ const fallbackPages: Record<string, Page> = {
     documentId: 'fallback-about',
     title: 'О проекте',
     slug: 'about',
-    meta_description: 'MyJOB — платформа для поиска работы и сотрудников в Беларуси',
+    SEO: null,
     blocks: [
       {
         __component: 'page.hero',
@@ -65,7 +66,7 @@ const fallbackPages: Record<string, Page> = {
     documentId: 'fallback-help',
     title: 'Помощь',
     slug: 'help',
-    meta_description: 'Часто задаваемые вопросы и контакты поддержки MyJOB',
+    SEO: null,
     blocks: [
       {
         __component: 'page.hero',
@@ -105,7 +106,7 @@ const fallbackPages: Record<string, Page> = {
     documentId: 'fallback-pricing',
     title: 'Тарифы',
     slug: 'pricing',
-    meta_description: 'Тарифные планы MyJOB для работодателей',
+    SEO: null,
     blocks: [
       {
         __component: 'page.hero',
@@ -149,7 +150,7 @@ const fallbackPages: Record<string, Page> = {
     documentId: 'fallback-terms',
     title: 'Пользовательское соглашение',
     slug: 'terms',
-    meta_description: 'Пользовательское соглашение MyJOB',
+    SEO: null,
     blocks: [
       {
         __component: 'page.rich-text',
@@ -170,7 +171,7 @@ const fallbackPages: Record<string, Page> = {
     documentId: 'fallback-privacy',
     title: 'Политика конфиденциальности',
     slug: 'privacy',
-    meta_description: 'Политика конфиденциальности MyJOB',
+    SEO: null,
     blocks: [
       {
         __component: 'page.rich-text',
@@ -192,72 +193,72 @@ const fallbackPages: Record<string, Page> = {
 const fallbackFooterLinks: Page[] = [
   {
     id: 0, documentId: 'fb-fl-1', title: 'Найти работу', slug: 'find-job',
-    meta_description: null, blocks: [], footer_group: 'seekers', footer_order: 0,
+    SEO: null, blocks: [], footer_group: 'seekers', footer_order: 0,
     footer_label: 'Найти работу', publishedAt: null, createdAt: '', updatedAt: '',
   },
   {
     id: 0, documentId: 'fb-fl-2', title: 'Разместить резюме', slug: 'submit-resume',
-    meta_description: null, blocks: [], footer_group: 'seekers', footer_order: 1,
+    SEO: null, blocks: [], footer_group: 'seekers', footer_order: 1,
     footer_label: 'Разместить резюме', publishedAt: null, createdAt: '', updatedAt: '',
   },
   {
     id: 0, documentId: 'fb-fl-3', title: 'Каталог профессий', slug: 'professions',
-    meta_description: null, blocks: [], footer_group: 'seekers', footer_order: 2,
+    SEO: null, blocks: [], footer_group: 'seekers', footer_order: 2,
     footer_label: 'Каталог профессий', publishedAt: null, createdAt: '', updatedAt: '',
   },
   {
     id: 0, documentId: 'fb-fl-4', title: 'Советы по поиску', slug: 'tips',
-    meta_description: null, blocks: [], footer_group: 'seekers', footer_order: 3,
+    SEO: null, blocks: [], footer_group: 'seekers', footer_order: 3,
     footer_label: 'Советы по поиску', publishedAt: null, createdAt: '', updatedAt: '',
   },
   {
     id: 0, documentId: 'fb-fl-5', title: 'Разместить вакансию', slug: 'post-vacancy',
-    meta_description: null, blocks: [], footer_group: 'employers', footer_order: 0,
+    SEO: null, blocks: [], footer_group: 'employers', footer_order: 0,
     footer_label: 'Разместить вакансию', publishedAt: null, createdAt: '', updatedAt: '',
   },
   {
     id: 0, documentId: 'fb-fl-6', title: 'Найти кандидатов', slug: 'find-candidates',
-    meta_description: null, blocks: [], footer_group: 'employers', footer_order: 1,
+    SEO: null, blocks: [], footer_group: 'employers', footer_order: 1,
     footer_label: 'Найти кандидатов', publishedAt: null, createdAt: '', updatedAt: '',
   },
   {
     id: 0, documentId: 'fb-fl-7', title: 'Тарифы', slug: 'pricing',
-    meta_description: null, blocks: [], footer_group: 'employers', footer_order: 2,
+    SEO: null, blocks: [], footer_group: 'employers', footer_order: 2,
     footer_label: 'Тарифы', publishedAt: null, createdAt: '', updatedAt: '',
   },
   {
     id: 0, documentId: 'fb-fl-8', title: 'Поддержка', slug: 'support',
-    meta_description: null, blocks: [], footer_group: 'employers', footer_order: 3,
+    SEO: null, blocks: [], footer_group: 'employers', footer_order: 3,
     footer_label: 'Поддержка', publishedAt: null, createdAt: '', updatedAt: '',
   },
   {
     id: 0, documentId: 'fb-fl-9', title: 'О проекте', slug: 'about',
-    meta_description: null, blocks: [], footer_group: 'company', footer_order: 0,
+    SEO: null, blocks: [], footer_group: 'company', footer_order: 0,
     footer_label: 'О проекте', publishedAt: null, createdAt: '', updatedAt: '',
   },
   {
     id: 0, documentId: 'fb-fl-10', title: 'Компании', slug: 'companies',
-    meta_description: null, blocks: [], footer_group: 'company', footer_order: 1,
+    SEO: null, blocks: [], footer_group: 'company', footer_order: 1,
     footer_label: 'Компании', publishedAt: null, createdAt: '', updatedAt: '',
   },
   {
     id: 0, documentId: 'fb-fl-11', title: 'Контакты', slug: 'contacts',
-    meta_description: null, blocks: [], footer_group: 'company', footer_order: 2,
+    SEO: null, blocks: [], footer_group: 'company', footer_order: 2,
     footer_label: 'Контакты', publishedAt: null, createdAt: '', updatedAt: '',
   },
   {
     id: 0, documentId: 'fb-fl-12', title: 'Помощь', slug: 'help-main',
-    meta_description: null, blocks: [], footer_group: 'company', footer_order: 3,
+    SEO: null, blocks: [], footer_group: 'company', footer_order: 3,
     footer_label: 'Помощь', publishedAt: null, createdAt: '', updatedAt: '',
   },
   {
     id: 0, documentId: 'fb-fl-13', title: 'Пользовательское соглашение', slug: 'terms',
-    meta_description: null, blocks: [], footer_group: 'bottom', footer_order: 0,
+    SEO: null, blocks: [], footer_group: 'bottom', footer_order: 0,
     footer_label: 'Пользовательское соглашение', publishedAt: null, createdAt: '', updatedAt: '',
   },
   {
     id: 0, documentId: 'fb-fl-14', title: 'Политика конфиденциальности', slug: 'privacy',
-    meta_description: null, blocks: [], footer_group: 'bottom', footer_order: 1,
+    SEO: null, blocks: [], footer_group: 'bottom', footer_order: 1,
     footer_label: 'Политика конфиденциальности', publishedAt: null, createdAt: '', updatedAt: '',
   },
 ];
@@ -266,7 +267,7 @@ export async function getPageBySlug(slug: string): Promise<Page | null> {
   try {
     const params = new URLSearchParams({
       'filters[slug][$eq]': slug,
-      'populate': 'blocks',
+      'populate': '*',
     });
 
     const response = await fetchAPI<StrapiListResponse<Record<string, unknown>>>(
@@ -292,7 +293,7 @@ export async function getFooterPages(): Promise<Page[]> {
       'filters[footer_group][$ne]': 'none',
       'sort[0]': 'footer_group:asc',
       'sort[1]': 'footer_order:asc',
-      'populate[blocks]': '0',
+      'populate': '0',
     });
 
     const response = await fetchAPI<StrapiListResponse<Record<string, unknown>>>(

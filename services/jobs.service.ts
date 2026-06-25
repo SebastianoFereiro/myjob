@@ -1,5 +1,6 @@
 import { jobCategories as fallbackCategories } from "@/app/data/job-categories";
 import { fetchAPI, getStrapiMediaURL } from "@/lib/strapi-client";
+import type { SeoMetadata } from '@/types/seo';
 import {
   type StrapiListResponse,
   unwrapStrapiRecord,
@@ -93,7 +94,7 @@ type StrapiCVRecord = {
   userId?: string;
   company?: StrapiCompanyRef | null;
   category?: StrapiCategoryRef | null;
-  SEO?: unknown[];
+  SEO?: SeoMetadata | null;
   image?: StrapiMediaField | null;
 };
 
@@ -102,9 +103,7 @@ const CV_ENDPOINT = "/cvs";
 
 function buildPopulateParams(): URLSearchParams {
   const params = new URLSearchParams();
-  params.append("populate[company][populate][logo]", "true");
-  params.append("populate[category]", "true");
-  params.append("populate[image]", "true");
+  params.set("populate", "*");
   return params;
 }
 
@@ -273,6 +272,7 @@ function cvToJob(record: StrapiCVRecord): Job {
     isActive: record.isActive !== false,
     sortOrder: record.sortOrder,
     image: resolveMediaURL(record.image),
+    SEO: record.SEO ?? null,
   };
 }
 

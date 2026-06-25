@@ -11,13 +11,17 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { notFound } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import Header from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
+import { markdownComponents } from '@/lib/markdown';
 import { navigationItems } from '@/app/data/navigation';
 import { getCompanyBySlug } from '@/services/companies.service';
 import { getAllJobs } from '@/services/jobs.service';
+import { extractSeoMetadata } from '@/lib/extract-seo';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -31,10 +35,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Компания не найдена | MyJOB' };
   }
 
-  return {
-    title: `${company.name} | MyJOB`,
-    description: company.description || `Вакансии компании ${company.name}`,
-  };
+  return extractSeoMetadata({
+    SEO: company.SEO,
+    fallbackTitle: company.name,
+    fallbackDescription: company.description || `Вакансии компании ${company.name}`,
+    fallbackImage: company.logoUrl,
+  });
 }
 
 export default async function CompanyDetailsPage({ params }: Props) {
@@ -151,9 +157,9 @@ export default async function CompanyDetailsPage({ params }: Props) {
                     <Building2 className="h-5 w-5" />
                     <h2 className="text-2xl font-semibold">О компании</h2>
                   </div>
-                  <p className="text-[15px] leading-8 text-muted-foreground md:text-base">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                     {company.description}
-                  </p>
+                  </ReactMarkdown>
                 </div>
               )}
 

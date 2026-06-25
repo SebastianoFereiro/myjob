@@ -1,11 +1,15 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import { Footer } from '@/components/footer';
 import Header from '@/components/header';
 import { Badge } from '@/components/ui/badge';
 import { getBlogArticleBySlug } from '@/services/blog.service';
+import { markdownComponents } from '@/lib/markdown';
+import { extractSeoMetadata } from '@/lib/extract-seo';
 
 type BlogArticlePageProps = {
   params: Promise<{
@@ -21,32 +25,21 @@ function formatDate(date: string) {
   }).format(new Date(date));
 }
 
-function splitContent(content?: string) {
-  return (content || '')
-    .split(/\n{2,}|\r\n{2,}/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean);
-}
 
 export async function generateMetadata({ params }: BlogArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
   const article = await getBlogArticleBySlug(slug);
 
   if (!article) {
-    return {
-      title: 'Статья не найдена | MyJOB',
-    };
+    return { title: 'Статья не найдена | MyJOB' };
   }
 
-  return {
-    title: `${article.title} | MyJOB`,
-    description: article.excerpt || article.title,
-    openGraph: {
-      title: article.title,
-      description: article.excerpt || article.title,
-      images: article.imageUrl ? [{ url: article.imageUrl }] : [],
-    },
-  };
+  return extractSeoMetadata({
+    SEO: article.SEO,
+    fallbackTitle: article.title,
+    fallbackDescription: article.excerpt || article.title,
+    fallbackImage: article.coverUrl,
+  });
 }
 
 export default async function BlogArticlePage({ params }: BlogArticlePageProps) {
@@ -57,7 +50,7 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
     notFound();
   }
 
-  const paragraphs = splitContent(article.content || article.excerpt);
+  const hasGallery = article.images.length > 1;
 
   return (
     <>
@@ -80,25 +73,36 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
 
           <section className="container py-8 md:py-12">
             <div className="mx-auto max-w-3xl">
-              {article.imageUrl && (
-                <div className="relative mb-8 aspect-video w-full overflow-hidden rounded-lg">
-                  <Image
-                    src={article.imageUrl}
-                    alt={article.imageAlt ?? ""}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 768px"
-                    className="object-cover"
-                  />
+              <div className="relative mb-8 aspect-video w-full overflow-hidden rounded-lg">
+                <Image
+                  src={article.coverUrl}
+                  alt={article.coverAlt}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 768px"
+                  className="object-cover"
+                />
+              </div>
+
+              <div className="prose prose-gray max-w-none dark:prose-invert">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                  {article.content || 'Материал готовится к публикации.'}
+                </ReactMarkdown>
+              </div>
+              {hasGallery && (
+                <div className="mb-8 grid grid-cols-2 gap-4">
+                  {article.images.slice(1).map((imgUrl, idx) => (
+                    <div key={idx} className="relative aspect-video overflow-hidden rounded-lg">
+                      <Image
+                        src={imgUrl}
+                        alt={`Иллюстрация ${idx + 2}`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 384px"
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
                 </div>
               )}
-
-              <div className="space-y-5 text-base leading-8 text-muted-foreground md:text-lg">
-                {paragraphs.length > 0 ? (
-                  paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)
-                ) : (
-                  <p>Материал готовится к публикации.</p>
-                )}
-              </div>
             </div>
           </section>
         </article>

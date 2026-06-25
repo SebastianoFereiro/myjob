@@ -295,35 +295,30 @@ export const CategorySchema = {
 } as const;
 
 // ========================================================================
-// 4. КОЛЛЕКЦИЯ: BlogPost
+// 4. КОЛЛЕКЦИЯ: Blog
 // ========================================================================
 // Тип: Collection Type
-// API ID: blog-post, blog-posts
-// Отношения: Category (M:M), Author (M:1), User (created_by)
+// API ID: blog, blogs
+// Атрибуты: title, slug, excerpt, content, images (multiple media), author (string)
 // ========================================================================
 
-export const BlogPostSchema = {
-  collectionName: 'blog-posts',
+export const BlogSchema = {
+  collectionName: 'blogs',
   info: {
-    singularName: 'blog-post',
-    pluralName: 'blog-posts',
-    displayName: 'Blog Post',
-    description: 'Статьи блога',
+    singularName: 'blog',
+    pluralName: 'blogs',
+    displayName: 'Blog',
+    description: 'Статьи блога по поиску работы',
   },
   options: {
     draftAndPublish: true,
   },
-  pluginOptions: {
-    'i18n': {
-      localized: true,
-    },
-  },
+  pluginOptions: {},
   attributes: {
     title: {
       type: 'string',
       required: true,
       maxLength: 200,
-      pluginOptions: { i18n: { localized: true } },
     },
     slug: {
       type: 'uid',
@@ -332,25 +327,22 @@ export const BlogPostSchema = {
     },
     excerpt: {
       type: 'text',
-      required: true,
       maxLength: 500,
-      pluginOptions: { i18n: { localized: true } },
     },
     content: {
       type: 'richtext',
       required: true,
-      pluginOptions: { i18n: { localized: true } },
     },
-    cover_image: {
+    images: {
       type: 'media',
+      multiple: true,
       allowedTypes: ['images'],
-      multiple: false,
       required: false,
     },
-    // --- Отношения ---
-    // categories: relation M:M -> Category (via join table)
-    // author: relation M:1 -> Author
-    // created_by: relation User (автоматически Strapi)
+    author: {
+      type: 'string',
+      maxLength: 100,
+    },
   },
 } as const;
 
@@ -575,8 +567,6 @@ export const EducationObject = {
 /*
   Компания ──1:M──> Вакансия
   Категория ──1:M──> Вакансия
-  Категория ──M:M──> Статья блога
-  Автор     ──1:M──> Статья блога
   Пользователь ──1:M──> Резюме (created_by)
   Пользователь ──1:M──> Компания (created_by)
 */

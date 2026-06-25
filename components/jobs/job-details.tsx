@@ -1,4 +1,8 @@
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
 import { Badge } from '@/components/ui/badge';
+import { markdownComponents } from '@/lib/markdown';
 import type { EmploymentType, Job } from '@/types/jobs';
 import { CheckCircle2, Layers3, MapPin, Sparkles, University } from 'lucide-react';
 
@@ -72,9 +76,17 @@ export function JobDetails({ job }: { job: Job }) {
             )}
           </div>
 
-          <p className="mt-8 whitespace-pre-line text-[15px] leading-8 text-muted-foreground md:text-base">
-            {job.description || 'Описание вакансии готовится к публикации.'}
-          </p>
+          <div className="mt-8">
+            {job.description ? (
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                {job.description}
+              </ReactMarkdown>
+            ) : (
+              <p className="text-[15px] leading-8 text-muted-foreground md:text-base">
+                Описание вакансии готовится к публикации.
+              </p>
+            )}
+          </div>
         </div>
       </section>
 

@@ -1,4 +1,5 @@
 import { fetchAPI } from "@/lib/strapi-client";
+import type { SeoMetadata } from '@/types/seo';
 import {
   type StrapiListResponse,
   unwrapStrapiRecord,
@@ -15,9 +16,7 @@ const PAGE_SIZE = 10;
 
 function buildPopulateParams(): URLSearchParams {
   const params = new URLSearchParams();
-  params.append("populate", "company");
-  params.append("populate", "category");
-  params.append("populate", "image");
+  params.set("populate", "*");
   return params;
 }
 
@@ -48,7 +47,7 @@ type StrapiCvRecord = {
   company?: Record<string, unknown> | null;
   category?: Record<string, unknown> | null;
   image?: unknown;
-  SEO?: unknown[];
+  SEO?: SeoMetadata | null;
   Profile?: unknown[];
   createdAt?: string;
   updatedAt?: string;

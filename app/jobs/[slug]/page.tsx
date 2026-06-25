@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getJobByDocumentId } from '@/services/jobs.service';
 import type { EmploymentType, Job } from '@/types/jobs';
+import { extractSeoMetadata } from '@/lib/extract-seo';
 
 type JobDetailsPageProps = {
   params: Promise<{
@@ -72,15 +73,15 @@ export async function generateMetadata({ params }: JobDetailsPageProps): Promise
   const job = await getJobByDocumentId(id);
 
   if (!job) {
-    return {
-      title: 'Вакансия не найдена | MyJOB',
-    };
+    return { title: 'Вакансия не найдена | MyJOB' };
   }
 
-  return {
-    title: `${job.title} | MyJOB`,
-    description: job.description || `Вакансия ${job.title} в ${job.company.name}`,
-  };
+  return extractSeoMetadata({
+    SEO: job.SEO,
+    fallbackTitle: job.title,
+    fallbackDescription: job.description || `Вакансия ${job.title} в ${job.company.name}`,
+    fallbackImage: job.image,
+  });
 }
 
 export default async function JobDetailsPage({ params }: JobDetailsPageProps) {

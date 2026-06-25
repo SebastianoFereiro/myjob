@@ -1,24 +1,22 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
+import Image from 'next/image';
 
-import Image from "next/image";
-
-import { Footer } from "@/components/footer";
-import Header from "@/components/header";
-import { Badge } from "@/components/ui/badge";
-import { getBlogArticles } from "@/services/blog.service";
+import { Footer } from '@/components/footer';
+import Header from '@/components/header';
+import { Badge } from '@/components/ui/badge';
+import { getBlogArticles } from '@/services/blog.service';
 
 export const metadata: Metadata = {
-  title: "Блог | MyJOB",
-  description: "Статьи MyJOB о поиске работы, вакансиях и карьере.",
+  title: 'Блог | MyJOB',
+  description: 'Статьи MyJOB о поиске работы, вакансиях и карьере.',
 };
 
 function formatDate(date: string) {
-  return new Intl.DateTimeFormat("ru-RU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
   }).format(new Date(date));
 }
 
@@ -49,28 +47,21 @@ export default async function BlogPage() {
                 href={`/blog/${article.slug}`}
                 className="group relative block h-56 overflow-hidden rounded-lg border bg-background shadow-sm transition hover:-translate-y-1 hover:shadow-md"
               >
-                {article.imageUrl && (
-                  <Image
-                    src={article.imageUrl}
-                    alt={article.imageAlt ?? ""}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover transition group-hover:opacity-90"
-                  />
-                )}
-                <div className="p-5">
-                  <div className="mb-3 flex items-center gap-1 text-sm text-muted-foreground">
-                    <time>{formatDate(article.publishedAt)}</time>
-                    <span aria-hidden="true">·</span>
-                    <span>{article.author}</span>
-                  </div>
-                  <h2 className="text-xl font-semibold tracking-tight">
+                <Image
+                  src={article.coverUrl}
+                  alt={article.coverAlt}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover transition group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-black/80 to-transparent" />
+                <div className="relative z-10 flex h-full flex-col justify-end p-5">
+                  <div className="mb-3 flex items-center gap-1 text-sm text-white/80"></div>
+                  <h2 className="text-md font-semibold tracking-tight text-white">
                     {article.title}
                   </h2>
                   {article.excerpt ? (
-                    <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">
-                      {article.excerpt}
-                    </p>
+                    <p className="mt-3 line-clamp-3 text-xs text-white/70">{article.excerpt}</p>
                   ) : null}
                 </div>
               </a>
@@ -82,4 +73,3 @@ export default async function BlogPage() {
     </>
   );
 }
-

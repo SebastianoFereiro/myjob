@@ -40,16 +40,13 @@ export default function CompanyListingClient({ companies }: Props) {
         <div className="mb-8 rounded-[32px] border bg-white p-6 shadow-sm md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <div className="mb-3 inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-                COMPANY DIRECTORY
-              </div>
-              <h1 className="text-3xl font-bold tracking-tight md:text-5xl">Компании</h1>
+              <h1 className="text-3xl font-bold tracking-tight md:text-5xl">Все компании</h1>
               <p className="mt-3 max-w-2xl text-muted-foreground">
                 Найдите лучшие компании для работы, изучите открытые вакансии и условия.
               </p>
             </div>
             <div className="rounded-3xl bg-black p-6 text-white shadow-xl">
-              <p className="text-sm text-zinc-400">Всего компаний</p>
+              <p className="text-sm text-zinc-400">Компаний</p>
               <h2 className="mt-2 text-4xl font-bold">{filteredCompanies.length}</h2>
             </div>
           </div>
@@ -120,7 +117,10 @@ export default function CompanyListingClient({ companies }: Props) {
               </div>
 
               <p className="mt-4 line-clamp-2 text-sm text-muted-foreground">
-                {company.description}
+                {company.description
+                  .replace(/[#*_`\[\]()>~-]/g, '')
+                  .replace(/\s+/g, ' ')
+                  .trim() || ''}
               </p>
 
               <div className="mt-6 flex items-center justify-between gap-4 border-t pt-5">

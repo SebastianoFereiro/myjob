@@ -1,4 +1,5 @@
 import { fetchAPI, getStrapiMediaURL } from "@/lib/strapi-client";
+import type { SeoMetadata } from '@/types/seo';
 import {
   type StrapiListResponse,
   type StrapiSingleResponse,
@@ -25,6 +26,7 @@ export type StrapiCompanyRecord = {
   size?: string;
   location?: string;
   founded_year?: number | null;
+  SEO?: SeoMetadata | null;
 };
 
 export type CompanyPublic = {
@@ -44,6 +46,7 @@ export type CompanyPublic = {
   ynp?: string;
   founded_year?: number | null;
   isActive: boolean;
+  SEO?: SeoMetadata | null;
 };
 
 const COMPANY_ENDPOINT = "/companies";
@@ -70,6 +73,7 @@ function mapStrapiCompany(record: StrapiCompanyRecord): CompanyPublic {
     ynp: record.ynp || undefined,
     founded_year: record.founded_year ?? undefined,
     isActive: record.isActive !== false,
+    SEO: record.SEO ?? null,
   };
 }
 
@@ -78,7 +82,7 @@ export async function getCompanies(): Promise<CompanyPublic[]> {
     const params = new URLSearchParams();
     params.set("sort[0]", "name:asc");
     params.set("pagination[pageSize]", "100");
-    params.set("populate[logo]", "true");
+    params.set("populate", "*");
 
     const response = await fetchAPI<StrapiListResponse<StrapiCompanyRecord>>(
       `${COMPANY_ENDPOINT}?${params.toString()}`,
@@ -100,7 +104,7 @@ export async function getCompanyBySlug(slug: string): Promise<CompanyPublic | nu
     const params = new URLSearchParams();
     params.set("filters[slug][$eq]", slug);
     params.set("pagination[pageSize]", "1");
-    params.set("populate[logo]", "true");
+    params.set("populate", "*");
 
     const response = await fetchAPI<StrapiListResponse<StrapiCompanyRecord>>(
       `${COMPANY_ENDPOINT}?${params.toString()}`,
@@ -121,7 +125,7 @@ export async function getCompanyByDocumentId(documentId: string): Promise<Compan
 
   try {
     const response = await fetchAPI<StrapiSingleResponse<StrapiCompanyRecord>>(
-      `${COMPANY_ENDPOINT}/${documentId}?populate[logo]=true`,
+      `${COMPANY_ENDPOINT}/${documentId}?populate=*`,
       { next: { revalidate: 1, tags: ["companies"] } },
     );
 
