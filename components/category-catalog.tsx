@@ -70,10 +70,13 @@ function CategoryCard({ item, active }: { item: CategoryItem; active: boolean })
 
       <div className="relative h-full w-full bg-muted">
         {item.image ? (
-          <img
+          <Image
             src={item.image}
             alt={item.title}
-            className="h-full w-full scale-[1.15] object-cover transition-transform duration-700 group-hover/card:scale-105 group-focus-within/card:scale-105"
+            fill
+            quality={95}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 50vw"
+            className="h-full w-full  object-cover transition-transform duration-700 group-hover/card:scale-105 group-focus-within/card:scale-105"
           />
         ) : (
           <Image
