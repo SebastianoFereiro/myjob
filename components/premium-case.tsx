@@ -6,7 +6,7 @@ import { Sparkles, Pin, ArrowUp, Clock, Calendar, CheckCircle2, Zap, Crown } fro
 
 export function PremiumServicesDescription() {
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8 py-8">
+    <div className="w-full max-w-4xl mx-auto space-y-8 py-8 px-4">
       {/* Заголовок */}
       <div className="text-center space-y-3">
         <Badge variant="secondary" className="text-sm font-medium px-4 py-1">

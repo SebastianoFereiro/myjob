@@ -22,7 +22,7 @@ type StrapiBlogRecord = {
   }>;
   publishedAt?: string;
   createdAt?: string;
-  SEO?: SeoMetadata | null;
+  seo?: SeoMetadata | null;
 };
 
 const BLOG_ENDPOINT = "/blogs";
@@ -58,7 +58,7 @@ function mapStrapiBlog(record: StrapiBlogRecord): BlogArticle {
     images: resolvedImages.map((img) => img.url),
     publishedAt:
       record.publishedAt || record.createdAt || new Date().toISOString(),
-    SEO: record.SEO ?? null,
+    SEO: record.seo ?? null,
   };
 }
 
@@ -76,44 +76,63 @@ export async function getBlogArticles(
   page = 1,
   pageSize = 20,
 ): Promise<BlogListResult> {
-  const params = new URLSearchParams();
-  params.set("populate", "*");
-  params.set("sort[0]", "publishedAt:desc");
-  params.set("pagination[page]", String(page));
-  params.set("pagination[pageSize]", String(pageSize));
+  try {
+    const params = new URLSearchParams();
+    params.set("populate", "*");
+    // params.set("populate[0]", "images");
+    // params.set("populate[1]", "seo");
+    params.set("sort[0]", "publishedAt:desc");
+    params.set("pagination[page]", String(page));
+    params.set("pagination[pageSize]", String(pageSize));
 
-  const response = await fetchAPI<StrapiListResponse<StrapiBlogRecord>>(
-    `${BLOG_ENDPOINT}?${params.toString()}`,
-    { next: { revalidate: 300, tags: ["blog"] } },
-  );
+  
+    const response = await fetchAPI<StrapiListResponse<StrapiBlogRecord>>(
+      `${BLOG_ENDPOINT}?${params.toString()}`,
+      { cache: "no-store" },
+    );
 
-  return {
-    articles: response.data
+    const articles = response.data
       .map((record) => mapStrapiBlog(unwrapStrapiRecord(record)))
-      .filter((article) => Boolean(article.slug && article.title)),
-    pagination: response.meta?.pagination || {
-      page: 1,
-      pageSize,
-      pageCount: 0,
-      total: 0,
-    },
-  };
+      .filter((article) => Boolean(article.slug && article.title));
+
+    return {
+      articles,
+      pagination: response.meta?.pagination || {
+        page: 1,
+        pageSize,
+        pageCount: 0,
+        total: 0,
+      },
+    };
+  } catch (err) {
+    console.log("[blog] Failed to fetch blog articles:", err);
+    return {
+      articles: [],
+      pagination: { page: 1, pageSize, pageCount: 0, total: 0 },
+    };
+  }
 }
 
 export async function getBlogArticleBySlug(slug: string) {
-  const params = new URLSearchParams();
-  params.set("populate", "*");
-  params.set("filters[slug][$eq]", slug);
-  params.set("pagination[pageSize]", "1");
+  try {
+    const params = new URLSearchParams();
+    params.set("populate[0]", "images");
+    params.set("populate[1]", "seo");
+    params.set("filters[slug][$eq]", slug);
+    params.set("pagination[pageSize]", "1");
 
-  const response = await fetchAPI<StrapiListResponse<StrapiBlogRecord>>(
-    `${BLOG_ENDPOINT}?${params.toString()}`,
-    { next: { revalidate: 300, tags: ["blog"] } },
-  );
+    const response = await fetchAPI<StrapiListResponse<StrapiBlogRecord>>(
+      `${BLOG_ENDPOINT}?${params.toString()}`,
+      { cache: "no-store" },
+    );
 
-  if (!response.data || response.data.length === 0) {
+    if (!response.data || response.data.length === 0) {
+      return null;
+    }
+
+    return mapStrapiBlog(unwrapStrapiRecord(response.data[0]));
+  } catch {
+    console.log(`Failed to fetch blog article by slug "${slug}" from Strapi.`);
     return null;
   }
-
-  return mapStrapiBlog(unwrapStrapiRecord(response.data[0]));
 }

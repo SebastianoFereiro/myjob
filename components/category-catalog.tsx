@@ -62,6 +62,8 @@ function CategoryCard({ item, active }: { item: CategoryItem; active: boolean })
       <div
         className={cx(
           'absolute inset-0 z-10 bg-black/40 transition-opacity duration-500 group-hover/card:opacity-100 group-focus-within/card:opacity-100',
+          'opacity-100 md:opacity-0',
+
           active ? 'opacity-100' : 'opacity-0'
         )}
       />
@@ -87,6 +89,7 @@ function CategoryCard({ item, active }: { item: CategoryItem; active: boolean })
       <div
         className={cx(
           'absolute bottom-4 left-4 z-20 text-white transition-all duration-500 group-hover/card:translate-y-0 group-hover/card:opacity-100 group-focus-within/card:translate-y-0 group-focus-within/card:opacity-100',
+          'translate-y-0 opacity-100 md:translate-y-3 md:opacity-0',
           active ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'
         )}
       >
@@ -122,8 +125,8 @@ export async function CategoryCatalog({
   const catalogItems = items || mapCategoriesToItems(await getCategoriesWithCounts());
 
   return (
-    <section className="relative h-full w-full overflow-hidden py-8">
-      <div className="container relative flex h-full w-full flex-col items-center justify-center">
+    <section className="relative h-full w-full overflow-hidden md:py-8 py-4">
+      <div className="relative mx-auto flex h-full w-full max-w-7xl flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="relative z-10 flex max-w-3xl flex-col items-center justify-center gap-5 text-center">
           <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
             {eyebrow}

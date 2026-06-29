@@ -1,13 +1,8 @@
-import Link from "next/link";
-import { ArrowRight, BriefcaseBusiness } from "lucide-react";
+import Link from 'next/link';
+import { ArrowRight, BriefcaseBusiness } from 'lucide-react';
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { getProfessions } from "@/services/professions.service";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getProfessions } from '@/services/professions.service';
 
 export async function ProfessionsSection() {
   const professions = await getProfessions();
@@ -17,8 +12,8 @@ export async function ProfessionsSection() {
   }
 
   return (
-    <section className="relative w-full overflow-hidden py-16">
-      <div className="container">
+    <section className="relative w-full overflow-hidden py-8 md:py-16 ">
+      <div className="container px-0">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <p className="mb-2 text-sm font-medium uppercase tracking-wide text-muted-foreground">
             Профессии
@@ -52,8 +47,8 @@ export async function ProfessionsSection() {
                     <BriefcaseBusiness className="size-4" />
                     <span>
                       {profession.count != null
-                        ? `${profession.count} ${decline(profession.count, ["вакансия", "вакансии", "вакансий"])}`
-                        : "Вакансии"}
+                        ? `${profession.count} ${decline(profession.count, ['вакансия', 'вакансии', 'вакансий'])}`
+                        : 'Вакансии'}
                     </span>
                   </div>
                 </CardContent>

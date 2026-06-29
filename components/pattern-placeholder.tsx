@@ -16,13 +16,22 @@ function formatDate(date: string) {
   }).format(new Date(date));
 }
 
-const layouts: Array<'default' | 'wide' | 'tall'> = ['default', 'wide', 'tall', 'wide', 'default', 'wide', 'wide'];
+const layouts: Array<'default' | 'wide' | 'tall'> = [
+  'default',
+  'wide',
+  'tall',
+  'wide',
+  'default',
+  'wide',
+  'wide',
+];
 
 const PatternPlaceholder = async () => {
   const [{ articles }, categories] = await Promise.all([
-    getBlogArticles(5),
+    getBlogArticles(1, 5),
     getCategoriesWithCounts(),
   ]);
+
   const cat: CategoryItem[] = categories.slice(0, 7).map((category, index) => ({
     title: category.name,
     meta: `${category.count || 0} вакансий`,
@@ -50,7 +59,7 @@ const PatternPlaceholder = async () => {
               Работа для людей, на которых все держится.
             </h1>
             <p className="mx-auto max-w-2xl font-light tracking-tighter text-pretty text-muted-foreground md:text-lg lg:text-xl">
-              202 актуальные вакансии каждый день.
+              1002+ актуальные вакансии каждый день.
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-2">
