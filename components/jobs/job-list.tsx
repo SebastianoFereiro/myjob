@@ -1,8 +1,9 @@
 import { JobCard } from "@/components/jobs/job-card";
+import { PremiumSection } from "@/components/jobs/premium-section";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getCategoriesWithCounts } from "@/services/categories.service";
-import { getJobs } from "@/services/jobs.service";
+import { getJobs, getPremiumJobs } from "@/services/jobs.service";
 import type { JobFilters } from "@/types/jobs";
 
 type JobListProps = {
@@ -29,10 +30,13 @@ export async function JobList({
   basePath = "/jobs",
   contained = true,
 }: JobListProps) {
-  const [{ jobs, pagination }, categories] = await Promise.all([
-    getJobs(filters),
-    getCategoriesWithCounts(),
-  ]);
+  const [{ jobs, pagination }, { jobs: premiumJobs }, categories] =
+    await Promise.all([
+      getJobs(filters),
+      getPremiumJobs(filters),
+      getCategoriesWithCounts(),
+    ]);
+
   const categoryName = categories.find(
     (category) => category.slug === filters.category,
   )?.name;
@@ -48,7 +52,7 @@ export async function JobList({
             {categoryName ? `Вакансии: ${categoryName}` : "Актуальные вакансии"}
           </h2>
           <p className="mt-2 text-muted-foreground">
-            Найдено вакансий: {pagination.total}
+            Найдено вакансий: {pagination.total + premiumJobs.length}
           </p>
         </div>
         {filters.category ? (
@@ -58,11 +62,20 @@ export async function JobList({
         ) : null}
       </div>
 
+      {/* Премиум-секция (первые 6, остальные по кнопке) */}
+      <PremiumSection jobs={premiumJobs} />
+
+      {/* Обычные вакансии */}
       {jobs.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {jobs.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
+        <div>
+          {premiumJobs.length > 0 && (
+            <h3 className="mb-3 text-lg font-semibold">Все вакансии</h3>
+          )}
+          <div className="grid gap-4 sm:grid-cols-2">
+            {jobs.map((job) => (
+              <JobCard key={job.id} job={job} />
+            ))}
+          </div>
         </div>
       ) : (
         <div className="rounded-lg border bg-background p-8 text-center">

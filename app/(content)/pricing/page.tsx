@@ -3,6 +3,7 @@ import { PageBlocks } from '@/components/page-blocks';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { extractSeoMetadata } from '@/lib/extract-seo';
+import { PremiumServicesDescription } from '@/components/premium-case';
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPageBySlug('pricing');
@@ -23,6 +24,7 @@ export default async function PricingPage() {
 
   return (
     <main>
+      <PremiumServicesDescription />
       <PageBlocks blocks={page.blocks} />
     </main>
   );

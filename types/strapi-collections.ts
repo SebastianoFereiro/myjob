@@ -298,6 +298,14 @@ export interface Job {
   sortOrder?: number;
   image?: string;
   SEO?: SeoMetadata | null;
+
+  // Премиум-закрепление
+  premium_from?: string | null;
+  premium_to?: string | null;
+  // Авто-поднятие
+  push_from?: string | null;
+  push_to?: string | null;
+  isPremium?: boolean;
 }
 
 export interface JobFilters {

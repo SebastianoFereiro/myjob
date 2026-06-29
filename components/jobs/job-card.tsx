@@ -1,8 +1,9 @@
-import { BriefcaseBusiness, Layers3, MapPin } from 'lucide-react';
+import { BriefcaseBusiness, Layers3, MapPin, Sparkles } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import type { EmploymentType, Job } from '@/types/jobs';
 
 const employmentLabels: Record<EmploymentType, string> = {
@@ -27,16 +28,34 @@ function formatSalary(job: Job) {
     : `до ${job.salaryTo} ${job.currency}`;
 }
 
-export function JobCard({ job }: { job: Job }) {
+export function JobCard({ job, isPremium }: { job: Job; isPremium?: boolean }) {
   return (
-    <Card className="shadow-sm transition-shadow hover:shadow-md">
+    <Card
+      className={cn(
+        "shadow-sm transition-shadow hover:shadow-md",
+        isPremium && "border-amber-400 ring-1 ring-amber-400/30",
+      )}
+    >
       <CardHeader className="p-3 sm:p-5">
         <div className="space-y-2">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <CardTitle className="text-[15px] leading-snug font-semibold sm:text-lg">
-                {job.title}
-              </CardTitle>
+              <div className="flex items-center gap-2">
+                {isPremium && (
+                  <Sparkles className="size-4 shrink-0 text-amber-500" />
+                )}
+                <CardTitle className="text-[15px] leading-snug font-semibold sm:text-lg">
+                  {job.title}
+                </CardTitle>
+              </div>
+              {isPremium && (
+                <Badge
+                  variant="default"
+                  className="mt-1.5 bg-amber-500 text-[10px] px-2 py-0 font-semibold text-white hover:bg-amber-600"
+                >
+                  Premium
+                </Badge>
+              )}
             </div>
             <Badge
               variant={job.employmentType === 'remote' ? 'secondary' : 'outline'}

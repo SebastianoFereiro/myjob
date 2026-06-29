@@ -52,6 +52,12 @@ type StrapiCvRecord = {
   createdAt?: string;
   updatedAt?: string;
   publishedAt?: string | null;
+  // Премиум-закрепление
+  premium_from?: string | null;
+  premium_to?: string | null;
+  // Авто-поднятие
+  push_from?: string | null;
+  push_to?: string | null;
 };
 
 function extractRef<T extends { id?: number; documentId?: string; [key: string]: unknown }>(
@@ -103,6 +109,12 @@ function mapStrapiCv(record: StrapiCvRecord): CvVacancy {
     createdAt: record.createdAt || "",
     updatedAt: record.updatedAt || "",
     publishedAt: record.publishedAt ?? null,
+    // Премиум-закрепление
+    premium_from: record.premium_from ?? null,
+    premium_to: record.premium_to ?? null,
+    // Авто-поднятие
+    push_from: record.push_from ?? null,
+    push_to: record.push_to ?? null,
   };
 }
 
@@ -269,6 +281,10 @@ export async function updateCv(documentId: string, data: Partial<CvVacancyFormDa
   if (data.conditions !== undefined) payload.conditions = data.conditions || undefined;
   if (data.companyDocumentId !== undefined) payload.company = data.companyDocumentId;
   if (data.categoryDocumentId !== undefined) payload.category = data.categoryDocumentId;
+  if (data.premium_from !== undefined) payload.premium_from = data.premium_from || undefined;
+  if (data.premium_to !== undefined) payload.premium_to = data.premium_to || undefined;
+  if (data.push_from !== undefined) payload.push_from = data.push_from || undefined;
+  if (data.push_to !== undefined) payload.push_to = data.push_to || undefined;
 
   const json = await strapiClientFetch<{ data: StrapiCvRecord }>(
     `/cvs/${documentId}`,

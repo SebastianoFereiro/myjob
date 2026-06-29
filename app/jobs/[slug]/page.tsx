@@ -8,6 +8,7 @@ import {
   CalendarDays,
   Clock3,
   MapPin,
+  Sparkles,
   Wallet,
 } from 'lucide-react';
 import { notFound } from 'next/navigation';
@@ -124,11 +125,22 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                   </div>
 
                   <div>
-                    {job.category && (
-                      <Badge variant="secondary" className="mb-3">
-                        {job.category.name}
-                      </Badge>
-                    )}
+                    <div className="mb-3 flex flex-wrap items-center gap-2">
+                      {job.category && (
+                        <Badge variant="secondary">
+                          {job.category.name}
+                        </Badge>
+                      )}
+                      {job.isPremium && (
+                        <Badge
+                          variant="default"
+                          className="bg-amber-500 text-white hover:bg-amber-600"
+                        >
+                          <Sparkles className="mr-1 size-3" />
+                          Premium
+                        </Badge>
+                      )}
+                    </div>
                     <h1 className="text-3xl font-bold tracking-tight md:text-5xl">{job.title}</h1>
 
                     <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">

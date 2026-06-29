@@ -96,6 +96,12 @@ type StrapiCVRecord = {
   category?: StrapiCategoryRef | null;
   SEO?: SeoMetadata | null;
   image?: StrapiMediaField | null;
+  // Премиум-закрепление
+  premium_from?: string | null;
+  premium_to?: string | null;
+  // Авто-поднятие
+  push_from?: string | null;
+  push_to?: string | null;
 };
 
 const PAGE_SIZE = 6;
@@ -273,6 +279,16 @@ function cvToJob(record: StrapiCVRecord): Job {
     sortOrder: record.sortOrder,
     image: resolveMediaURL(record.image),
     SEO: record.SEO ?? null,
+    // Премиум-закрепление
+    premium_from: record.premium_from ?? null,
+    premium_to: record.premium_to ?? null,
+    // Авто-поднятие
+    push_from: record.push_from ?? null,
+    push_to: record.push_to ?? null,
+    // Вычисляем isPremium: active if now is between premium_from and premium_to
+    isPremium: !!(record.premium_from && record.premium_to
+      && record.premium_from <= new Date().toISOString()
+      && record.premium_to >= new Date().toISOString()),
   };
 }
 
@@ -284,12 +300,22 @@ const employmentTypeReverseMap: Record<EmploymentType, string> = {
   "remote": "Удаленно",
 };
 
-function buildFiltersParams(filters: JobFilters): URLSearchParams {
+function buildFiltersParams(
+  filters: JobFilters,
+  options?: { excludePremium?: boolean },
+): URLSearchParams {
   const params = buildPopulateParams();
   let orIndex = 0;
 
   params.set("filters[isActive][$eq]", "true");
   params.set("sort[0]", "publishedAt:desc");
+
+  // Исключаем активные премиум-вакансии из обычной выдачи
+  if (options?.excludePremium) {
+    const now = new Date().toISOString();
+    params.set("filters[$or][0][premium_from][$null]", "true");
+    params.set("filters[$or][1][premium_to][$lt]", now);
+  }
 
   if (filters.query) {
     params.set(`filters[$or][${orIndex}][title][$contains]`, filters.query);
@@ -328,7 +354,7 @@ function buildFiltersParams(filters: JobFilters): URLSearchParams {
 
 export async function getJobs(filters: JobFilters = {}): Promise<JobListResult> {
   try {
-    const params = buildFiltersParams(filters);
+    const params = buildFiltersParams(filters, { excludePremium: true });
     const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
       `${CV_ENDPOINT}?${params.toString()}`,
       { next: { revalidate: 1, tags: ["cv"] } },
@@ -340,6 +366,61 @@ export async function getJobs(filters: JobFilters = {}): Promise<JobListResult> 
     };
   } catch {
     return { jobs: [], pagination: { page: 1, pageSize: PAGE_SIZE, pageCount: 0, total: 0 } };
+  }
+}
+
+export async function getPremiumJobs(filters: JobFilters = {}): Promise<JobListResult> {
+  try {
+    const now = new Date().toISOString();
+    const params = buildPopulateParams();
+    let orIndex = 0;
+
+    params.set("filters[isActive][$eq]", "true");
+    params.set("filters[premium_from][$lte]", now);
+    params.set("filters[premium_to][$gte]", now);
+    params.set("sort[0]", "premium_from:desc");
+
+    if (filters.query) {
+      params.set(`filters[$or][${orIndex}][title][$contains]`, filters.query);
+      orIndex++;
+      params.set(`filters[$or][${orIndex}][position][$contains]`, filters.query);
+      orIndex++;
+      params.set(`filters[$or][${orIndex}][description][$contains]`, filters.query);
+      orIndex++;
+      params.set(`filters[$or][${orIndex}][company][name][$contains]`, filters.query);
+      orIndex++;
+    }
+
+    if (filters.location) {
+      params.set("filters[location][$contains]", filters.location);
+    }
+
+    if (filters.type) {
+      const russianType = employmentTypeReverseMap[filters.type as EmploymentType] || filters.type;
+      params.set("filters[employmentType][$eq]", russianType);
+    }
+
+    if (filters.category) {
+      if (filters.category === "other") {
+        params.set("filters[category][id][$null]", "true");
+      } else {
+        params.set("filters[category][slug][$eq]", filters.category);
+      }
+    }
+
+    params.set("pagination[pageSize]", "50");
+
+    const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
+      `${CV_ENDPOINT}?${params.toString()}`,
+      { next: { revalidate: 1, tags: ["cv"] } },
+    );
+
+    return {
+      jobs: response.data.map((record) => cvToJob(unwrapStrapiRecord(record))),
+      pagination: response.meta?.pagination || { page: 1, pageSize: 50, pageCount: 0, total: 0 },
+    };
+  } catch {
+    return { jobs: [], pagination: { page: 1, pageSize: 50, pageCount: 0, total: 0 } };
   }
 }
 
@@ -431,8 +512,12 @@ export async function getCategoryCounts(categories = fallbackCategories) {
 
 export async function getAllJobs() {
   try {
+    const now = new Date().toISOString();
     const params = buildPopulateParams();
     params.set("filters[isActive][$eq]", "true");
+    // Исключаем премиум-вакансии из общего подсчёта (они уже в premium-секции)
+    params.set("filters[$or][0][premium_from][$null]", "true");
+    params.set("filters[$or][1][premium_to][$lt]", now);
     params.set("sort[0]", "publishedAt:desc");
     params.set("pagination[pageSize]", "100");
 

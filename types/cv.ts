@@ -92,6 +92,13 @@ export interface CvVacancy {
   createdAt: string;
   updatedAt: string;
   publishedAt?: string | null;
+
+  // Премиум-закрепление
+  premium_from?: string | null;
+  premium_to?: string | null;
+  // Авто-поднятие
+  push_from?: string | null;
+  push_to?: string | null;
 }
 
 export interface CvVacancyFormData {
@@ -115,6 +122,11 @@ export interface CvVacancyFormData {
   // Relations (Strapi 5 — documentId)
   companyDocumentId?: string | null;
   categoryDocumentId?: string | null;
+
+  premium_from?: string;
+  premium_to?: string;
+  push_from?: string;
+  push_to?: string;
 }
 
 export interface CvFilters {

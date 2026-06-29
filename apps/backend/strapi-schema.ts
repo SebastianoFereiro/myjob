@@ -537,6 +537,155 @@ export const PageSchema = {
 } as const;
 
 // ========================================================================
+// 8. КОЛЛЕКЦИЯ: CV (вакансии — реально используемая)
+// ========================================================================
+// Тип: Collection Type
+// API ID: cv, cvs
+// Отношения: Company (M:1), Category (M:1), User (created_by)
+// ПОЛЯ premium_*/push_* — для премиум-закрепления и авто-поднятия
+// ========================================================================
+
+export const CVSchema = {
+  collectionName: 'cvs',
+  info: {
+    singularName: 'cv',
+    pluralName: 'cvs',
+    displayName: 'CV',
+    description: 'Вакансии компаний (основная коллекция)',
+  },
+  options: {
+    draftAndPublish: true,
+  },
+  pluginOptions: {},
+  attributes: {
+    title: {
+      type: 'string',
+      required: true,
+      maxLength: 200,
+    },
+    slug: {
+      type: 'uid',
+      targetField: 'title',
+      required: true,
+    },
+    position: {
+      type: 'string',
+      required: false,
+      maxLength: 200,
+    },
+    description: {
+      type: 'richtext',
+      required: true,
+    },
+    requirements: {
+      type: 'richtext',
+      required: false,
+    },
+    conditions: {
+      type: 'richtext',
+      required: false,
+    },
+    salaryFrom: {
+      type: 'integer',
+      required: false,
+      min: 0,
+    },
+    salaryTo: {
+      type: 'integer',
+      required: false,
+      min: 0,
+    },
+    currency: {
+      type: 'string',
+      required: false,
+      default: 'BYN',
+      maxLength: 3,
+    },
+    employmentType: {
+      type: 'string',
+      required: false,
+      maxLength: 100,
+    },
+    location: {
+      type: 'string',
+      required: false,
+      maxLength: 300,
+    },
+    city: {
+      type: 'string',
+      required: false,
+      maxLength: 200,
+    },
+    level_job: {
+      type: 'string',
+      required: false,
+      maxLength: 100,
+    },
+    experience_job: {
+      type: 'string',
+      required: false,
+      maxLength: 100,
+    },
+    education_job: {
+      type: 'string',
+      required: false,
+      maxLength: 100,
+    },
+    deadline: {
+      type: 'datetime',
+      required: false,
+    },
+    datetime_start: {
+      type: 'datetime',
+      required: false,
+    },
+    datetime_finish: {
+      type: 'datetime',
+      required: false,
+    },
+    sortOrder: {
+      type: 'integer',
+      required: false,
+      default: 100,
+    },
+    isActive: {
+      type: 'boolean',
+      required: false,
+      default: true,
+    },
+    userId: {
+      type: 'string',
+      required: false,
+    },
+    // --- Премиум-закрепление ---
+    premium_from: {
+      type: 'datetime',
+      required: false,
+    },
+    premium_to: {
+      type: 'datetime',
+      required: false,
+    },
+    // --- Авто-поднятие ---
+    push_from: {
+      type: 'datetime',
+      required: false,
+    },
+    push_to: {
+      type: 'datetime',
+      required: false,
+    },
+    // --- Отношения ---
+    // company: relation M:1 -> Company
+    // category: relation M:1 -> Category
+    // image: media
+    // SEO: component
+    // Profile: relation
+    // created_by: relation User (автоматически Strapi)
+  },
+} as const;
+
+// ========================================================================
 // ВСПОМОГАТЕЛЬНЫЕ JSON-ТИПЫ (не коллекции, а структуры внутри JSON полей)
 // ========================================================================
 
