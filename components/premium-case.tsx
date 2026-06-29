@@ -46,7 +46,7 @@ export function PremiumServicesDescription() {
             <ul className="space-y-3">
               <FeatureItem
                 icon={<Pin className="w-4 h-4" />}
-                text="Закрепление в отдельной секции «Premium вакансии»"
+                text="Закрепление в отдельной секции «Premium»"
               />
               <FeatureItem
                 icon={<Sparkles className="w-4 h-4" />}
@@ -75,7 +75,7 @@ export function PremiumServicesDescription() {
               </div>
             </div>
 
-            <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold h-12 text-base">
+            <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold h-12 text-xs md:text-base">
               {/* Активировать Premium */} Для подключения обратитесь к менеджеру
             </Button>
           </CardContent>
@@ -135,7 +135,7 @@ export function PremiumServicesDescription() {
               </div>
             </div>
 
-            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold h-12 text-base">
+            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold h-12 text-xs md:text-base">
               {/* Настроить поднятие */}Для подключения обратитесь к менеджеру
             </Button>
           </CardContent>
