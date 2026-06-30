@@ -532,6 +532,41 @@ export async function getAllJobs() {
   }
 }
 
+export type SitemapJobEntry = {
+  slug: string;
+  documentId: string;
+  updatedAt: string;
+};
+
+export async function getAllJobsForSitemap(): Promise<SitemapJobEntry[]> {
+  try {
+    const params = new URLSearchParams();
+    params.set("filters[isActive][$eq]", "true");
+    params.set("sort[0]", "updatedAt:desc");
+    params.set("pagination[pageSize]", "1000");
+    // Минимальная populate — только поля для URL и даты
+    params.set("fields[0]", "slug");
+    params.set("fields[1]", "documentId");
+    params.set("fields[2]", "updatedAt");
+
+    const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
+      `${CV_ENDPOINT}?${params.toString()}`,
+      { next: { revalidate: 3600, tags: ["cv"] } },
+    );
+
+    return response.data.map((record) => {
+      const r = unwrapStrapiRecord(record) as StrapiCVRecord;
+      return {
+        slug: r.slug || "",
+        documentId: r.documentId || String(r.id || ""),
+        updatedAt: r.updatedAt || r.publishedAt || new Date().toISOString(),
+      };
+    }).filter((entry) => entry.slug && entry.documentId);
+  } catch {
+    return [];
+  }
+}
+
 export async function createJobSubscription(payload: SubscriptionPayload) {
   return fetchAPI("/subscriptions", {
     method: "POST",
