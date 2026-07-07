@@ -101,10 +101,25 @@ export async function GET(request: NextRequest) {
     errors.push({ stage: "push", id: "batch", error: String(err) });
   }
 
+  // --- 4. Revalidate Yandex XML feed ---
+  let feedRevalidated = false;
+  if (autoPublished > 0 || autoPushed > 0) {
+    try {
+      const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
+      const cronSecret = process.env.CRON_SECRET || "";
+      const revalidateUrl = `${appUrl}/api/revalidate?tag=yandex-feed&secret=${encodeURIComponent(cronSecret)}`;
+      const res = await fetch(revalidateUrl);
+      feedRevalidated = res.ok;
+    } catch (err) {
+      errors.push({ stage: "revalidate-feed", id: "feed", error: String(err) });
+    }
+  }
+
   return NextResponse.json({
     autoPublished,
     autoUnpublished,
     autoPushed,
+    feedRevalidated,
     errors: errors.length > 0 ? errors : undefined,
     message: `Опубликовано: ${autoPublished}, снято: ${autoUnpublished}, поднято: ${autoPushed}`,
   });
