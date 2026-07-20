@@ -1,45 +1,53 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { BriefcaseBusiness, Loader2, User } from "lucide-react";
+import { useState } from 'react';
+import { BriefcaseBusiness, Loader2, User } from 'lucide-react';
+import Link from 'next/link';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { authClient } from "@/lib/auth-client";
-import type { UserRole } from "@/types/auth";
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { authClient } from '@/lib/auth-client';
+import type { UserRole } from '@/types/auth';
 
 export function RegisterForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("user");
-  const [ynp, setYnp] = useState("");
-  const [error, setError] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState<UserRole>('user');
+  const [ynp, setYnp] = useState('');
+  const [consent, setConsent] = useState(false);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
+    setError('');
 
     if (!name.trim() || !email.trim() || !password.trim()) {
-      setError("Заполните все поля");
+      setError('Заполните все поля');
       return;
     }
 
     if (password.length < 8) {
-      setError("Пароль должен быть не менее 8 символов");
+      setError('Пароль должен быть не менее 8 символов');
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Пароли не совпадают");
+      setError('Пароли не совпадают');
       return;
     }
 
-    if (role === "company" && !ynp.trim()) {
-      setError("Укажите УНП компании");
+    if (role === 'company' && !ynp.trim()) {
+      setError('Укажите УНП компании');
+      return;
+    }
+
+    if (!consent) {
+      setError('Необходимо дать согласие на обработку персональных данных');
       return;
     }
 
@@ -55,16 +63,16 @@ export function RegisterForm() {
       });
 
       if (authError) {
-        setError(authError.message || "Ошибка при регистрации");
+        setError(authError.message || 'Ошибка при регистрации');
         setLoading(false);
         return;
       }
 
       // Создаём компанию в фоне (не блокируем редирект)
-      if (role === "company") {
-        fetch("/api/company/create", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+      if (role === 'company') {
+        fetch('/api/company/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: name.trim(),
             ynp: ynp.trim(),
@@ -73,10 +81,10 @@ export function RegisterForm() {
       }
 
       // Редирект через публичный callback для избежания middleware redirect
-      const redirectTo = role === "company" ? "/company/dashboard" : "/dashboard";
+      const redirectTo = role === 'company' ? '/company/dashboard' : '/dashboard';
       window.location.href = `/auth/callback?redirect=${encodeURIComponent(redirectTo)}`;
     } catch {
-      setError("Ошибка при регистрации. Попробуйте позже.");
+      setError('Ошибка при регистрации. Попробуйте позже.');
       setLoading(false);
     }
   }
@@ -87,67 +95,61 @@ export function RegisterForm() {
       <div className="grid grid-cols-2 gap-3">
         <button
           type="button"
-          onClick={() => setRole("user")}
+          onClick={() => setRole('user')}
           className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition ${
-            role === "user"
-              ? "border-primary bg-primary/5"
-              : "border-border hover:border-muted-foreground/30"
+            role === 'user'
+              ? 'border-primary bg-primary/5'
+              : 'border-border hover:border-muted-foreground/30'
           }`}
         >
-          <User className={`size-6 ${role === "user" ? "text-primary" : "text-muted-foreground"}`} />
+          <User
+            className={`size-6 ${role === 'user' ? 'text-primary' : 'text-muted-foreground'}`}
+          />
           <span
             className={`text-sm font-medium ${
-              role === "user" ? "text-primary" : "text-muted-foreground"
+              role === 'user' ? 'text-primary' : 'text-muted-foreground'
             }`}
           >
             Соискатель
           </span>
-          <span className="text-xs text-muted-foreground">
-            Ищу работу
-          </span>
+          <span className="text-xs text-muted-foreground">Ищу работу</span>
         </button>
 
         <button
           type="button"
-          onClick={() => setRole("company")}
+          onClick={() => setRole('company')}
           className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition ${
-            role === "company"
-              ? "border-primary bg-primary/5"
-              : "border-border hover:border-muted-foreground/30"
+            role === 'company'
+              ? 'border-primary bg-primary/5'
+              : 'border-border hover:border-muted-foreground/30'
           }`}
         >
           <BriefcaseBusiness
-            className={`size-6 ${role === "company" ? "text-primary" : "text-muted-foreground"}`}
+            className={`size-6 ${role === 'company' ? 'text-primary' : 'text-muted-foreground'}`}
           />
           <span
             className={`text-sm font-medium ${
-              role === "company" ? "text-primary" : "text-muted-foreground"
+              role === 'company' ? 'text-primary' : 'text-muted-foreground'
             }`}
           >
             Компания
           </span>
-          <span className="text-xs text-muted-foreground">
-            Размещаю вакансии
-          </span>
+          <span className="text-xs text-muted-foreground">Размещаю вакансии</span>
         </button>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="name">
-          {role === "company" ? "Название компании" : "Имя и фамилия"}
-        </Label>
+        <Label htmlFor="name">{role === 'company' ? 'Название компании' : 'Имя и фамилия'}</Label>
         <Input
           id="name"
-          placeholder={
-            role === "company" ? "ООО Моя Компания" : "Иван Иванов"
-          }
+          placeholder={role === 'company' ? 'ООО Моя Компания' : 'Иван Иванов'}
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
       </div>
 
-      {role === "company" && (
+      {role === 'company' && (
         <div className="space-y-2">
           <Label htmlFor="ynp">
             УНП (учётный номер плательщика) <span className="text-destructive">*</span>
@@ -206,6 +208,29 @@ export function RegisterForm() {
         />
       </div>
 
+      <div className="rounded-lg border bg-muted/30 px-4 py-3">
+        <div className="flex items-start gap-3">
+          <Checkbox
+            id="consent"
+            checked={consent}
+            onCheckedChange={(checked) => setConsent(checked === true)}
+            className="mt-0.5"
+          />
+          <Label
+            htmlFor="consent"
+            className="text-xs text-muted-foreground leading-5 cursor-pointer"
+          >
+            Я даю согласие на
+            <Link
+              href="/privacy"
+              className="text-primary font-medium underline underline-offset-2 hover:text-primary/80"
+            >
+              обработку персональных данных
+            </Link>
+          </Label>
+        </div>
+      </div>
+
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       <Button type="submit" className="w-full" disabled={loading}>
@@ -215,7 +240,7 @@ export function RegisterForm() {
             Регистрация...
           </>
         ) : (
-          "Создать аккаунт"
+          'Создать аккаунт'
         )}
       </Button>
     </form>
