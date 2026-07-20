@@ -22,7 +22,7 @@ export async function ToolsStackSection() {
         <ul className="relative grid w-full gap-3 lg:grid-cols-2">
           {top.map((category) => (
             <li key={category.slug}>
-              <Link href={`/jobs?category=${category.slug}#vacancies`} className="block">
+              <Link href={`/categories/${category.slug}#vacancies`} className="block">
                 <Card className="bg-hatch rounded-2xl border-0 p-2 shadow-none transition-colors hover:bg-accent/50">
                   <div className="flex items-center justify-between gap-2 md:gap-10">
                     <div className="flex items-center gap-0 md:gap-4">

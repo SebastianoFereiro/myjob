@@ -27,7 +27,7 @@ export async function ProfessionsSection() {
           {professions.map((profession) => (
             <Link
               key={profession.slug}
-              href={`/jobs?category=${profession.slug}`}
+              href={`/categories/${profession.slug}#vacancies`}
               className="group block"
             >
               <Card className="h-full transition-shadow hover:shadow-md">

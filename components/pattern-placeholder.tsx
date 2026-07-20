@@ -37,7 +37,7 @@ const PatternPlaceholder = async () => {
     meta: `${category.count || 0} вакансий`,
     image: category.imageUrl || `/cat/default.jpg`,
     alt: `Раздел ${category.name}`,
-    href: `/jobs?category=${category.slug}#vacancies`,
+    href: `/categories/${category.slug}#vacancies`,
     slug: category.slug,
     layout: layouts[index] || 'default',
   }));

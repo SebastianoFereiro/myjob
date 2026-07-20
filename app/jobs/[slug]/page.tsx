@@ -22,6 +22,18 @@ import { getJobByDocumentId } from '@/services/jobs.service';
 import type { EmploymentType, Job } from '@/types/jobs';
 import { extractSeoMetadata } from '@/lib/extract-seo';
 
+function firstPhone(value?: string): string | undefined {
+  return value?.split(",").map((s) => s.trim()).filter(Boolean)[0];
+}
+
+function getContactHref(job: Job): string | null {
+  const phone = firstPhone(job.phone) || firstPhone(job.company?.phone);
+  if (phone) return `tel:${phone}`;
+  const email = job.email || job.company?.email;
+  if (email) return `mailto:${email}`;
+  return null;
+}
+
 type JobDetailsPageProps = {
   params: Promise<{
     slug: string;
@@ -173,9 +185,20 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                     Зарплата
                   </div>
                   <h2 className="text-3xl font-bold">{formatSalary(job)}</h2>
-                  <Button className="mt-6 w-full" variant="secondary">
-                    Откликнуться
-                  </Button>
+                  {(() => {
+                    const contactHref = getContactHref(job);
+                    return contactHref ? (
+                      <Button className="mt-6 w-full" variant="secondary" asChild>
+                        <a href={contactHref} target="_blank" rel="noopener noreferrer">
+                          Откликнуться
+                        </a>
+                      </Button>
+                    ) : (
+                      <Button className="mt-6 w-full" variant="secondary" disabled>
+                        Откликнуться
+                      </Button>
+                    );
+                  })()}
                 </div>
               </div>
             </div>

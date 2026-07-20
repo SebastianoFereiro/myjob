@@ -75,7 +75,7 @@ export function JobCard({ job, isPremium }: { job: Job; isPremium?: boolean }) {
 
         {job.category && (
           <div className="flex flex-wrap gap-1.5">
-            <a href={`/jobs?category=${job.category.slug}`}>
+            <a href={`/categories/${job.category.slug}`}>
               <Badge
                 variant="secondary"
                 className="rounded-full text-[11px] px-2.5 py-0 font-normal cursor-pointer hover:bg-muted-foreground/20 transition-colors"

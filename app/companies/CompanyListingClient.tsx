@@ -124,9 +124,7 @@ export default function CompanyListingClient({ companies }: Props) {
               </p>
 
               <div className="mt-6 flex items-center justify-between gap-4 border-t pt-5">
-                <div>
-                  <p className="text-sm text-muted-foreground">Подробнее</p>
-                </div>
+                <div>{/* <p className="text-sm text-muted-foreground">Подробнее</p> */}</div>
                 <a
                   href={`/companies/${company.slug}`}
                   className="rounded-2xl bg-black px-5 py-3 text-sm font-medium text-white transition hover:scale-[1.02]"

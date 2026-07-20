@@ -1,4 +1,3 @@
-import { jobCategories as fallbackCategories } from "@/app/data/job-categories";
 import { fetchAPI, getStrapiMediaURL } from "@/lib/strapi-client";
 import type { SeoMetadata } from '@/types/seo';
 import {
@@ -162,10 +161,7 @@ function resolveMediaURL(media?: StrapiMediaField | StrapiMediaArray | null) {
 
 function normalizeCategoryTag(tag: StrapiCategoryRef | string): JobCategory | null {
   if (typeof tag === "string") {
-    const existing = fallbackCategories.find(
-      (category) => category.slug === tag || category.name === tag,
-    );
-    return existing || { slug: slugify(tag), name: tag };
+    return { slug: slugify(tag), name: tag };
   }
 
   const name = tag.title || tag.name || "";
@@ -210,13 +206,14 @@ function extractCompany(record: StrapiCVRecord) {
   }
 
   const unwrapped = unwrapStrapiRecord(company as Record<string, unknown>);
+  const typed = unwrapped as { name?: string; slug?: string; phone?: string; email?: string; logo?: StrapiMediaField | null };
   return {
     id: String(unwrapped.documentId || unwrapped.id || "myjob"),
-    name: (unwrapped as { name?: string }).name || "MyJOB",
-    slug: (unwrapped as { slug?: string }).slug || "myjob",
-    logoUrl: resolveMediaURL(
-      (unwrapped as { logo?: StrapiMediaField | null }).logo,
-    ),
+    name: typed.name || "MyJOB",
+    slug: typed.slug || "myjob",
+    logoUrl: resolveMediaURL(typed.logo),
+    phone: typed.phone || undefined,
+    email: typed.email || undefined,
   };
 }
 
@@ -246,6 +243,8 @@ function cvToJob(record: StrapiCVRecord): Job {
       name: company.name,
       slug: company.slug,
       logoUrl: company.logoUrl,
+      phone: company.phone,
+      email: company.email,
     },
 
     category: primaryCategory,
@@ -345,6 +344,26 @@ function buildFiltersParams(
     }
   }
 
+  if (filters.company) {
+    params.set("filters[company][slug][$eq]", filters.company);
+  }
+
+  if (filters.level) {
+    params.set("filters[level_job][$eq]", filters.level);
+  }
+
+  if (filters.experience) {
+    params.set("filters[experience_job][$eq]", filters.experience);
+  }
+
+  if (filters.education) {
+    params.set("filters[education_job][$eq]", filters.education);
+  }
+
+  if (filters.position) {
+    params.set("filters[position][$contains]", filters.position);
+  }
+
   const safePage = filters.page && Number.isFinite(filters.page) && filters.page > 0 ? filters.page : 1;
   params.set("pagination[page]", String(safePage));
   params.set("pagination[pageSize]", String(PAGE_SIZE));
@@ -406,6 +425,26 @@ export async function getPremiumJobs(filters: JobFilters = {}): Promise<JobListR
       } else {
         params.set("filters[category][slug][$eq]", filters.category);
       }
+    }
+
+    if (filters.company) {
+      params.set("filters[company][slug][$eq]", filters.company);
+    }
+
+    if (filters.level) {
+      params.set("filters[level_job][$eq]", filters.level);
+    }
+
+    if (filters.experience) {
+      params.set("filters[experience_job][$eq]", filters.experience);
+    }
+
+    if (filters.education) {
+      params.set("filters[education_job][$eq]", filters.education);
+    }
+
+    if (filters.position) {
+      params.set("filters[position][$contains]", filters.position);
     }
 
     params.set("pagination[pageSize]", "50");
@@ -497,7 +536,7 @@ export async function getJobsByCategory(categorySlug: string): Promise<JobListRe
   }
 }
 
-export async function getCategoryCounts(categories = fallbackCategories) {
+export async function getCategoryCounts(categories: JobCategory[] = []) {
   try {
     const allJobs = await getAllJobs();
 

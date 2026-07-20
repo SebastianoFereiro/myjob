@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
 import { markdownComponents } from '@/lib/markdown';
@@ -21,10 +22,18 @@ function splitLines(value?: string) {
     .filter(Boolean);
 }
 
+function searchParamsString(entries: Record<string, string>): string {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(entries)) {
+    if (value) params.set(key, value);
+  }
+  const qs = params.toString();
+  return qs ? `?${qs}` : '';
+}
+
 export function JobDetails({ job }: { job: Job }) {
   const requirements = splitLines(job.requirements);
   const conditions = splitLines(job.conditions);
-  console.log('jib', job);
   return (
     <div className="space-y-8">
       <section>
@@ -35,44 +44,83 @@ export function JobDetails({ job }: { job: Job }) {
 
         <div className="rounded-lg border bg-background p-5 md:p-7">
           <div className="flex flex-wrap gap-2">
-            <Badge
-              variant={job.employmentType === 'remote' ? 'secondary' : 'outline'}
-              className="rounded-full px-4 py-1 text-xs font-medium"
+            <Link
+              href={`/jobs${searchParamsString({ type: job.employmentType })}`}
+              className="hover:opacity-80 transition-opacity"
             >
-              {employmentLabels[job.employmentType]}
-            </Badge>
-            {job.level && (
-              <Badge variant="outline" className="rounded-full px-4 py-1 text-xs font-medium">
-                {job.level}
+              <Badge
+                variant={job.employmentType === 'remote' ? 'secondary' : 'outline'}
+                className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer"
+              >
+                {employmentLabels[job.employmentType]}
               </Badge>
+            </Link>
+            {job.level && (
+              <Link
+                href={`/jobs${searchParamsString({ level: job.level })}`}
+                className="hover:opacity-80 transition-opacity"
+              >
+                <Badge variant="outline" className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer">
+                  {job.level}
+                </Badge>
+              </Link>
             )}
             {job.experience && (
-              <Badge variant="outline" className="rounded-full px-4 py-1 text-xs font-medium">
-                {job.experience}
-              </Badge>
+              <Link
+                href={`/jobs${searchParamsString({ experience: job.experience })}`}
+                className="hover:opacity-80 transition-opacity"
+              >
+                <Badge variant="outline" className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer">
+                  {job.experience}
+                </Badge>
+              </Link>
             )}
             {job.position && (
-              <Badge variant="outline" className="rounded-full px-4 py-1 text-xs font-medium">
-                {job.position}
-              </Badge>
+              <Link
+                href={`/jobs${searchParamsString({ position: job.position })}`}
+                className="hover:opacity-80 transition-opacity"
+              >
+                <Badge variant="outline" className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer">
+                  {job.position}
+                </Badge>
+              </Link>
             )}
           </div>
 
           <div className="mt-5 flex flex-wrap gap-4 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
-              <Layers3 className="size-4" />
-              {job.category?.name || ''}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
-              <MapPin className="size-4" />
-              {job.city ? `${job.city},` : ''} {job.location}
-            </span>
+            {job.category?.slug ? (
+              <Link href={`/categories/${job.category.slug}`} className="hover:opacity-80 transition-opacity">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 cursor-pointer">
+                  <Layers3 className="size-4" />
+                  {job.category.name}
+                </span>
+              </Link>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
+                <Layers3 className="size-4" />
+                {job.category?.name || ''}
+              </span>
+            )}
+            <Link
+              href={`/jobs${searchParamsString({ location: job.city || job.location })}`}
+              className="hover:opacity-80 transition-opacity"
+            >
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 cursor-pointer">
+                <MapPin className="size-4" />
+                {job.city ? `${job.city},` : ''} {job.location}
+              </span>
+            </Link>
 
             {job.education && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
-                <University className="size-4" />
-                Образование: {job.education}
-              </span>
+              <Link
+                href={`/jobs${searchParamsString({ education: job.education })}`}
+                className="hover:opacity-80 transition-opacity"
+              >
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 cursor-pointer">
+                  <University className="size-4" />
+                  Образование: {job.education}
+                </span>
+              </Link>
             )}
           </div>
 

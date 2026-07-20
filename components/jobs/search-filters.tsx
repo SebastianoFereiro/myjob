@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { BriefcaseBusiness, Layers3, MapPin, Search } from "lucide-react";
 import Link from "next/link";
@@ -7,7 +7,6 @@ import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { jobCategories as fallbackCategories } from "@/app/data/job-categories";
 import type { EmploymentType, JobCategory, JobFilters } from "@/types/jobs";
 
 type SearchFiltersProps = {
@@ -28,7 +27,7 @@ const employmentOptions: Array<{ value: EmploymentType | ""; label: string }> = 
 export function SearchFilters({
   initialFilters,
   layout = "bar",
-  categories = fallbackCategories,
+  categories = [],
 }: SearchFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -64,15 +63,20 @@ export function SearchFilters({
       params.delete("type");
     }
 
+    const queryString = params.toString();
+    const suffix = queryString ? `?${queryString}` : "";
+
     if (category) {
-      params.set("category", category);
+      // Категория выбрана — открываем страницу категории
+      router.push(`/categories/${category}${suffix}`);
+    } else if (pathname.startsWith("/categories/") && pathname !== "/categories") {
+      // На странице категории, но категория сброшена — переходим на /jobs
+      router.push(`/jobs${suffix}`);
     } else {
-      params.delete("category");
+      // На /jobs без категории — обычная фильтрация
+      const nextQuery = params.toString();
+      router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname);
     }
-    
-    const nextQuery = params.toString();
-    const url = layout === "sidebar" ? pathname : "/jobs";
-    router.push(nextQuery ? `${url}?${nextQuery}` : `${url}`);
   }
 
   return (
@@ -115,7 +119,7 @@ export function SearchFilters({
           className="h-10 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           <option value="">Все категории</option>
-          {categories.map((option) => (
+          {(categories ?? []).map((option) => (
             <option key={option.slug} value={option.slug}>
               {option.name}
             </option>

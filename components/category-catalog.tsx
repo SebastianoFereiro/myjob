@@ -41,7 +41,7 @@ function mapCategoriesToItems(categories: Awaited<ReturnType<typeof getCategorie
       meta: `${category.count || 0} вакансий`,
       image: category.imageUrl || `/cat/default.jpg`,
       alt: `Раздел ${category.name}`,
-      href: `/jobs?category=${category.slug}#vacancies`,
+      href: `/categories/${category.slug}#vacancies`,
       slug: category.slug,
       layout: layouts[index] || 'default',
     }))
@@ -75,6 +75,7 @@ function CategoryCard({ item, active }: { item: CategoryItem; active: boolean })
             alt={item.title}
             fill
             quality={95}
+            loading="eager"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 50vw"
             className="h-full w-full  object-cover transition-transform duration-700 group-hover/card:scale-105 group-focus-within/card:scale-105"
           />
@@ -83,6 +84,7 @@ function CategoryCard({ item, active }: { item: CategoryItem; active: boolean })
             src="/cat/default.jpg"
             alt={item.title}
             fill
+            loading="eager"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
             className="scale-[1.15] object-cover transition-transform duration-700 group-hover/card:scale-105 group-focus-within/card:scale-105"
           />

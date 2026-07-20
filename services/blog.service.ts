@@ -19,10 +19,10 @@ type StrapiBlogRecord = {
     url?: string;
     alternativeText?: string | null;
     formats?: Record<string, unknown>;
-  }>;
+  }> | null;
   publishedAt?: string;
   createdAt?: string;
-  seo?: SeoMetadata | null;
+  SEO?: SeoMetadata | null;
 };
 
 const BLOG_ENDPOINT = "/blogs";
@@ -30,13 +30,19 @@ const BLOG_ENDPOINT = "/blogs";
 function resolveImages(
   images?: StrapiBlogRecord["images"],
 ): { url: string; alt: string }[] {
-  if (!images || !Array.isArray(images) || images.length === 0) {
+  if (!images) {
     return [{ url: FALLBACK_IMAGE_URL, alt: "Изображение недоступно" }];
   }
 
-  return images.map((img) => ({
-    url: getStrapiMediaURL(img.url) || FALLBACK_IMAGE_URL,
-    alt: img.alternativeText || "Иллюстрация статьи",
+  const imageArray = Array.isArray(images) ? images : [];
+
+  if (imageArray.length === 0) {
+    return [{ url: FALLBACK_IMAGE_URL, alt: "Изображение недоступно" }];
+  }
+
+  return imageArray.map((img) => ({
+    url: getStrapiMediaURL("url" in img ? img.url : undefined) || FALLBACK_IMAGE_URL,
+    alt: "alternativeText" in img ? (img.alternativeText ?? "Иллюстрация статьи") : "Иллюстрация статьи",
   }));
 }
 
@@ -58,7 +64,7 @@ function mapStrapiBlog(record: StrapiBlogRecord): BlogArticle {
     images: resolvedImages.map((img) => img.url),
     publishedAt:
       record.publishedAt || record.createdAt || new Date().toISOString(),
-    SEO: record.seo ?? null,
+    SEO: record.SEO ?? null,
   };
 }
 
@@ -116,8 +122,7 @@ export async function getBlogArticles(
 export async function getBlogArticleBySlug(slug: string) {
   try {
     const params = new URLSearchParams();
-    params.set("populate[0]", "images");
-    params.set("populate[1]", "seo");
+    params.set("populate", "*");
     params.set("filters[slug][$eq]", slug);
     params.set("pagination[pageSize]", "1");
 

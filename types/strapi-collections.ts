@@ -79,11 +79,15 @@ export type VacancyStatus =
 // ========================================================================
 export interface Category {
   id: number;
+  documentId?: string;
   name: string;
   slug: string;
   description: string | null;
   icon: string | null;
   count: number;
+  SEO?: SeoMetadata | null;
+  blocks?: PageBlock[];
+  text?: string | null;
 }
 
 // ========================================================================
@@ -102,6 +106,7 @@ export interface BlogPost {
     alternativeText: string | null;
   }>;
   author: string;
+  SEO?: SeoMetadata | null;
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -254,6 +259,8 @@ export interface JobCompany {
   name: string;
   slug: string;
   logoUrl?: string;
+  phone?: string;
+  email?: string;
 }
 
 export interface JobCategory {
@@ -286,6 +293,8 @@ export interface Job {
   salaryTo?: number;
   salary?: string | number;
   currency: string;
+  phone?: string;
+  email?: string;
   requirements?: string;
   conditions?: string;
   publishedAt: string;
@@ -313,6 +322,11 @@ export interface JobFilters {
   location?: string;
   type?: EmploymentType | '';
   category?: string;
+  company?: string;
+  level?: string;
+  experience?: string;
+  education?: string;
+  position?: string;
   page?: number;
 }
 
@@ -334,6 +348,10 @@ export interface SubscriptionPayload {
   location?: string;
   type?: EmploymentType | '';
   category?: string;
+  level?: string;
+  experience?: string;
+  education?: string;
+  position?: string;
 }
 
 // ========================================================================

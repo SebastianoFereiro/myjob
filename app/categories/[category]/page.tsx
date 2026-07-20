@@ -1,21 +1,39 @@
-import { notFound } from "next/navigation";
+import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-import { Metadata } from "next";
-import { getCategories } from "@/services/categories.service";
-import { JobList } from "@/components/jobs/job-list";
-import type { JobFilters } from "@/types/jobs";
-import Header from "@/components/header";
-import { navigationItems } from "@/app/data/navigation";
-import { Footer } from "@/components/footer";
-import { extractSeoMetadata } from "@/lib/extract-seo";
+import { Metadata } from 'next';
+import { getCategories, getCategoryBySlug } from '@/services/categories.service';
+import { JobList } from '@/components/jobs/job-list';
+import type { EmploymentType, JobFilters } from '@/types/jobs';
+import Header from '@/components/header';
+import { navigationItems } from '@/app/data/navigation';
+import { Footer } from '@/components/footer';
+import { extractSeoMetadata } from '@/lib/extract-seo';
+import { PageBlocks } from '@/components/page-blocks';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 type Props = {
   params: Promise<{
     category: string;
   }>;
+  searchParams: Promise<{
+    query?: string;
+    location?: string;
+    type?: string;
+    level?: string;
+    experience?: string;
+    education?: string;
+    position?: string;
+    page?: string;
+  }>;
 };
+
+function normalizePage(value?: string) {
+  const page = value ? parseInt(value, 10) : 1;
+  return Number.isFinite(page) && page > 0 ? page : 1;
+}
 
 async function getCategoryName(categorySlug: string): Promise<string | null> {
   const categories = await getCategories();
@@ -25,21 +43,27 @@ async function getCategoryName(categorySlug: string): Promise<string | null> {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params;
-  const categoryName = await getCategoryName(category);
-
-  if (!categoryName) {
-    return { title: "Категория не найдена" };
-  }
-
+  const [categoryData, categoryName] = await Promise.all([
+    getCategoryBySlug(category),
+    getCategoryName(category),
+  ]);
   return extractSeoMetadata({
-    fallbackTitle: `${categoryName} - Резюме и вакансии`,
-    fallbackDescription: `Профессионалы и вакансии в категории "${categoryName}". Найди свою идеальную работу на MyJOB.`,
+    SEO: categoryData?.SEO,
+    fallbackTitle: categoryName ? `${categoryName} - Резюме и вакансии` : 'Категория не найдена',
+    fallbackDescription: categoryName
+      ? `Профессионалы и вакансии в категории "${categoryName}". Найди свою идеальную работу на MyJOB.`
+      : undefined,
   });
 }
 
-export default async function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params, searchParams }: Props) {
   const { category } = await params;
-  const categoryName = await getCategoryName(category);
+  const sp = await searchParams;
+
+  const [categoryName, categoryData] = await Promise.all([
+    getCategoryName(category),
+    getCategoryBySlug(category),
+  ]);
 
   if (!categoryName) {
     notFound();
@@ -47,15 +71,35 @@ export default async function CategoryPage({ params }: Props) {
 
   const filters: JobFilters = {
     category,
+    query: sp.query || '',
+    location: sp.location || '',
+    type: (sp.type || '') as EmploymentType | '',
+    level: sp.level || '',
+    experience: sp.experience || '',
+    education: sp.education || '',
+    position: sp.position || '',
+    page: normalizePage(sp.page),
   };
 
+  const blocks = categoryData?.blocks;
+  const text = categoryData?.text;
+
   return (
-      <>
-     <Header navigationData={navigationItems} />
-    <main className="min-h-screen bg-background">
-      <JobList filters={filters} basePath="/categories" contained={true} />
-    </main>
-    <Footer />
+    <>
+      <Header navigationData={navigationItems} />
+      <main className="min-h-screen bg-background">
+        {blocks && blocks.length > 0 && <PageBlocks blocks={blocks} />}
+
+        <JobList filters={filters} basePath="/categories" contained={true} categorySlug={category} />
+        {text && (
+          <section className="w-full py-12">
+            <div className="prose prose-lg dark:prose-invert mx-auto max-w-3xl px-4">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+            </div>
+          </section>
+        )}
+      </main>
+      <Footer />
     </>
   );
 }

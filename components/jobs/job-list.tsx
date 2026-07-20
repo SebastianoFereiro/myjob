@@ -3,6 +3,7 @@ import { PremiumSection } from "@/components/jobs/premium-section";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getCategoriesWithCounts } from "@/services/categories.service";
+import { getCompanyBySlug } from "@/services/companies.service";
 import { getJobs, getPremiumJobs } from "@/services/jobs.service";
 import type { JobFilters } from "@/types/jobs";
 
@@ -10,18 +11,30 @@ type JobListProps = {
   filters: JobFilters;
   basePath?: string;
   contained?: boolean;
+  categorySlug?: string;
 };
 
-function pageHref(filters: JobFilters, page: number, basePath: string) {
+function pageHref(filters: JobFilters, page: number, basePath: string, categorySlug?: string) {
   const params = new URLSearchParams();
 
   if (filters.query) params.set("query", filters.query);
   if (filters.location) params.set("location", filters.location);
   if (filters.type) params.set("type", filters.type);
-  if (filters.category) params.set("category", filters.category);
+  if (!categorySlug && filters.category) params.set("category", filters.category);
+  if (filters.company) params.set("company", filters.company);
+  if (filters.level) params.set("level", filters.level);
+  if (filters.experience) params.set("experience", filters.experience);
+  if (filters.education) params.set("education", filters.education);
+  if (filters.position) params.set("position", filters.position);
   if (page > 1) params.set("page", String(page));
 
   const query = params.toString();
+
+  if (categorySlug) {
+    const base = `${basePath}/${categorySlug}`;
+    return query ? `${base}?${query}#vacancies` : `${base}#vacancies`;
+  }
+
   return query ? `${basePath}?${query}#vacancies` : `${basePath}#vacancies`;
 }
 
@@ -29,17 +42,27 @@ export async function JobList({
   filters,
   basePath = "/jobs",
   contained = true,
+  categorySlug,
 }: JobListProps) {
-  const [{ jobs, pagination }, { jobs: premiumJobs }, categories] =
+  const [{ jobs, pagination }, { jobs: premiumJobs }, categories, company] =
     await Promise.all([
       getJobs(filters),
       getPremiumJobs(filters),
       getCategoriesWithCounts(),
+      filters.company ? getCompanyBySlug(filters.company) : null,
     ]);
 
   const categoryName = categories.find(
     (category) => category.slug === filters.category,
   )?.name;
+
+  const companyName = company?.name;
+
+  const heading = companyName
+    ? `Вакансии: ${companyName}`
+    : categoryName
+      ? `Вакансии: ${categoryName}`
+      : "Актуальные вакансии";
 
   return (
     <section
@@ -48,24 +71,27 @@ export async function JobList({
     >
       <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">
-            {categoryName ? `Вакансии: ${categoryName}` : "Актуальные вакансии"}
-          </h2>
+          <h2 className="text-3xl font-semibold tracking-tight">{heading}</h2>
           <p className="mt-2 text-muted-foreground">
             Найдено вакансий: {pagination.total + premiumJobs.length}
           </p>
         </div>
         {filters.category ? (
           <Button variant="outline" asChild>
-            <a href={`${basePath}#vacancies`}>Сбросить категорию</a>
+            <a href={categorySlug ? `/jobs#vacancies` : `${basePath}#vacancies`}>
+              Сбросить категорию
+            </a>
+          </Button>
+        ) : null}
+        {filters.company && !filters.category ? (
+          <Button variant="outline" asChild>
+            <a href={`${basePath}#vacancies`}>Сбросить компанию</a>
           </Button>
         ) : null}
       </div>
 
-      {/* Премиум-секция (первые 6, остальные по кнопке) */}
       <PremiumSection jobs={premiumJobs} />
 
-      {/* Обычные вакансии */}
       {jobs.length > 0 ? (
         <div>
           {premiumJobs.length > 0 && (
@@ -94,7 +120,7 @@ export async function JobList({
             asChild={pagination.page > 1}
           >
             {pagination.page > 1 ? (
-              <a href={pageHref(filters, pagination.page - 1, basePath)}>Назад</a>
+              <a href={pageHref(filters, pagination.page - 1, basePath, categorySlug)}>Назад</a>
             ) : (
               <span>Назад</span>
             )}
@@ -108,7 +134,7 @@ export async function JobList({
             asChild={pagination.page < pagination.pageCount}
           >
             {pagination.page < pagination.pageCount ? (
-              <a href={pageHref(filters, pagination.page + 1, basePath)}>Вперед</a>
+              <a href={pageHref(filters, pagination.page + 1, basePath, categorySlug)}>Вперед</a>
             ) : (
               <span>Вперед</span>
             )}
@@ -118,4 +144,3 @@ export async function JobList({
     </section>
   );
 }
-

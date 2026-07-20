@@ -395,6 +395,10 @@ async function main() {
             author: post.author,
             images: uploadedIds.length > 0 ? uploadedIds : undefined,
             publishedAt: new Date().toISOString(),
+            SEO: {
+              metaTitle: post.title,
+              metaDescription: post.excerpt,
+            },
           },
         }),
       });

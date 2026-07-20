@@ -288,6 +288,27 @@ export const CategorySchema = {
       default: 0,
       min: 0,
     },
+    SEO: {
+      type: 'component',
+      repeatable: false,
+      component: 'shared.seo',
+    },
+    blocks: {
+      type: 'dynamiczone',
+      components: [
+        'page.hero',
+        'page.rich-text',
+        'page.faq',
+        'page.contact-info',
+        'page.pricing-table',
+        'page.team',
+        'page.cta',
+      ],
+    },
+    text: {
+      type: 'richtext',
+      required: false,
+    },
     // --- Отношения ---
     // vacancies: relation 1:M (inverse от Vacancy.category)
     // blog_posts: relation M:M (inverse от BlogPost.categories)
@@ -342,6 +363,11 @@ export const BlogSchema = {
     author: {
       type: 'string',
       maxLength: 100,
+    },
+    SEO: {
+      type: 'component',
+      repeatable: false,
+      component: 'shared.seo',
     },
   },
 } as const;
