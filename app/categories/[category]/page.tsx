@@ -91,10 +91,15 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       <main className="min-h-screen bg-background">
         {blocks && blocks.length > 0 && <PageBlocks blocks={blocks} />}
 
-        <JobList filters={filters} basePath="/categories" contained={true} categorySlug={category} />
+        <JobList
+          filters={filters}
+          basePath="/categories"
+          contained={true}
+          categorySlug={category}
+        />
         {text && (
           <section className="w-full py-12">
-            <div className="mx-auto max-w-3xl px-4">
+            <div className="mx-auto max-w-4xl px-4">
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                 {text}
               </ReactMarkdown>
