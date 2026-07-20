@@ -1,6 +1,7 @@
 import type { PageBlock } from '@/types/strapi-collections';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { markdownComponents } from '@/lib/markdown';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -9,9 +10,7 @@ function HeroBlock({ block }: { block: Extract<PageBlock, { __component: 'page.h
   return (
     <section className="w-full py-16 md:py-24">
       <div className="mx-auto max-w-4xl px-4 text-center">
-        <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
-          {block.title}
-        </h1>
+        <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">{block.title}</h1>
         {block.subtitle ? (
           <p className="mt-6 text-lg text-muted-foreground md:text-xl">{block.subtitle}</p>
         ) : null}
@@ -20,11 +19,17 @@ function HeroBlock({ block }: { block: Extract<PageBlock, { __component: 'page.h
   );
 }
 
-function RichTextBlock({ block }: { block: Extract<PageBlock, { __component: 'page.rich-text' }> }) {
+function RichTextBlock({
+  block,
+}: {
+  block: Extract<PageBlock, { __component: 'page.rich-text' }>;
+}) {
   return (
     <section className="w-full py-12">
-      <div className="prose prose-lg dark:prose-invert mx-auto max-w-3xl px-4">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{block.content}</ReactMarkdown>
+      <div className="mx-auto max-w-4xl px-4">
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+          {block.content}
+        </ReactMarkdown>
       </div>
     </section>
   );
@@ -40,9 +45,7 @@ function FaqBlock({ block }: { block: Extract<PageBlock, { __component: 'page.fa
         <div className="space-y-4">
           {(block.items ?? []).map((item, i) => (
             <details key={i} className="group rounded-lg border p-4">
-              <summary className="cursor-pointer text-lg font-medium">
-                {item.question}
-              </summary>
+              <summary className="cursor-pointer text-lg font-medium">{item.question}</summary>
               <p className="mt-2 text-muted-foreground">{item.answer}</p>
             </details>
           ))}
@@ -128,7 +131,11 @@ function PricingTableBlock({
                     </li>
                   ))}
                 </ul>
-                <Button asChild variant={item.highlighted ? 'default' : 'outline'} className="w-full">
+                <Button
+                  asChild
+                  variant={item.highlighted ? 'default' : 'outline'}
+                  className="w-full"
+                >
                   <Link href={item.button_url}>{item.button_text}</Link>
                 </Button>
               </CardContent>

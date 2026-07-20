@@ -11,6 +11,7 @@ import { navigationItems } from '@/app/data/navigation';
 import { Footer } from '@/components/footer';
 import { extractSeoMetadata } from '@/lib/extract-seo';
 import { PageBlocks } from '@/components/page-blocks';
+import { markdownComponents } from '@/lib/markdown';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -93,8 +94,10 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         <JobList filters={filters} basePath="/categories" contained={true} categorySlug={category} />
         {text && (
           <section className="w-full py-12">
-            <div className="prose prose-lg dark:prose-invert mx-auto max-w-3xl px-4">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+            <div className="mx-auto max-w-3xl px-4">
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                {text}
+              </ReactMarkdown>
             </div>
           </section>
         )}

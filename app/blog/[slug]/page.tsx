@@ -83,7 +83,7 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
                 />
               </div>
 
-              <div className="prose prose-gray max-w-none dark:prose-invert">
+              <div className="max-w-none">
                 <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                   {article.content || 'Материал готовится к публикации.'}
                 </ReactMarkdown>
