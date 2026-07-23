@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ interface CompanySettingsFormProps {
 }
 
 export function CompanySettingsForm({ company: initialCompany }: CompanySettingsFormProps) {
+  const router = useRouter();
   const { data: session } = authClient.useSession();
   const [company, setCompany] = useState<CompanyPublic | null>(initialCompany ?? null);
   const [loadingCompany, setLoadingCompany] = useState(!initialCompany);
@@ -97,7 +99,11 @@ export function CompanySettingsForm({ company: initialCompany }: CompanySettings
         throw new Error(data.error || "Не удалось обновить данные");
       }
 
+      // Обновляем user.name в сессии better-auth, чтобы DashboardLayout подхватил новое название
+      await authClient.updateUser({ name: name.trim() });
+
       setSuccess("Данные компании успешно обновлены");
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ошибка при сохранении");
     } finally {
