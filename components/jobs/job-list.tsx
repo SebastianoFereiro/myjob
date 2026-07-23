@@ -81,7 +81,7 @@ export async function JobList({
 
   return (
     <section id="vacancies" className={cn(contained ? 'container py-12' : 'py-0')}>
-      <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+      <div className="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
         <div>
           {categoryData?.description && (
             <h1
