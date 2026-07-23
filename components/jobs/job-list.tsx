@@ -1,11 +1,11 @@
-import { JobCard } from "@/components/jobs/job-card";
-import { PremiumSection } from "@/components/jobs/premium-section";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { getCategoriesWithCounts, getCategoryBySlug } from "@/services/categories.service";
-import { getCompanyBySlug } from "@/services/companies.service";
-import { getJobs, getPremiumJobs } from "@/services/jobs.service";
-import type { JobFilters } from "@/types/jobs";
+import { JobCard } from '@/components/jobs/job-card';
+import { PremiumSection } from '@/components/jobs/premium-section';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { getCategoriesWithCounts, getCategoryBySlug } from '@/services/categories.service';
+import { getCompanyBySlug } from '@/services/companies.service';
+import { getJobs, getPremiumJobs } from '@/services/jobs.service';
+import type { JobFilters } from '@/types/jobs';
 
 type JobListProps = {
   filters: JobFilters;
@@ -15,20 +15,26 @@ type JobListProps = {
   citySlug?: string;
 };
 
-function pageHref(filters: JobFilters, page: number, basePath: string, categorySlug?: string, citySlug?: string) {
+function pageHref(
+  filters: JobFilters,
+  page: number,
+  basePath: string,
+  categorySlug?: string,
+  citySlug?: string
+) {
   const params = new URLSearchParams();
 
-  if (filters.query) params.set("query", filters.query);
-  if (filters.location) params.set("location", filters.location);
-  if (filters.type) params.set("type", filters.type);
-  if (!categorySlug && filters.category) params.set("category", filters.category);
-  if (filters.company) params.set("company", filters.company);
-  if (filters.level) params.set("level", filters.level);
-  if (filters.experience) params.set("experience", filters.experience);
-  if (filters.education) params.set("education", filters.education);
-  if (filters.position) params.set("position", filters.position);
-  if (!citySlug && filters.city) params.set("city", filters.city);
-  if (page > 1) params.set("page", String(page));
+  if (filters.query) params.set('query', filters.query);
+  if (filters.location) params.set('location', filters.location);
+  if (filters.type) params.set('type', filters.type);
+  if (!categorySlug && filters.category) params.set('category', filters.category);
+  if (filters.company) params.set('company', filters.company);
+  if (filters.level) params.set('level', filters.level);
+  if (filters.experience) params.set('experience', filters.experience);
+  if (filters.education) params.set('education', filters.education);
+  if (filters.position) params.set('position', filters.position);
+  if (!citySlug && filters.city) params.set('city', filters.city);
+  if (page > 1) params.set('page', String(page));
 
   const query = params.toString();
 
@@ -39,8 +45,8 @@ function pageHref(filters: JobFilters, page: number, basePath: string, categoryS
 
   if (categorySlug) {
     const base = `${basePath}/${categorySlug}`;
-    const cityQ = filters.city ? `city=${filters.city}` : "";
-    const combined = [query, cityQ].filter(Boolean).join("&");
+    const cityQ = filters.city ? `city=${filters.city}` : '';
+    const combined = [query, cityQ].filter(Boolean).join('&');
     return combined ? `${base}?${combined}#vacancies` : `${base}#vacancies`;
   }
 
@@ -49,7 +55,7 @@ function pageHref(filters: JobFilters, page: number, basePath: string, categoryS
 
 export async function JobList({
   filters,
-  basePath = "/jobs",
+  basePath = '/jobs',
   contained = true,
   categorySlug,
   citySlug,
@@ -63,9 +69,7 @@ export async function JobList({
       categorySlug ? getCategoryBySlug(categorySlug) : null,
     ]);
 
-  const categoryName = categories.find(
-    (category) => category.slug === filters.category,
-  )?.name;
+  const categoryName = categories.find((category) => category.slug === filters.category)?.name;
 
   const companyName = company?.name;
 
@@ -73,21 +77,20 @@ export async function JobList({
     ? `Вакансии: ${companyName}`
     : categoryName
       ? `Вакансии: ${categoryName}`
-      : "Актуальные вакансии";
+      : 'Актуальные вакансии';
 
   return (
-    <section
-      id="vacancies"
-      className={cn(contained ? "container py-12" : "py-0")}
-    >
+    <section id="vacancies" className={cn(contained ? 'container py-12' : 'py-0')}>
       <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">{heading}</h2>
           {categoryData?.description && (
-            <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-5xl">
-              {categoryData.description}
-            </h1>
+            <h1
+              className="pt-3 text-3xl font-bold tracking-tight md:text-5xl"
+              dangerouslySetInnerHTML={{ __html: categoryData.description }}
+            />
           )}
+          <h2 className="text-xl mt-1 font-semibold tracking-tight">{heading}</h2>
+
           <p className="mt-2 text-muted-foreground">
             Найдено вакансий: {pagination.total + premiumJobs.length}
           </p>
@@ -100,7 +103,7 @@ export async function JobList({
         {filters.category ? (
           <Button variant="outline" asChild>
             <a href={citySlug ? `/cities/${citySlug}#vacancies` : `${basePath}#vacancies`}>
-              {citySlug ? "Сбросить категорию" : "Сбросить категорию"}
+              {citySlug ? 'Сбросить категорию' : 'Сбросить категорию'}
             </a>
           </Button>
         ) : null}
@@ -115,9 +118,7 @@ export async function JobList({
 
       {jobs.length > 0 ? (
         <div>
-          {premiumJobs.length > 0 && (
-            <h3 className="mb-3 text-lg font-semibold">Все вакансии</h3>
-          )}
+          {premiumJobs.length > 0 && <h3 className="mb-3 text-lg font-semibold">Все вакансии</h3>}
           <div className="grid gap-4 sm:grid-cols-2">
             {jobs.map((job) => (
               <JobCard key={job.id} job={job} />
@@ -135,11 +136,7 @@ export async function JobList({
 
       {pagination.pageCount > 1 ? (
         <div className="mt-8 flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            disabled={pagination.page <= 1}
-            asChild={pagination.page > 1}
-          >
+          <Button variant="outline" disabled={pagination.page <= 1} asChild={pagination.page > 1}>
             {pagination.page > 1 ? (
               <a href={pageHref(filters, pagination.page - 1, basePath, categorySlug)}>Назад</a>
             ) : (
