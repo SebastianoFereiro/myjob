@@ -123,6 +123,34 @@ async function fetchBlogPages(): Promise<SitemapEntry[]> {
   }
 }
 
+async function fetchCityPages(): Promise<SitemapEntry[]> {
+  try {
+    const params = new URLSearchParams();
+    params.set("sort[0]", "title:asc");
+    params.set("pagination[pageSize]", "100");
+    params.set("populate", "*");
+
+    const response = await fetchAPI<StrapiListResponse<StrapiSitemapRecord>>(
+      `/cities?${params.toString()}`,
+      { next: { revalidate: 3600, tags: ["cities"] } },
+    );
+
+    return response.data
+      .map((record) => {
+        const r = unwrapStrapiRecord(record);
+        if (!r.slug) return null;
+        return {
+          url: siteUrl(`/cities/${r.slug}`),
+          changeFrequency: "weekly" as const,
+          priority: 0.6 as const,
+        };
+      })
+      .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
+  } catch {
+    return [];
+  }
+}
+
 async function fetchCategoryPages(): Promise<SitemapEntry[]> {
   try {
     const params = new URLSearchParams();
@@ -184,7 +212,7 @@ async function fetchCompanyPages(): Promise<SitemapEntry[]> {
 // ===== Главная функция =====
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [staticPages, jobPages, blogPages, categoryPages, companyPages] =
+  const [staticPages, jobPages, blogPages, categoryPages, companyPages, cityPages] =
     await Promise.all([
       Promise.resolve(
         STATIC_ROUTES.map((route) => ({
@@ -197,7 +225,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       fetchBlogPages(),
       fetchCategoryPages(),
       fetchCompanyPages(),
+      fetchCityPages(),
     ]);
 
-  return [...staticPages, ...jobPages, ...blogPages, ...categoryPages, ...companyPages];
+  return [...staticPages, ...jobPages, ...blogPages, ...categoryPages, ...companyPages, ...cityPages];
 }

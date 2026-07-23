@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Building2, Loader2 } from 'lucide-react';
 
@@ -27,6 +27,7 @@ import type {
   CvCurrency,
   CategoryRef,
 } from '@/types/cv';
+import type { CityRef } from '@/types/strapi-collections';
 
 const employmentOptions: { value: CvEmploymentType; label: string }[] = [
   { value: 'Полная занятость', label: 'Полная занятость' },
@@ -69,6 +70,8 @@ interface Props {
 export function CvEditForm({ cv, categories }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [cities, setCities] = useState<CityRef[]>([]);
+  const [loadingCities, setLoadingCities] = useState(true);
   const [error, setError] = useState('');
 
   const [formData, setFormData] = useState<CvVacancyFormData>({
@@ -82,7 +85,7 @@ export function CvEditForm({ cv, categories }: Props) {
     currency: cv.currency,
     employmentType: (cv.employmentType || '') as CvVacancyFormData['employmentType'],
     location: cv.location,
-    city: cv.city || '',
+    cityDocumentId: cv.city?.documentId || null,
     level_job: (cv.level_job || '') as CvVacancyFormData['level_job'],
     experience_job: (cv.experience_job || '') as CvVacancyFormData['experience_job'],
     education_job: (cv.education_job || '') as CvVacancyFormData['education_job'],
@@ -91,6 +94,30 @@ export function CvEditForm({ cv, categories }: Props) {
     companyDocumentId: cv.company?.documentId || null,
     categoryDocumentId: cv.category?.documentId || null,
   });
+
+  useEffect(() => {
+    async function loadCities() {
+      try {
+        const res = await fetch('/api/strapi/cities?pagination[pageSize]=100&sort[0]=title:asc');
+        if (res.ok) {
+          const json = await res.json();
+          setCities(
+            (json.data || []).map((r: Record<string, unknown>) => ({
+              id: (r as { id?: number }).id || 0,
+              documentId: (r as { documentId?: string }).documentId || '',
+              title: (r as { title?: string }).title || '',
+              slug: (r as { slug?: string }).slug || '',
+            }) as CityRef),
+          );
+        }
+      } catch {
+        // ignore
+      } finally {
+        setLoadingCities(false);
+      }
+    }
+    loadCities();
+  }, []);
 
   function updateField<K extends keyof CvVacancyFormData>(key: K, value: CvVacancyFormData[K]) {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -191,12 +218,22 @@ export function CvEditForm({ cv, categories }: Props) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="city">Город проживания</Label>
-            <Input
-              id="city"
-              value={formData.city || ''}
-              onChange={(e) => updateField('city', e.target.value)}
-            />
+            <Label htmlFor="city">Город</Label>
+            <Select
+              value={formData.cityDocumentId || ''}
+              onValueChange={(value) => updateField('cityDocumentId', value || null)}
+            >
+              <SelectTrigger id="city">
+                <SelectValue placeholder="Выберите город" />
+              </SelectTrigger>
+              <SelectContent>
+                {cities.map((city) => (
+                  <SelectItem key={city.documentId || city.id} value={city.documentId || String(city.id)}>
+                    {city.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

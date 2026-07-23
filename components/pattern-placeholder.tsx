@@ -4,6 +4,7 @@ import { BlogLatestTech, type BlogPost } from '@/components/blog-latest-tech';
 import { Button } from '@/components/ui/button';
 import { getBlogArticles } from '@/services/blog.service';
 import { getCategoriesWithCounts } from '@/services/categories.service';
+import { getCities } from '@/services/cities.service';
 import { Feature154 } from './feature-list';
 import { SearchFilters } from './jobs/search-filters';
 import { ToolsStackSection } from './tools-stack-section';
@@ -27,9 +28,10 @@ const layouts: Array<'default' | 'wide' | 'tall'> = [
 ];
 
 const PatternPlaceholder = async () => {
-  const [{ articles }, categories] = await Promise.all([
+  const [{ articles }, categories, cities] = await Promise.all([
     getBlogArticles(1, 5),
     getCategoriesWithCounts(),
+    getCities(),
   ]);
 
   const cat: CategoryItem[] = categories.slice(0, 7).map((category, index) => ({
@@ -71,7 +73,7 @@ const PatternPlaceholder = async () => {
             </Button>
           </div>
           <Suspense fallback={null}>
-            <SearchFilters categories={categories} />
+            <SearchFilters categories={categories} cities={cities} />
           </Suspense>
           <CategoryCatalog items={cat} />
           <Feature154 />

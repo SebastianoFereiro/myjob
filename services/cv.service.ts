@@ -1,5 +1,6 @@
 import { fetchAPI } from "@/lib/strapi-client";
 import type { SeoMetadata } from '@/types/seo';
+import type { CityRef } from '@/types/strapi-collections';
 import {
   type StrapiListResponse,
   unwrapStrapiRecord,
@@ -34,7 +35,7 @@ type StrapiCvRecord = {
   currency?: string;
   employmentType?: string;
   location?: string;
-  city?: string | null;
+  city?: Record<string, unknown> | null;
   level_job?: string | null;
   experience_job?: string | null;
   education_job?: string | null;
@@ -91,7 +92,7 @@ function mapStrapiCv(record: StrapiCvRecord): CvVacancy {
     currency: (record.currency as CvVacancy["currency"]) || "BYN",
     employmentType: (record.employmentType as CvVacancy["employmentType"]) || "Полная занятость",
     location: record.location || "",
-    city: record.city ?? null,
+    city: extractRef<CityRef>(record.city as Record<string, unknown> | null | undefined),
     level_job: (record.level_job as CvVacancy["level_job"]) ?? null,
     experience_job: (record.experience_job as CvVacancy["experience_job"]) ?? null,
     education_job: (record.education_job as CvVacancy["education_job"]) ?? null,
@@ -227,7 +228,7 @@ export async function createCv(data: CvVacancyFormData) {
     currency: data.currency,
     employmentType: data.employmentType,
     location: data.location,
-    city: data.city,
+    city: data.cityDocumentId || undefined,
     level_job: data.level_job || undefined,
     experience_job: data.experience_job || undefined,
     education_job: data.education_job || undefined,
@@ -271,7 +272,7 @@ export async function updateCv(documentId: string, data: Partial<CvVacancyFormDa
   if (data.currency !== undefined) payload.currency = data.currency;
   if (data.employmentType !== undefined) payload.employmentType = data.employmentType;
   if (data.location !== undefined) payload.location = data.location;
-  if (data.city !== undefined) payload.city = data.city;
+  if (data.cityDocumentId !== undefined) payload.city = data.cityDocumentId || null;
   if (data.level_job !== undefined) payload.level_job = data.level_job || undefined;
   if (data.experience_job !== undefined) payload.experience_job = data.experience_job || undefined;
   if (data.education_job !== undefined) payload.education_job = data.education_job || undefined;

@@ -1,5 +1,6 @@
 import { fetchAPI, getStrapiMediaURL } from "@/lib/strapi-client";
 import type { SeoMetadata } from '@/types/seo';
+import type { CityRef } from '@/types/strapi-collections';
 import {
   type StrapiListResponse,
   unwrapStrapiRecord,
@@ -75,7 +76,7 @@ type StrapiCVRecord = {
   slug?: string;
   sortOrder?: number;
   isActive?: boolean;
-  city?: string | null;
+  city?: Record<string, unknown> | string | null;
   location?: string | null;
   position?: string | null;
   requirements?: string | null;
@@ -231,6 +232,23 @@ function cvToJob(record: StrapiCVRecord): Job {
 
   const id = String(record.documentId ?? record.id ?? record.slug ?? record.title);
 
+  function extractCityName(city: Record<string, unknown> | string | null | undefined): string | undefined {
+    if (!city) return undefined;
+    if (typeof city === "string") return city;
+    return (city.title as string) ?? (city.name as string) ?? undefined;
+  }
+
+  function extractCityRef(city: Record<string, unknown> | string | null | undefined): CityRef | undefined {
+    if (!city || typeof city === "string") return undefined;
+    return {
+      id: Number((city as Record<string, unknown>).id ?? 0),
+      documentId: String((city as Record<string, unknown>).documentId ?? ""),
+      title: String((city as Record<string, unknown>).title ?? ""),
+      slug: String((city as Record<string, unknown>).slug ?? ""),
+      description: (city as Record<string, unknown>).description as string | undefined,
+    };
+  }
+
   return {
     id,
     documentId: record.documentId || id,
@@ -253,10 +271,11 @@ function cvToJob(record: StrapiCVRecord): Job {
     education: record.education_job || undefined,
     experience: record.experience_job || undefined,
     position: record.position || undefined,
-    region: record.city || record.location || undefined,
-    cities: record.city ? [record.city] : [],
-    city: record.city || undefined,
-    location: record.location || record.city || "Не указано",
+    region: extractCityName(record.city) || record.location || undefined,
+    cities: extractCityName(record.city) ? [extractCityName(record.city)!] : [],
+    city: extractCityName(record.city),
+    cityRef: extractCityRef(record.city),
+    location: record.location || extractCityName(record.city) || "Не указано",
     employmentType: normalizeEmploymentType(record.employmentType),
 
     salaryFrom: record.salaryFrom ?? undefined,
@@ -364,6 +383,10 @@ function buildFiltersParams(
     params.set("filters[position][$contains]", filters.position);
   }
 
+  if (filters.city) {
+    params.set("filters[city][slug][$eq]", filters.city);
+  }
+
   const safePage = filters.page && Number.isFinite(filters.page) && filters.page > 0 ? filters.page : 1;
   params.set("pagination[page]", String(safePage));
   params.set("pagination[pageSize]", String(PAGE_SIZE));
@@ -445,6 +468,10 @@ export async function getPremiumJobs(filters: JobFilters = {}): Promise<JobListR
 
     if (filters.position) {
       params.set("filters[position][$contains]", filters.position);
+    }
+
+    if (filters.city) {
+      params.set("filters[city][slug][$eq]", filters.city);
     }
 
     params.set("pagination[pageSize]", "50");

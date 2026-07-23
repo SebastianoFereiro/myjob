@@ -12,9 +12,10 @@ type JobListProps = {
   basePath?: string;
   contained?: boolean;
   categorySlug?: string;
+  citySlug?: string;
 };
 
-function pageHref(filters: JobFilters, page: number, basePath: string, categorySlug?: string) {
+function pageHref(filters: JobFilters, page: number, basePath: string, categorySlug?: string, citySlug?: string) {
   const params = new URLSearchParams();
 
   if (filters.query) params.set("query", filters.query);
@@ -26,13 +27,21 @@ function pageHref(filters: JobFilters, page: number, basePath: string, categoryS
   if (filters.experience) params.set("experience", filters.experience);
   if (filters.education) params.set("education", filters.education);
   if (filters.position) params.set("position", filters.position);
+  if (!citySlug && filters.city) params.set("city", filters.city);
   if (page > 1) params.set("page", String(page));
 
   const query = params.toString();
 
+  if (citySlug && !filters.category) {
+    const base = `/cities/${citySlug}`;
+    return query ? `${base}?${query}#vacancies` : `${base}#vacancies`;
+  }
+
   if (categorySlug) {
     const base = `${basePath}/${categorySlug}`;
-    return query ? `${base}?${query}#vacancies` : `${base}#vacancies`;
+    const cityQ = filters.city ? `city=${filters.city}` : "";
+    const combined = [query, cityQ].filter(Boolean).join("&");
+    return combined ? `${base}?${combined}#vacancies` : `${base}#vacancies`;
   }
 
   return query ? `${basePath}?${query}#vacancies` : `${basePath}#vacancies`;
@@ -43,6 +52,7 @@ export async function JobList({
   basePath = "/jobs",
   contained = true,
   categorySlug,
+  citySlug,
 }: JobListProps) {
   const [{ jobs, pagination }, { jobs: premiumJobs }, categories, company] =
     await Promise.all([
@@ -76,10 +86,15 @@ export async function JobList({
             Найдено вакансий: {pagination.total + premiumJobs.length}
           </p>
         </div>
+        {filters.city && !filters.category ? (
+          <Button variant="outline" asChild>
+            <a href={`/jobs#vacancies`}>Сбросить город</a>
+          </Button>
+        ) : null}
         {filters.category ? (
           <Button variant="outline" asChild>
-            <a href={categorySlug ? `/jobs#vacancies` : `${basePath}#vacancies`}>
-              Сбросить категорию
+            <a href={citySlug ? `/cities/${citySlug}#vacancies` : `${basePath}#vacancies`}>
+              {citySlug ? "Сбросить категорию" : "Сбросить категорию"}
             </a>
           </Button>
         ) : null}

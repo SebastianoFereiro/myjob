@@ -1,11 +1,14 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+
+export const dynamic = 'force-dynamic';
 
 import { Footer } from "@/components/footer";
 import Header from "@/components/header";
 import { JobFiltersPanel } from "@/components/jobs/job-filters-panel";
 import { JobList } from "@/components/jobs/job-list";
 import { getCategoriesWithCounts } from "@/services/categories.service";
+import { getCities } from "@/services/cities.service";
 import type { EmploymentType, JobFilters } from "@/types/jobs";
 
 export const metadata: Metadata = {
@@ -25,6 +28,7 @@ type JobsPageProps = {
     experience?: string;
     education?: string;
     position?: string;
+    city?: string;
     page?: string;
   }>;
 };
@@ -34,8 +38,31 @@ function normalizePage(value?: string) {
   return Number.isFinite(page) && page > 0 ? page : 1;
 }
 
+function slugifyCity(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[а-яё]/g, (ch: string) => {
+      const map: Record<string, string> = {
+        а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e',
+        ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm',
+        н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u',
+        ф: 'f', х: 'kh', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'shch',
+        ы: 'y', э: 'e', ю: 'yu', я: 'ya',
+      };
+      return map[ch] ?? ch;
+    })
+    .replace(/[^a-z0-9-_.~]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 export default async function JobsPage({ searchParams }: JobsPageProps) {
   const params = await searchParams;
+
+  // Перенаправляем /jobs?location=Минск на /cities/minsk
+  if (params.location && !params.category && !params.query && !params.type) {
+    const slug = slugifyCity(params.location);
+    redirect(`/cities/${slug}`);
+  }
 
   // Перенаправляем /jobs?category=X на каноническую страницу /categories/X
   if (params.category) {
@@ -63,9 +90,13 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
     experience: params.experience || "",
     education: params.education || "",
     position: params.position || "",
+    city: params.city || "",
     page: normalizePage(params.page),
   };
-  const categories = await getCategoriesWithCounts();
+  const [categories, cities] = await Promise.all([
+    getCategoriesWithCounts(),
+    getCities(),
+  ]);
 
   return (
     <>
@@ -86,7 +117,7 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
 
         <section className="container py-6 lg:py-8">
           <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[320px_minmax(0,1fr)]">
-            <JobFiltersPanel filters={filters} categories={categories} />
+            <JobFiltersPanel filters={filters} categories={categories} cities={cities} />
             <div className="min-w-0">
               <JobList filters={filters} basePath="/jobs" contained={false} />
             </div>

@@ -1,4 +1,5 @@
 import type { SeoMetadata } from '@/types/seo';
+import type { CityRef } from '@/types/strapi-collections';
 
 export type CvEmploymentType =
   | 'Полная занятость'
@@ -71,7 +72,7 @@ export interface CvVacancy {
   currency: CvCurrency;
   employmentType: CvEmploymentType;
   location: string;
-  city?: string | null;
+  city?: CityRef | null;
   level_job?: CvLevelJob | null;
   experience_job?: CvExperienceJob | null;
   education_job?: CvEducationJob | null;
@@ -112,7 +113,7 @@ export interface CvVacancyFormData {
   currency: CvCurrency;
   employmentType: CvEmploymentType | '';
   location: string;
-  city?: string;
+  cityDocumentId?: string | null;
   level_job?: CvLevelJob | '';
   experience_job?: CvExperienceJob | '';
   education_job?: CvEducationJob | '';

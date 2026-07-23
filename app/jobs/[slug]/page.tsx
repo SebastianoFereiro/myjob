@@ -165,7 +165,18 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                       </Link>
                       <span className="inline-flex items-center gap-2">
                         <MapPin className="size-4" />
-                        {job.city ? `${job.city},` : ''} {job.location}
+                        {job.cityRef?.slug ? (
+                          <a
+                            href={`/cities/${job.cityRef.slug}`}
+                            className="hover:text-foreground hover:underline"
+                          >
+                            {job.city}
+                          </a>
+                        ) : (
+                          job.city
+                        )}
+                        {job.city && job.location ? ',' : ''}
+                        {job.location ? ` ${job.location}` : ''}
                       </span>
                       <span className="inline-flex items-center gap-2">
                         <BriefcaseBusiness className="size-4" />

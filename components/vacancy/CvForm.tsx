@@ -28,6 +28,7 @@ import type {
   CompanyRef,
   CategoryRef,
 } from '@/types/cv';
+import type { CityRef } from '@/types/strapi-collections';
 
 const employmentOptions: { value: CvEmploymentType; label: string }[] = [
   { value: 'Полная занятость', label: 'Полная занятость' },
@@ -77,6 +78,7 @@ export function CvForm({ company: initialCompany }: Props) {
   const [error, setError] = useState('');
 
   const [categories, setCategories] = useState<CategoryRef[]>([]);
+  const [cities, setCities] = useState<CityRef[]>([]);
   const [loadingRefs, setLoadingRefs] = useState(true);
 
   const [formData, setFormData] = useState<CvVacancyFormData>({
@@ -90,7 +92,7 @@ export function CvForm({ company: initialCompany }: Props) {
     currency: 'BYN',
     employmentType: '',
     location: '',
-    city: '',
+    cityDocumentId: null,
     level_job: '',
     experience_job: '',
     education_job: '',
@@ -103,9 +105,12 @@ export function CvForm({ company: initialCompany }: Props) {
   useEffect(() => {
     async function loadRefs() {
       try {
-        const res = await fetch('/api/strapi/categories?pagination[pageSize]=100');
-        if (res.ok) {
-          const json = await res.json();
+        const [catRes, cityRes] = await Promise.all([
+          fetch('/api/strapi/categories?pagination[pageSize]=100'),
+          fetch('/api/strapi/cities?pagination[pageSize]=100&sort[0]=title:asc'),
+        ]);
+        if (catRes.ok) {
+          const json = await catRes.json();
           setCategories(
             (json.data || []).map((r: Record<string, unknown>) => ({
               id: (r as { id?: number }).id || 0,
@@ -113,6 +118,17 @@ export function CvForm({ company: initialCompany }: Props) {
               name: (r as { name?: string }).name || (r as { title?: string }).title || '',
               slug: (r as { slug?: string }).slug || '',
             }) as CategoryRef),
+          );
+        }
+        if (cityRes.ok) {
+          const json = await cityRes.json();
+          setCities(
+            (json.data || []).map((r: Record<string, unknown>) => ({
+              id: (r as { id?: number }).id || 0,
+              documentId: (r as { documentId?: string }).documentId || '',
+              title: (r as { title?: string }).title || '',
+              slug: (r as { slug?: string }).slug || '',
+            }) as CityRef),
           );
         }
       } catch {
@@ -255,13 +271,22 @@ export function CvForm({ company: initialCompany }: Props) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="city">Город проживания</Label>
-            <Input
-              id="city"
-              value={formData.city || ''}
-              onChange={(e) => updateField('city', e.target.value)}
-              placeholder="Минск"
-            />
+            <Label htmlFor="city">Город</Label>
+            <Select
+              value={formData.cityDocumentId || ''}
+              onValueChange={(value) => updateField('cityDocumentId', value || null)}
+            >
+              <SelectTrigger id="city">
+                <SelectValue placeholder="Выберите город" />
+              </SelectTrigger>
+              <SelectContent>
+                {cities.map((city) => (
+                  <SelectItem key={city.documentId || city.id} value={city.documentId || String(city.id)}>
+                    {city.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

@@ -60,7 +60,10 @@ export function JobDetails({ job }: { job: Job }) {
                 href={`/jobs${searchParamsString({ level: job.level })}`}
                 className="hover:opacity-80 transition-opacity"
               >
-                <Badge variant="outline" className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer">
+                <Badge
+                  variant="outline"
+                  className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer"
+                >
                   {job.level}
                 </Badge>
               </Link>
@@ -70,7 +73,10 @@ export function JobDetails({ job }: { job: Job }) {
                 href={`/jobs${searchParamsString({ experience: job.experience })}`}
                 className="hover:opacity-80 transition-opacity"
               >
-                <Badge variant="outline" className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer">
+                <Badge
+                  variant="outline"
+                  className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer"
+                >
                   {job.experience}
                 </Badge>
               </Link>
@@ -80,7 +86,10 @@ export function JobDetails({ job }: { job: Job }) {
                 href={`/jobs${searchParamsString({ position: job.position })}`}
                 className="hover:opacity-80 transition-opacity"
               >
-                <Badge variant="outline" className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer">
+                <Badge
+                  variant="outline"
+                  className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer"
+                >
                   {job.position}
                 </Badge>
               </Link>
@@ -89,7 +98,10 @@ export function JobDetails({ job }: { job: Job }) {
 
           <div className="mt-5 flex flex-wrap gap-4 text-sm text-muted-foreground">
             {job.category?.slug ? (
-              <Link href={`/categories/${job.category.slug}`} className="hover:opacity-80 transition-opacity">
+              <Link
+                href={`/categories/${job.category.slug}`}
+                className="hover:opacity-80 transition-opacity"
+              >
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 cursor-pointer">
                   <Layers3 className="size-4" />
                   {job.category.name}
@@ -101,15 +113,24 @@ export function JobDetails({ job }: { job: Job }) {
                 {job.category?.name || ''}
               </span>
             )}
-            <Link
-              href={`/jobs${searchParamsString({ location: job.city || job.location })}`}
-              className="hover:opacity-80 transition-opacity"
-            >
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 cursor-pointer">
+            {job.cityRef?.slug ? (
+              <Link
+                href={`/cities/${job.cityRef.slug}`}
+                className="hover:opacity-80 transition-opacity"
+              >
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 cursor-pointer">
+                  <MapPin className="size-4" />
+
+                  {job.location ? `${job.city}, ${job.location}` : job.city}
+                </span>
+              </Link>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
                 <MapPin className="size-4" />
-                {job.city ? `${job.city},` : ''} {job.location}
+                {job.city ? `${job.city},` : ''}
+                {job.location}
               </span>
-            </Link>
+            )}
 
             {job.education && (
               <Link

@@ -27,6 +27,7 @@ type Props = {
     experience?: string;
     education?: string;
     position?: string;
+    city?: string;
     page?: string;
   }>;
 };
@@ -79,6 +80,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     experience: sp.experience || '',
     education: sp.education || '',
     position: sp.position || '',
+    city: sp.city || '',
     page: normalizePage(sp.page),
   };
 
@@ -96,6 +98,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           basePath="/categories"
           contained={true}
           categorySlug={category}
+          citySlug={sp.city}
         />
         {text && (
           <section className="w-full py-12">

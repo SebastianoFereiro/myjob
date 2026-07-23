@@ -32,8 +32,8 @@ export function JobCard({ job, isPremium }: { job: Job; isPremium?: boolean }) {
   return (
     <Card
       className={cn(
-        "shadow-sm transition-shadow hover:shadow-md",
-        isPremium && "border-amber-400 ring-1 ring-amber-400/30",
+        'shadow-sm transition-shadow hover:shadow-md',
+        isPremium && 'border-amber-400 ring-1 ring-amber-400/30'
       )}
     >
       <CardHeader className="p-3 sm:p-5">
@@ -41,9 +41,7 @@ export function JobCard({ job, isPremium }: { job: Job; isPremium?: boolean }) {
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                {isPremium && (
-                  <Sparkles className="size-4 shrink-0 text-amber-500" />
-                )}
+                {isPremium && <Sparkles className="size-4 shrink-0 text-amber-500" />}
                 <CardTitle className="text-[15px] leading-snug font-semibold sm:text-lg">
                   {job.title}
                 </CardTitle>
@@ -102,13 +100,28 @@ export function JobCard({ job, isPremium }: { job: Job; isPremium?: boolean }) {
         </div>
 
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5">
-            <MapPin className="size-3.5 shrink-0" />
-            <span className="truncate">
-              {' '}
-              {job.city} {job.location}
+          {job.cityRef?.slug ? (
+            <a
+              href={`/cities/${job.cityRef.slug}`}
+              className="inline-flex items-center gap-1.5 hover:text-foreground hover:underline"
+            >
+              <MapPin className="size-3.5 shrink-0" />
+              <span className="truncate">
+                {job.city}
+                {job.location && (
+                  <span className="text-muted-foreground">
+                    {job.city ? ',' : ''} {job.location}
+                  </span>
+                )}
+              </span>
+            </a>
+          ) : job.city ? (
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="size-3.5 shrink-0" />
+              <span className="truncate">{job.city}</span>
             </span>
-          </span>
+          ) : null}
+
           <span className="inline-flex items-center gap-1.5 font-medium text-foreground/80">
             <BriefcaseBusiness className="size-3.5 shrink-0" />
             <span className="truncate">{formatSalary(job)}</span>

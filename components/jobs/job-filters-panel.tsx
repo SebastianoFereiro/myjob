@@ -13,13 +13,15 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import type { JobCategory, JobFilters } from "@/types/jobs";
+import type { CityRef } from "@/types/strapi-collections";
 
 type JobFiltersPanelProps = {
   filters: JobFilters;
   categories: JobCategory[];
+  cities?: CityRef[];
 };
 
-function FilterContent({ filters, categories }: JobFiltersPanelProps) {
+function FilterContent({ filters, categories, cities }: JobFiltersPanelProps) {
   return (
     <div className="space-y-5">
       <div>
@@ -32,17 +34,18 @@ function FilterContent({ filters, categories }: JobFiltersPanelProps) {
         initialFilters={filters}
         layout="sidebar"
         categories={categories}
+        cities={cities}
       />
     </div>
   );
 }
 
-export function JobFiltersPanel({ filters, categories }: JobFiltersPanelProps) {
+export function JobFiltersPanel({ filters, categories, cities }: JobFiltersPanelProps) {
   return (
     <>
       <aside className="hidden lg:block">
         <div className="sticky top-20 rounded-lg border bg-background p-4 shadow-sm">
-          <FilterContent filters={filters} categories={categories} />
+          <FilterContent filters={filters} categories={categories} cities={cities} />
         </div>
       </aside>
 
@@ -66,6 +69,7 @@ export function JobFiltersPanel({ filters, categories }: JobFiltersPanelProps) {
                 initialFilters={filters}
                 layout="sidebar"
                 categories={categories}
+                cities={cities}
               />
             </div>
           </SheetContent>

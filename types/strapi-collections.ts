@@ -91,6 +91,29 @@ export interface Category {
 }
 
 // ========================================================================
+// CITY
+// ========================================================================
+export interface City {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  text: string | null;
+  SEO: SeoMetadata | null;
+  count?: number;
+}
+
+export interface CityRef {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  description?: string;
+  [key: string]: unknown;
+}
+
+// ========================================================================
 // BLOG POST
 // ========================================================================
 export interface BlogPost {
@@ -315,6 +338,7 @@ export interface Job {
   push_from?: string | null;
   push_to?: string | null;
   isPremium?: boolean;
+  cityRef?: CityRef;
 }
 
 export interface JobFilters {
@@ -327,6 +351,7 @@ export interface JobFilters {
   experience?: string;
   education?: string;
   position?: string;
+  city?: string;
   page?: number;
 }
 

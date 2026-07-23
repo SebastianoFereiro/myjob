@@ -563,7 +563,50 @@ export const PageSchema = {
 } as const;
 
 // ========================================================================
-// 8. КОЛЛЕКЦИЯ: CV (вакансии — реально используемая)
+// 8. КОЛЛЕКЦИЯ: City
+// ========================================================================
+// Тип: Collection Type
+// API ID: city, cities
+// Отношения: CV (1:M)
+// ========================================================================
+
+export const CitySchema = {
+  collectionName: 'cities',
+  info: {
+    singularName: 'city',
+    pluralName: 'cities',
+    displayName: 'City',
+    description: 'Города для вакансий',
+  },
+  options: {
+    draftAndPublish: true,
+  },
+  pluginOptions: {},
+  attributes: {
+    title: {
+      type: 'string',
+    },
+    description: {
+      type: 'string',
+    },
+    slug: {
+      type: 'uid',
+    },
+    text: {
+      type: 'richtext',
+    },
+    SEO: {
+      type: 'component',
+      repeatable: false,
+      component: 'shared.seo',
+    },
+    // --- Отношения ---
+    // cvs: relation 1:M (inverse от CV.city)
+  },
+} as const;
+
+// ========================================================================
+// 9. КОЛЛЕКЦИЯ: CV (вакансии — реально используемая)
 // ========================================================================
 // Тип: Collection Type
 // API ID: cv, cvs
@@ -638,9 +681,10 @@ export const CVSchema = {
       maxLength: 300,
     },
     city: {
-      type: 'string',
-      required: false,
-      maxLength: 200,
+      type: 'relation',
+      relation: 'manyToOne',
+      target: 'api::city.city',
+      inversedBy: 'cvs',
     },
     level_job: {
       type: 'string',
@@ -704,6 +748,7 @@ export const CVSchema = {
     // --- Отношения ---
     // company: relation M:1 -> Company
     // category: relation M:1 -> Category
+    // city: relation M:1 -> City
     // image: media
     // SEO: component
     // Profile: relation
