@@ -94,6 +94,7 @@ function serializeFormData(data: ResumeFormData) {
     languages: JSON.stringify(data.languages),
     about: data.about,
     isPublished: data.isPublished,
+    publishedAt: new Date().toISOString(),
   };
 }
 
@@ -172,7 +173,7 @@ export async function createResume(data: ResumeFormData) {
     body: JSON.stringify(payload),
   });
 
-  let json: unknown;
+  let json: { data?: unknown } | undefined;
   try {
     json = await response.json();
   } catch {
@@ -184,8 +185,8 @@ export async function createResume(data: ResumeFormData) {
     );
   }
 
-  if (!response.ok || !(json as Record<string, unknown>)?.data) {
-    throw new Error(formatStrapiError(json as Parameters<typeof formatStrapiError>[0]));
+  if (!response.ok || !json?.data) {
+    throw new Error(formatStrapiError(json));
   }
 
   return mapStrapiResume(unwrapStrapiRecord(json.data));
