@@ -9,13 +9,13 @@ export const markdownComponents: Components = {
   ),
   h3: ({ children }) => <h3 className="mb-2 mt-6 text-lg font-semibold md:text-xl">{children}</h3>,
   p: ({ children }) => (
-    <p className="mb-2 leading-6 text-muted-foreground md:text-lg">{children}</p>
+    <p className="mb-2 leading-6 text-muted-foreground md:text-md">{children}</p>
   ),
   ul: ({ children }) => (
-    <ul className="mb-5 list-disc space-y-0 pl-6 text-muted-foreground md:text-lg">{children}</ul>
+    <ul className="mb-5 list-disc space-y-0 pl-6 text-muted-foreground md:text-md">{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="mb-5 list-decimal space-y-2 pl-6 text-muted-foreground md:text-lg">
+    <ol className="mb-5 list-decimal space-y-2 pl-6 text-muted-foreground md:text-md">
       {children}
     </ol>
   ),
