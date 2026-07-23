@@ -1,6 +1,6 @@
 export type Currency = "BYN" | "USD" | "EUR";
 
-export type EmploymentType = "full-time" | "part-time" | "contract" | "internship" | "remote";
+export type EmploymentType = "Полный день" | "Гибридный формат" | "Удаленный формат" | "Контракт";
 
 export interface SkillItem {
   name: string;
@@ -38,7 +38,7 @@ export interface ResumeFormData {
   position: string;
   salary: number | null;
   currency: Currency;
-  employmentType: EmploymentType | "";
+  employmentType: EmploymentType;
   location: string;
   skills: SkillItem[];
   experience: ExperienceItem[];

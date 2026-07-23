@@ -69,7 +69,11 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
     url = `${STRAPI_URL}/api/${strapiPath}${searchString ? `?${searchString}` : ""}`;
   }
 
-  const token = process.env.STRAPI_API_TOKEN;
+  // Выбираем токен в зависимости от метода
+  const isWriteMethod = request.method !== "GET" && request.method !== "HEAD";
+  const token = isWriteMethod
+    ? (process.env.STRAPI_API_WRITE_TOKEN || process.env.STRAPI_API_TOKEN)
+    : process.env.STRAPI_API_TOKEN;
 
   if (!token) {
     console.error("STRAPI_API_TOKEN is not set");
@@ -79,10 +83,12 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
     );
   }
 
+  console.log(`[STRAPI PROXY] method=${request.method} path=${strapiPath} usingWriteToken=${!!isWriteMethod && !!process.env.STRAPI_API_WRITE_TOKEN}`);
+
   try {
     let body = undefined;
 
-    if (request.method !== "GET" && request.method !== "HEAD") {
+    if (isWriteMethod) {
       const json = await request.json();
       // Добавляем userId из сессии в тело запроса
       body = {
@@ -94,8 +100,6 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
       };
     }
 
-    console.log(`Strapi proxy: ${request.method} ${url}`);
-
     const response = await fetch(url, {
       method: request.method,
       headers: {
@@ -105,8 +109,14 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
       body: body ? JSON.stringify(body) : undefined,
     });
 
-    const data = await response.json();
-    console.log(`Strapi response: ${response.status}`, JSON.stringify(data).slice(0, 200));
+    let data: unknown;
+    try {
+      data = await response.json();
+    } catch {
+      data = { error: { message: `Сервер Strapi вернул пустой ответ (${response.status})` } };
+    }
+
+    console.log(`[STRAPI PROXY] response status=${response.status} body=`, JSON.stringify(data).slice(0, 500));
 
     return NextResponse.json(data, {
       status: response.status,

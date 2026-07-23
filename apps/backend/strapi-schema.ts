@@ -459,6 +459,11 @@ export const ResumeSchema = {
       required: true,
       maxLength: 200,
     },
+    employmentType: {
+      type: 'enumeration',
+      enum: ['Полный день', 'Гибридный формат', 'Удаленный формат', 'Контракт'],
+      required: false,
+    },
     experience: {
       type: 'json',              // массив Experience[]
       required: true,

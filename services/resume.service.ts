@@ -1,4 +1,5 @@
 import { fetchAPI } from "@/lib/strapi-client";
+import { formatStrapiError } from "@/lib/strapi-errors";
 import {
   type StrapiListResponse,
   type StrapiSingleResponse,
@@ -48,7 +49,7 @@ function mapStrapiResume(record: StrapiResumeRecord): Resume {
     position: record.position || "",
     salary: record.salary ?? null,
     currency: (record.currency as Resume["currency"]) || "BYN",
-    employmentType: (record.employmentType as Resume["employmentType"]) || "full-time",
+    employmentType: (record.employmentType as Resume["employmentType"]) || "Полный день",
     location: record.location || "",
     skills: record.skills ? JSON.parse(record.skills) : [],
     experience: record.experience ? JSON.parse(record.experience) : [],
@@ -64,12 +65,20 @@ function mapStrapiResume(record: StrapiResumeRecord): Resume {
   };
 }
 
+function toSlug(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+    || "resume";
+}
+
 function serializeFormData(data: ResumeFormData) {
+  const hash = Date.now().toString(36).slice(-4);
+  const base = toSlug(data.position || data.title || `${data.firstName}-${data.lastName}`);
   return {
     title: data.title || `${data.position}`,
-    slug: data.title
-      ? data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
-      : `${data.firstName}-${data.lastName}`.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    slug: `${base}-${hash}`,
     firstName: data.firstName,
     lastName: data.lastName,
     phone: data.phone,
@@ -163,10 +172,21 @@ export async function createResume(data: ResumeFormData) {
     body: JSON.stringify(payload),
   });
 
-  if (!response.ok) throw new Error("Failed to create resume");
+  let json: unknown;
+  try {
+    json = await response.json();
+  } catch {
+    const text = await response.text().catch(() => "");
+    throw new Error(
+      text
+        ? `Сервер вернул ошибку: ${text.slice(0, 300)}`
+        : `Сервер вернул пустой ответ (${response.status})`
+    );
+  }
 
-  const json = await response.json();
-  if (!json.data) throw new Error("Failed to create resume");
+  if (!response.ok || !(json as Record<string, unknown>)?.data) {
+    throw new Error(formatStrapiError(json as Parameters<typeof formatStrapiError>[0]));
+  }
 
   return mapStrapiResume(unwrapStrapiRecord(json.data));
 }

@@ -209,7 +209,7 @@ export function CvEditForm({ cv, categories }: Props) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="location">Город / Регион</Label>
+            <Label htmlFor="location">Место</Label>
             <Input
               id="location"
               value={formData.location}

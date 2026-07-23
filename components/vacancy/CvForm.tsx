@@ -170,8 +170,8 @@ export function CvForm({ company: initialCompany }: Props) {
       const cv = await createCv(formData);
       router.push(`/company/cvs/${cv.documentId}/edit`);
       router.refresh();
-    } catch {
-      setError('Не удалось создать вакансию. Попробуйте позже.');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Не удалось создать вакансию. Попробуйте позже.');
       setLoading(false);
     }
   }
@@ -261,7 +261,7 @@ export function CvForm({ company: initialCompany }: Props) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="location">Город / Регион</Label>
+            <Label htmlFor="location">Место</Label>
             <Input
               id="location"
               value={formData.location}

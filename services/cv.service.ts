@@ -1,4 +1,5 @@
 import { fetchAPI } from "@/lib/strapi-client";
+import { formatStrapiError } from "@/lib/strapi-errors";
 import type { SeoMetadata } from '@/types/seo';
 import type { CityRef } from '@/types/strapi-collections';
 import {
@@ -125,11 +126,18 @@ async function strapiClientFetch<T>(path: string, options?: RequestInit): Promis
     ...options,
   });
 
-  if (!response.ok) {
-    throw new Error(`Strapi request failed: ${response.status}`);
+  let json: unknown;
+  try {
+    json = await response.json();
+  } catch {
+    throw new Error(`Сервер вернул некорректный ответ (${response.status}). Попробуйте позже.`);
   }
 
-  return response.json();
+  if (!response.ok) {
+    throw new Error(formatStrapiError(json as Parameters<typeof formatStrapiError>[0]));
+  }
+
+  return json as T;
 }
 
 export async function getCvsByUserId(page = 1): Promise<CvListResult> {
@@ -200,7 +208,8 @@ export async function getCvByDocumentId(documentId: string): Promise<CvVacancy |
 }
 
 export async function createCv(data: CvVacancyFormData) {
-  const slug = (data.title || data.position)
+  const hash = Date.now().toString(36).slice(-4);
+  const base = (data.title || data.position)
     .toLowerCase()
     // Транслитерация кириллицы
     .replace(/[а-яё]/g, (ch) => {
@@ -216,7 +225,8 @@ export async function createCv(data: CvVacancyFormData) {
     .replace(/[^a-z0-9-_.~]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .replace(/\.+/g, ".")
-    .slice(0, 200);
+    .slice(0, 196) || "vacancy";
+  const slug = `${base}-${hash}`;
 
   const payload: Record<string, unknown> = {
     title: data.title || data.position,

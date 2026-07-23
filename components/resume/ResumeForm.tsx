@@ -27,11 +27,10 @@ import type {
 } from "@/types/resume";
 
 const employmentOptions: { value: EmploymentType; label: string }[] = [
-  { value: "full-time", label: "Полная занятость" },
-  { value: "part-time", label: "Частичная занятость" },
-  { value: "contract", label: "Проектная работа" },
-  { value: "internship", label: "Стажировка" },
-  { value: "remote", label: "Удаленно" },
+  { value: "Полный день", label: "Полный день" },
+  { value: "Гибридный формат", label: "Гибридный формат" },
+  { value: "Удаленный формат", label: "Удаленный формат" },
+  { value: "Контракт", label: "Контракт" },
 ];
 
 const skillLevels = [
@@ -74,7 +73,7 @@ export function ResumeForm({
     position: initialData?.position || "",
     salary: initialData?.salary || null,
     currency: initialData?.currency || "BYN",
-    employmentType: initialData?.employmentType || "",
+    employmentType: initialData?.employmentType || "Полный день",
     location: initialData?.location || "",
     skills: initialData?.skills || [],
     experience: initialData?.experience || [],
@@ -220,8 +219,8 @@ export function ResumeForm({
       await createResume(formData);
       router.push("/dashboard");
       router.refresh();
-    } catch {
-      setError("Не удалось сохранить резюме. Попробуйте позже.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Не удалось сохранить резюме. Попробуйте позже.");
       setLoading(false);
     }
   }
@@ -313,7 +312,9 @@ export function ResumeForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="employmentType">Тип занятости</Label>
+            <Label htmlFor="employmentType">
+              Тип занятости <span className="text-destructive">*</span>
+            </Label>
             <Select
               value={formData.employmentType}
               onValueChange={(value) =>
@@ -321,7 +322,7 @@ export function ResumeForm({
               }
             >
               <SelectTrigger id="employmentType">
-                <SelectValue placeholder="Выберите тип" />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {employmentOptions.map((opt) => (
