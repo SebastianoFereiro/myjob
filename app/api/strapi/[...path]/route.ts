@@ -36,8 +36,11 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
 
   if (request.method === "GET") {
     const searchParams = new URLSearchParams(request.nextUrl.searchParams);
-    const ownedCollections = strapiPath === "cvs" || strapiPath === "cvs/" || strapiPath === "resumes" || strapiPath === "resumes/";
-    if (ownedCollections) {
+    // Добавляем userId для списков cvs и resumes
+    if (
+      strapiPath === "cvs" || strapiPath === "cvs/" ||
+      strapiPath === "resumes" || strapiPath === "resumes/"
+    ) {
       searchParams.set("filters[userId][$eq]", userId);
     }
     const searchString = searchParams.toString();
@@ -96,6 +99,11 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
       },
       body,
     });
+
+    // Strapi может вернуть 204 No Content (успешный DELETE без тела)
+    if (response.status === 204) {
+      return new NextResponse(null, { status: 204 });
+    }
 
     let data: unknown;
     try {

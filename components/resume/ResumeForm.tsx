@@ -17,7 +17,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { authClient } from "@/lib/auth-client";
-import { createResume } from "@/services/resume.service";
+import { createResume, updateResume } from "@/services/resume.service";
 import type {
   ResumeFormData,
   Currency,
@@ -58,6 +58,8 @@ interface Props {
 
 export function ResumeForm({
   initialData,
+  documentId,
+  mode = "create",
 }: Props) {
   const router = useRouter();
   const { data: session } = authClient.useSession();
@@ -216,9 +218,12 @@ export function ResumeForm({
     setLoading(true);
 
     try {
-      await createResume(formData);
-      router.push("/dashboard");
-      router.refresh();
+      if (mode === "edit" && documentId) {
+        await updateResume(documentId, formData);
+      } else {
+        await createResume(formData);
+      }
+      window.location.href = "/dashboard";
     } catch (e) {
       setError(e instanceof Error ? e.message : "Не удалось сохранить резюме. Попробуйте позже.");
       setLoading(false);

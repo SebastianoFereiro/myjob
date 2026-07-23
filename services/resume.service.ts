@@ -2,7 +2,6 @@ import { fetchAPI } from "@/lib/strapi-client";
 import { formatStrapiError } from "@/lib/strapi-errors";
 import {
   type StrapiListResponse,
-  type StrapiSingleResponse,
   unwrapStrapiRecord,
 } from "@/lib/strapi-record";
 import type { Resume, ResumeFormData } from "@/types/resume";
@@ -36,6 +35,19 @@ type StrapiResumeRecord = {
   publishedAt?: string;
 };
 
+function parseJSONField(value: unknown): unknown[] {
+  if (value == null) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 function mapStrapiResume(record: StrapiResumeRecord): Resume {
   return {
     id: String(record.documentId || record.id || ""),
@@ -51,10 +63,10 @@ function mapStrapiResume(record: StrapiResumeRecord): Resume {
     currency: (record.currency as Resume["currency"]) || "BYN",
     employmentType: (record.employmentType as Resume["employmentType"]) || "Полный день",
     location: record.location || "",
-    skills: record.skills ? JSON.parse(record.skills) : [],
-    experience: record.experience ? JSON.parse(record.experience) : [],
-    education: record.education ? JSON.parse(record.education) : [],
-    languages: record.languages ? JSON.parse(record.languages) : [],
+    skills: parseJSONField(record.skills) as Resume["skills"],
+    experience: parseJSONField(record.experience) as Resume["experience"],
+    education: parseJSONField(record.education) as Resume["education"],
+    languages: parseJSONField(record.languages) as Resume["languages"],
     about: record.about || "",
     isPublished: record.isPublished !== false,
     userId: record.userId || "",
@@ -143,6 +155,24 @@ export async function getResumesByUserId(userId: string, page = 1): Promise<Resu
   }
 }
 
+export async function getResumeByDocumentId(documentId: string) {
+  try {
+    const params = new URLSearchParams();
+    params.set("populate", "*");
+
+    const response = await fetchAPI<{ data: StrapiResumeRecord }>(
+      `${RESUME_ENDPOINT}/${documentId}?${params.toString()}`,
+      { next: { revalidate: 1, tags: ["resumes"] } },
+    );
+
+    if (!response.data) return null;
+
+    return mapStrapiResume(unwrapStrapiRecord(response.data));
+  } catch {
+    return null;
+  }
+}
+
 export async function getResumeBySlug(slug: string) {
   const params = new URLSearchParams();
   params.set("populate", "*");
@@ -159,6 +189,26 @@ export async function getResumeBySlug(slug: string) {
   return mapStrapiResume(unwrapStrapiRecord(record));
 }
 
+async function strapiClientFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const response = await fetch(`/api/strapi${path}`, {
+    headers: { "Content-Type": "application/json" },
+    ...options,
+  });
+
+  let json: unknown;
+  try {
+    json = await response.json();
+  } catch {
+    throw new Error(`Сервер вернул некорректный ответ (${response.status}). Попробуйте позже.`);
+  }
+
+  if (!response.ok) {
+    throw new Error(formatStrapiError(json as Parameters<typeof formatStrapiError>[0]));
+  }
+
+  return json as T;
+}
+
 export async function createResume(data: ResumeFormData) {
   const payload = {
     data: {
@@ -172,38 +222,51 @@ export async function createResume(data: ResumeFormData) {
     body: JSON.stringify(payload),
   });
 
-  let json: { data?: unknown } | undefined;
+  // Статус 2xx — успех, редиректим на dashboard
+  // Ошибки парсинга игнорируем — запись уже создана в Strapi
+  if (response.ok) return;
+
+  // Пробуем получить причину ошибки
   try {
-    json = await response.json();
-  } catch {
-    const text = await response.text().catch(() => "");
-    throw new Error(
-      text
-        ? `Сервер вернул ошибку: ${text.slice(0, 300)}`
-        : `Сервер вернул пустой ответ (${response.status})`
-    );
+    const raw = await response.text();
+    if (!raw) throw new Error(`HTTP ${response.status}`);
+    const parsed = JSON.parse(raw);
+    throw new Error(formatStrapiError(parsed));
+  } catch (e) {
+    if (e instanceof Error && e.message !== `HTTP ${response.status}`) throw e;
+    throw new Error(`Ошибка сервера (${response.status}). Попробуйте позже.`);
   }
-
-  if (!response.ok || !json?.data) {
-    throw new Error(formatStrapiError(json));
-  }
-
-  return mapStrapiResume(unwrapStrapiRecord(json.data));
 }
 
 export async function updateResume(
   documentId: string,
   data: Partial<ResumeFormData>,
 ) {
-  const payload = {
-    data: serializeFormData(data as ResumeFormData),
-  };
+  // Build partial payload — only send fields that changed
+  const payload: Record<string, unknown> = {};
 
-  const response = await fetchAPI<StrapiSingleResponse<StrapiResumeRecord>>(
-    `${RESUME_ENDPOINT}/${documentId}`,
+  if (data.title !== undefined) payload.title = data.title;
+  if (data.firstName !== undefined) payload.firstName = data.firstName;
+  if (data.lastName !== undefined) payload.lastName = data.lastName;
+  if (data.phone !== undefined) payload.phone = data.phone;
+  if (data.email !== undefined) payload.email = data.email;
+  if (data.position !== undefined) payload.position = data.position;
+  if (data.salary !== undefined) payload.salary = data.salary;
+  if (data.currency !== undefined) payload.currency = data.currency;
+  if (data.employmentType !== undefined) payload.employmentType = data.employmentType;
+  if (data.location !== undefined) payload.location = data.location;
+  if (data.skills !== undefined) payload.skills = JSON.stringify(data.skills);
+  if (data.experience !== undefined) payload.experience = JSON.stringify(data.experience);
+  if (data.education !== undefined) payload.education = JSON.stringify(data.education);
+  if (data.languages !== undefined) payload.languages = JSON.stringify(data.languages);
+  if (data.about !== undefined) payload.about = data.about;
+  if (data.isPublished !== undefined) payload.isPublished = data.isPublished;
+
+  const response = await strapiClientFetch<{ data: StrapiResumeRecord }>(
+    `/resumes/${documentId}`,
     {
       method: "PUT",
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ data: payload }),
     },
   );
 
@@ -213,7 +276,16 @@ export async function updateResume(
 }
 
 export async function deleteResume(documentId: string) {
-  await fetchAPI(`${RESUME_ENDPOINT}/${documentId}`, {
+  const response = await fetch(`/api/strapi/resumes/${documentId}`, {
     method: "DELETE",
   });
+
+  if (!response.ok) {
+    let message = "Не удалось удалить резюме";
+    try {
+      const err = await response.json();
+      message = err?.error?.message || message;
+    } catch {}
+    throw new Error(message);
+  }
 }

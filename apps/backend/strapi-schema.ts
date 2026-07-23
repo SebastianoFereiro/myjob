@@ -425,8 +425,8 @@ export const AuthorSchema = {
 // ========================================================================
 // Тип: Collection Type
 // API ID: resume, resumes
-// Отношения: User (created_by)
-// ВНИМАНИЕ: experience и education — JSON поля, НЕ компоненты Strapi
+// draftAndPublish: true
+// ВНИМАНИЕ: experience и education — blocks (Strapi Blocks), НЕ JSON
 // ========================================================================
 
 export const ResumeSchema = {
@@ -438,68 +438,76 @@ export const ResumeSchema = {
     description: 'Резюме соискателей',
   },
   options: {
-    draftAndPublish: false,
+    draftAndPublish: true,
   },
+  pluginOptions: {},
   attributes: {
-    full_name: {
+    title: {
       type: 'string',
       required: true,
-      maxLength: 200,
     },
-    email: {
-      type: 'email',
-      required: true,
+    slug: {
+      type: 'uid',
+      targetField: 'title',
+    },
+    firstName: {
+      type: 'string',
+    },
+    lastName: {
+      type: 'string',
     },
     phone: {
       type: 'string',
-      required: true,
+    },
+    email: {
+      type: 'string',
+    },
+    photo: {
+      type: 'media',
+      multiple: false,
+      allowedTypes: ['images', 'files', 'videos', 'audios'],
     },
     position: {
       type: 'string',
-      required: true,
-      maxLength: 200,
+    },
+    salary: {
+      type: 'integer',
+    },
+    currency: {
+      type: 'enumeration',
+      enum: ['USD', 'EUR', 'BYN'],
     },
     employmentType: {
       type: 'enumeration',
       enum: ['Полный день', 'Гибридный формат', 'Удаленный формат', 'Контракт'],
-      required: false,
     },
-    experience: {
-      type: 'json',              // массив Experience[]
-      required: true,
-    },
-    education: {
-      type: 'json',              // массив Education[]
-      required: true,
+    location: {
+      type: 'string',
     },
     skills: {
-      type: 'json',              // массив string[]
-      required: true,
+      type: 'json',
     },
-    summary: {
+    experience: {
+      type: 'blocks',
+    },
+    education: {
+      type: 'blocks',
+    },
+    languages: {
+      type: 'json',
+    },
+    about: {
       type: 'richtext',
-      required: true,
     },
-    portfolio_url: {
+    isPublished: {
+      type: 'boolean',
+    },
+    userId: {
       type: 'string',
-      required: false,
     },
-    linkedin_url: {
-      type: 'string',
-      required: false,
+    userEmail: {
+      type: 'email',
     },
-    file_url: {
-      type: 'string',            // URL загруженного файла
-      required: false,
-    },
-    status: {
-      type: 'enumeration',
-      enum: ['new', 'reviewed', 'interviewed', 'rejected', 'hired'],
-      required: true,
-      default: 'new',
-    },
-    // --- Отношения ---
-    // created_by: relation User (автоматически Strapi)
   },
 } as const;
 
