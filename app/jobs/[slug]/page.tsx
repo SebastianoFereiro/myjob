@@ -162,9 +162,10 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                         <Building2 className="size-4" />
                         {job.company.name}
                       </Link>
-                      <span className="inline-flex items-center gap-2">
-                        <MapPin className="size-4" />
-                        {job.cityRef?.slug ? (
+                      {job.cityRef?.slug && (
+                        <span className="inline-flex items-center gap-2">
+                          <MapPin className="size-4" />
+
                           <a
                             href={`/cities/${job.cityRef.slug}`}
                             className="hover:text-foreground hover:underline"
@@ -173,10 +174,8 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                               ? `${job.city}, ${job.location}`
                               : job.city || job.location}
                           </a>
-                        ) : (
-                          job.city
-                        )}
-                      </span>
+                        </span>
+                      )}
                       <span className="inline-flex items-center gap-2">
                         <BriefcaseBusiness className="size-4" />
                         {employmentLabels[job.employmentType]}
