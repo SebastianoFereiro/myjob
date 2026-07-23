@@ -2,7 +2,7 @@ import { JobCard } from "@/components/jobs/job-card";
 import { PremiumSection } from "@/components/jobs/premium-section";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { getCategoriesWithCounts } from "@/services/categories.service";
+import { getCategoriesWithCounts, getCategoryBySlug } from "@/services/categories.service";
 import { getCompanyBySlug } from "@/services/companies.service";
 import { getJobs, getPremiumJobs } from "@/services/jobs.service";
 import type { JobFilters } from "@/types/jobs";
@@ -54,12 +54,13 @@ export async function JobList({
   categorySlug,
   citySlug,
 }: JobListProps) {
-  const [{ jobs, pagination }, { jobs: premiumJobs }, categories, company] =
+  const [{ jobs, pagination }, { jobs: premiumJobs }, categories, company, categoryData] =
     await Promise.all([
       getJobs(filters),
       getPremiumJobs(filters),
       getCategoriesWithCounts(),
       filters.company ? getCompanyBySlug(filters.company) : null,
+      categorySlug ? getCategoryBySlug(categorySlug) : null,
     ]);
 
   const categoryName = categories.find(
@@ -82,6 +83,11 @@ export async function JobList({
       <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
         <div>
           <h2 className="text-3xl font-semibold tracking-tight">{heading}</h2>
+          {categoryData?.description && (
+            <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-5xl">
+              {categoryData.description}
+            </h1>
+          )}
           <p className="mt-2 text-muted-foreground">
             Найдено вакансий: {pagination.total + premiumJobs.length}
           </p>

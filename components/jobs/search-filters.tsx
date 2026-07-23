@@ -74,6 +74,9 @@ export function SearchFilters({
       router.push(`/categories/${category}${suffix}`);
     } else if (pathname.startsWith('/categories/') && pathname !== '/categories') {
       router.push(`/jobs${queryString ? `?${queryString}` : ''}`);
+    } else if (pathname === '/') {
+      const nextQuery = params.toString();
+      router.push(nextQuery ? `/jobs?${nextQuery}` : '/jobs');
     } else {
       const nextQuery = params.toString();
       router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname);
