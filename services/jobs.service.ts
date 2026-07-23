@@ -323,7 +323,8 @@ function buildFiltersParams(
   options?: { excludePremium?: boolean },
 ): URLSearchParams {
   const params = buildPopulateParams();
-  let orIndex = 0;
+  // excludePremium использует $or[0] и $or[1], query должен начинаться с $or[2]
+  let orIndex = options?.excludePremium ? 2 : 0;
 
   params.set("filters[isActive][$eq]", "true");
   params.set("sort[0]", "publishedAt:desc");

@@ -70,6 +70,8 @@ export function SearchFilters({
       const suffix = qs.toString() ? `?${qs.toString()}` : '';
       router.push(`/cities/${city}${suffix}`);
     } else if (category) {
+      const suffix = queryString ? `?${queryString}` : '';
+      router.push(`/categories/${category}${suffix}`);
     } else if (pathname.startsWith('/categories/') && pathname !== '/categories') {
       router.push(`/jobs${queryString ? `?${queryString}` : ''}`);
     } else {
