@@ -3,41 +3,21 @@ import { auth } from "@/lib/auth";
 
 const STRAPI_URL = (process.env.STRAPI_URL || "https://atlantis.myjob.by").replace(/\/$/, "");
 
-/**
- * Прокси для Strapi. Проверяет авторизацию и добавляет API-токен.
- * Запрос: POST /api/strapi/company-vacancies
- *         GET  /api/strapi/company-vacancies?filters...
- */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> },
-) {
-  return handleStrapiProxy(request, await params);
-}
-
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> },
-) {
-  return handleStrapiProxy(request, await params);
-}
-
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> },
-) {
-  return handleStrapiProxy(request, await params);
-}
-
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> },
-) {
-  return handleStrapiProxy(request, await params);
+function withErrorHandler(fn: (request: NextRequest, params: { path: string[] }) => Promise<NextResponse>) {
+  return async (request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) => {
+    try {
+      return await fn(request, await params);
+    } catch (err) {
+      console.error("Strapi proxy unhandled error:", err);
+      return NextResponse.json(
+        { error: { message: err instanceof Error ? err.message : "Strapi proxy error" } },
+        { status: 500 },
+      );
+    }
+  };
 }
 
 async function handleStrapiProxy(request: NextRequest, params: { path: string[] }) {
-  // Проверяем авторизацию
   const session = await auth.api.getSession({
     headers: request.headers,
   });
@@ -52,14 +32,12 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
   const userId = session.user.id;
   const strapiPath = params.path.join("/");
 
-  // Строим URL
   let url: string;
 
   if (request.method === "GET") {
     const searchParams = new URLSearchParams(request.nextUrl.searchParams);
-    // Добавляем userId только для списков cvs, не для одиночных записей
-    const cvsCollection = strapiPath === "cvs" || strapiPath === "cvs/";
-    if (cvsCollection) {
+    const ownedCollections = strapiPath === "cvs" || strapiPath === "cvs/" || strapiPath === "resumes" || strapiPath === "resumes/";
+    if (ownedCollections) {
       searchParams.set("filters[userId][$eq]", userId);
     }
     const searchString = searchParams.toString();
@@ -69,7 +47,6 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
     url = `${STRAPI_URL}/api/${strapiPath}${searchString ? `?${searchString}` : ""}`;
   }
 
-  // Выбираем токен в зависимости от метода
   const isWriteMethod = request.method !== "GET" && request.method !== "HEAD";
   const token = isWriteMethod
     ? (process.env.STRAPI_API_WRITE_TOKEN || process.env.STRAPI_API_TOKEN)
@@ -85,28 +62,39 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
 
   console.log(`[STRAPI PROXY] method=${request.method} path=${strapiPath} usingWriteToken=${!!isWriteMethod && !!process.env.STRAPI_API_WRITE_TOKEN}`);
 
-  try {
-    let body = undefined;
+  let body: string | undefined;
 
-    if (isWriteMethod) {
-      const json = await request.json();
-      // Добавляем userId из сессии в тело запроса
-      body = {
-        ...json,
+  if (isWriteMethod) {
+    // Читаем тело как текст, чтобы избежать ошибок при пустом/битом JSON
+    const raw = await request.text();
+    if (raw) {
+      let parsed: Record<string, unknown>;
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        return NextResponse.json(
+          { error: { message: "Invalid JSON in request body" } },
+          { status: 400 },
+        );
+      }
+      body = JSON.stringify({
+        ...parsed,
         data: {
-          ...json.data,
+          ...((parsed.data as Record<string, unknown>) || {}),
           userId,
         },
-      };
+      });
     }
+  }
 
+  try {
     const response = await fetch(url, {
       method: request.method,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: body ? JSON.stringify(body) : undefined,
+      body,
     });
 
     let data: unknown;
@@ -122,10 +110,17 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
       status: response.status,
     });
   } catch (err) {
-    console.error("Strapi proxy error:", err);
+    console.error("Strapi proxy fetch error:", err);
     return NextResponse.json(
       { error: { message: "Strapi proxy error" } },
       { status: 500 },
     );
   }
 }
+
+const handler = withErrorHandler(handleStrapiProxy);
+
+export const GET = handler;
+export const POST = handler;
+export const PUT = handler;
+export const DELETE = handler;

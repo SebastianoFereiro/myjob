@@ -115,7 +115,6 @@ export async function getResumesByUserId(userId: string, page = 1): Promise<Resu
     const params = new URLSearchParams();
     params.set("populate", "*");
     params.set("sort[0]", "updatedAt:desc");
-    params.set("filters[userId][$eq]", userId);
     params.set("pagination[page]", String(page));
     params.set("pagination[pageSize]", String(PAGE_SIZE));
 
