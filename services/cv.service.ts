@@ -126,6 +126,11 @@ async function strapiClientFetch<T>(path: string, options?: RequestInit): Promis
     ...options,
   });
 
+  // Strapi возвращает 204 No Content для успешных DELETE
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   let json: unknown;
   try {
     json = await response.json();
@@ -314,6 +319,12 @@ export async function softDeleteCv(documentId: string) {
   await strapiClientFetch(`/cvs/${documentId}`, {
     method: "PUT",
     body: JSON.stringify({ data: { isActive: false } }),
+  });
+}
+
+export async function hardDeleteCv(documentId: string) {
+  await strapiClientFetch(`/cvs/${documentId}`, {
+    method: "DELETE",
   });
 }
 

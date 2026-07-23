@@ -11,7 +11,7 @@ import { EmptyState } from '@/components/dashboard/EmptyState';
 import { Badge } from '@/components/ui/badge';
 import { Pagination } from '@/components/ui/pagination';
 import { authClient } from '@/lib/auth-client';
-import { getCvsByUserId, softDeleteCv } from '@/services/cv.service';
+import { getCvsByUserId, softDeleteCv, hardDeleteCv } from '@/services/cv.service';
 import type { CvVacancy } from '@/types/cv';
 
 const employmentLabels: Record<string, string> = {
@@ -79,14 +79,24 @@ export function CvList() {
     };
   }, [userId, page]);
 
-  async function handleDelete(documentId: string) {
-    if (!confirm('Вы уверены, что хотите архивировать эту вакансию?')) return;
+  async function handleDelete(vacancy: CvVacancy) {
+    const isArchived = !vacancy.isActive;
+
+    if (isArchived) {
+      if (!confirm('Вы уверены, что хотите окончательно удалить эту вакансию? Это действие нельзя отменить.')) return;
+    } else {
+      if (!confirm('Вы уверены, что хотите архивировать эту вакансию?')) return;
+    }
 
     try {
-      await softDeleteCv(documentId);
-      setVacancies((prev) => prev.filter((v) => v.documentId !== documentId));
+      if (isArchived) {
+        await hardDeleteCv(vacancy.documentId);
+      } else {
+        await softDeleteCv(vacancy.documentId);
+      }
+      setVacancies((prev) => prev.filter((v) => v.documentId !== vacancy.documentId));
     } catch {
-      alert('Не удалось архивировать вакансию');
+      alert(isArchived ? 'Не удалось удалить вакансию' : 'Не удалось архивировать вакансию');
     }
   }
 
@@ -198,7 +208,7 @@ export function CvList() {
                 variant="ghost"
                 size="sm"
                 className="h-8 px-2.5 text-destructive hover:text-destructive hover:bg-destructive/10 sm:h-9 sm:px-3"
-                onClick={() => handleDelete(vacancy.documentId)}
+                onClick={() => handleDelete(vacancy)}
               >
                 <Trash2 className="size-3.5 sm:mr-1.5" />
                 <span className="hidden sm:inline">Удалить</span>
