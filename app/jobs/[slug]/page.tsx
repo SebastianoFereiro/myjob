@@ -23,7 +23,10 @@ import type { EmploymentType, Job } from '@/types/jobs';
 import { extractSeoMetadata } from '@/lib/extract-seo';
 
 function firstPhone(value?: string): string | undefined {
-  return value?.split(",").map((s) => s.trim()).filter(Boolean)[0];
+  return value
+    ?.split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)[0];
 }
 
 function getContactHref(job: Job): string | null {
@@ -138,11 +141,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
 
                   <div>
                     <div className="mb-3 flex flex-wrap items-center gap-2">
-                      {job.category && (
-                        <Badge variant="secondary">
-                          {job.category.name}
-                        </Badge>
-                      )}
+                      {job.category && <Badge variant="secondary">{job.category.name}</Badge>}
                       {job.isPremium && (
                         <Badge
                           variant="default"
@@ -170,13 +169,13 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                             href={`/cities/${job.cityRef.slug}`}
                             className="hover:text-foreground hover:underline"
                           >
-                            {job.city}
+                            {job.city && job.location
+                              ? `${job.city}, ${job.location}`
+                              : job.city || job.location}
                           </a>
                         ) : (
                           job.city
                         )}
-                        {job.city && job.location ? ',' : ''}
-                        {job.location ? ` ${job.location}` : ''}
                       </span>
                       <span className="inline-flex items-center gap-2">
                         <BriefcaseBusiness className="size-4" />
