@@ -63,7 +63,7 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
     );
   }
 
-  console.log(`[STRAPI PROXY] method=${request.method} path=${strapiPath} usingWriteToken=${!!isWriteMethod && !!process.env.STRAPI_API_WRITE_TOKEN}`);
+  // console.log(`[STRAPI PROXY] method=${request.method} path=${strapiPath} usingWriteToken=${!!isWriteMethod && !!process.env.STRAPI_API_WRITE_TOKEN}`);
 
   let body: string | undefined;
 
@@ -112,7 +112,7 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
       data = { error: { message: `Сервер Strapi вернул пустой ответ (${response.status})` } };
     }
 
-    console.log(`[STRAPI PROXY] response status=${response.status} body=`, JSON.stringify(data).slice(0, 500));
+    // console.log(`[STRAPI PROXY] response status=${response.status} body=`, JSON.stringify(data).slice(0, 500));
 
     return NextResponse.json(data, {
       status: response.status,
