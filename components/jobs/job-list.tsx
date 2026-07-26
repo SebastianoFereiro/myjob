@@ -115,7 +115,7 @@ export async function JobList({
         </div>
 
         {/* Правая группа - кнопки сброса */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap mb-3">
           {filters.city && !filters.category && (
             <Button variant="outline" asChild>
               <a href={`/jobs#vacancies`}>Сбросить город</a>
