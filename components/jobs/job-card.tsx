@@ -84,6 +84,26 @@ export function JobCard({ job, isPremium }: { job: Job; isPremium?: boolean }) {
           </div>
         )}
 
+        {job.tags && job.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {job.tags.slice(0, 4).map((tag) => (
+              <a key={tag} href={`/categories/${job.category?.slug || ''}?tag=${encodeURIComponent(tag)}`}>
+                <Badge
+                  variant="outline"
+                  className="rounded-full text-[11px] px-2.5 py-0 font-normal cursor-pointer hover:bg-muted/60 transition-colors"
+                >
+                  {tag}
+                </Badge>
+              </a>
+            ))}
+            {job.tags.length > 4 && (
+              <span className="inline-flex items-center text-[11px] text-muted-foreground px-1">
+                +{job.tags.length - 4}
+              </span>
+            )}
+          </div>
+        )}
+
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
           {job.level && (
             <span className="inline-flex items-center gap-1.5">

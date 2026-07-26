@@ -96,6 +96,8 @@ type StrapiCVRecord = {
   category?: StrapiCategoryRef | null;
   SEO?: SeoMetadata | null;
   image?: StrapiMediaField | null;
+  // Теги
+  tags?: string[];
   // Премиум-закрепление
   premium_from?: string | null;
   premium_to?: string | null;
@@ -297,6 +299,8 @@ function cvToJob(record: StrapiCVRecord): Job {
     sortOrder: record.sortOrder,
     image: resolveMediaURL(record.image),
     SEO: record.SEO ?? null,
+    // Теги
+    tags: record.tags || [],
     // Премиум-закрепление
     premium_from: record.premium_from ?? null,
     premium_to: record.premium_to ?? null,
@@ -388,9 +392,12 @@ function buildFiltersParams(
     params.set("filters[city][slug][$eq]", filters.city);
   }
 
+  // Фильтрация по тегам делается на клиенте — Strapi 5 $contains не работает на JSON-полях
   const safePage = filters.page && Number.isFinite(filters.page) && filters.page > 0 ? filters.page : 1;
   params.set("pagination[page]", String(safePage));
-  params.set("pagination[pageSize]", String(PAGE_SIZE));
+  // При фильтрации по тегам увеличиваем pageSize для клиентской фильтрации
+  const pageSize = filters.tag ? 100 : PAGE_SIZE;
+  params.set("pagination[pageSize]", String(pageSize));
 
   return params;
 }
@@ -400,13 +407,29 @@ export async function getJobs(filters: JobFilters = {}): Promise<JobListResult> 
     const params = buildFiltersParams(filters, { excludePremium: true });
     const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
       `${CV_ENDPOINT}?${params.toString()}`,
-      { next: { revalidate: 1, tags: ["cv"] } },
+      { next: { revalidate: 60, tags: ["cv"] } },
     );
 
-    return {
-      jobs: response.data.map((record) => cvToJob(unwrapStrapiRecord(record))),
-      pagination: response.meta?.pagination || { page: 1, pageSize: PAGE_SIZE, pageCount: 0, total: 0 },
-    };
+    let jobs = response.data.map((record) => cvToJob(unwrapStrapiRecord(record)));
+    const pagination = response.meta?.pagination || { page: 1, pageSize: PAGE_SIZE, pageCount: 0, total: 0 };
+
+    // Клиентская фильтрация по тегам (fallback, если Strapi не отфильтровал)
+    if (filters.tag) {
+      const tagLower = filters.tag.toLowerCase();
+      jobs = jobs.filter((job) => {
+        if (!job.tags || job.tags.length === 0) return false;
+        return job.tags.some((t) => t.toLowerCase() === tagLower || t.toLowerCase().includes(tagLower));
+      });
+      const total = jobs.length;
+      const pageSize = PAGE_SIZE;
+      const pageCount = Math.ceil(total / pageSize) || 1;
+      return {
+        jobs: jobs.slice(0, pageSize),
+        pagination: { page: 1, pageSize, pageCount, total },
+      };
+    }
+
+    return { jobs, pagination };
   } catch {
     return { jobs: [], pagination: { page: 1, pageSize: PAGE_SIZE, pageCount: 0, total: 0 } };
   }
@@ -475,16 +498,35 @@ export async function getPremiumJobs(filters: JobFilters = {}): Promise<JobListR
       params.set("filters[city][slug][$eq]", filters.city);
     }
 
+    // Фильтрация по тегам на клиенте — Strapi 5 $contains не работает на JSON-полях
+
     params.set("pagination[pageSize]", "50");
 
-    const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
-      `${CV_ENDPOINT}?${params.toString()}`,
-      { next: { revalidate: 1, tags: ["cv"] } },
-    );
+    let responseData: StrapiCVRecord[];
+    try {
+      const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
+        `${CV_ENDPOINT}?${params.toString()}`,
+        { next: { revalidate: 60, tags: ["cv"] } },
+      );
+      responseData = response.data;
+    } catch {
+      return { jobs: [], pagination: { page: 1, pageSize: 50, pageCount: 0, total: 0 } };
+    }
+
+    let premiumJobs = responseData.map((record) => cvToJob(unwrapStrapiRecord(record)));
+
+    // Клиентская фильтрация по тегам
+    if (filters.tag) {
+      const tagLower = filters.tag.toLowerCase();
+      premiumJobs = premiumJobs.filter((job) => {
+        if (!job.tags || job.tags.length === 0) return false;
+        return job.tags.some((t) => t.toLowerCase() === tagLower || t.toLowerCase().includes(tagLower));
+      });
+    }
 
     return {
-      jobs: response.data.map((record) => cvToJob(unwrapStrapiRecord(record))),
-      pagination: response.meta?.pagination || { page: 1, pageSize: 50, pageCount: 0, total: 0 },
+      jobs: premiumJobs,
+      pagination: { page: 1, pageSize: 50, pageCount: 1, total: premiumJobs.length },
     };
   } catch {
     return { jobs: [], pagination: { page: 1, pageSize: 50, pageCount: 0, total: 0 } };
@@ -501,7 +543,7 @@ export async function getJobBySlug(slug: string) {
 
     const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
       `${CV_ENDPOINT}?${params.toString()}`,
-      { next: { revalidate: 1, tags: ["cv"] } },
+      { next: { revalidate: 60, tags: ["cv"] } },
     );
 
     const record = response.data[0];
@@ -522,7 +564,7 @@ export async function getJobByDocumentId(documentId: string) {
 
     const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
       `${CV_ENDPOINT}?${params.toString()}`,
-      { next: { revalidate: 1, tags: ["cv"] } },
+      { next: { revalidate: 60, tags: ["cv"] } },
     );
 
     const record = response.data[0];
@@ -552,7 +594,7 @@ export async function getJobsByCategory(categorySlug: string): Promise<JobListRe
 
     const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
       `${CV_ENDPOINT}?${params.toString()}`,
-      { next: { revalidate: 1, tags: ["cv"] } },
+      { next: { revalidate: 60, tags: ["cv"] } },
     );
 
     return {
@@ -590,7 +632,7 @@ export async function getAllJobs() {
 
     const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
       `${CV_ENDPOINT}?${params.toString()}`,
-      { next: { revalidate: 1, tags: ["cv"] } },
+      { next: { revalidate: 60, tags: ["cv"] } },
     );
 
     return response.data.map((record) => cvToJob(unwrapStrapiRecord(record)));
@@ -634,11 +676,33 @@ export async function getAllJobsForSitemap(): Promise<SitemapJobEntry[]> {
   }
 }
 
-export async function createJobSubscription(payload: SubscriptionPayload) {
-  return fetchAPI("/subscriptions", {
-    method: "POST",
-    body: JSON.stringify({ data: payload }),
-  });
+export async function getCategoryTags(categorySlug: string): Promise<string[]> {
+  try {
+    const params = new URLSearchParams();
+    params.set("populate", "*");
+    params.set("filters[isActive][$eq]", "true");
+    params.set("filters[category][slug][$eq]", categorySlug);
+    params.set("pagination[pageSize]", "100");
+
+    const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
+      `${CV_ENDPOINT}?${params.toString()}`,
+      { next: { revalidate: 60, tags: ["cv"] } },
+    );
+
+    const tagSet = new Set<string>();
+    for (const record of response.data) {
+      const r = unwrapStrapiRecord(record) as StrapiCVRecord;
+      if (Array.isArray(r.tags)) {
+        for (const tag of r.tags) {
+          if (tag) tagSet.add(tag);
+        }
+      }
+    }
+
+    return Array.from(tagSet).sort((a, b) => a.localeCompare(b, "ru"));
+  } catch {
+    return [];
+  }
 }
 
 export type { PaginationMeta };

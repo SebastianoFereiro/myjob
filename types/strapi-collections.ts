@@ -331,6 +331,8 @@ export interface Job {
   image?: string;
   SEO?: SeoMetadata | null;
 
+  // Теги
+  tags?: string[];
   // Премиум-закрепление
   premium_from?: string | null;
   premium_to?: string | null;
@@ -352,6 +354,7 @@ export interface JobFilters {
   education?: string;
   position?: string;
   city?: string;
+  tag?: string;
   page?: number;
 }
 

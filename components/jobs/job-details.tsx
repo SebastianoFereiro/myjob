@@ -94,6 +94,25 @@ export function JobDetails({ job }: { job: Job }) {
                 </Badge>
               </Link>
             )}
+
+            {job.tags && job.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-3">
+                {job.tags.map((tag) => (
+                  <Link
+                    key={tag}
+                    href={`/categories/${job.category?.slug || ''}?tag=${encodeURIComponent(tag)}`}
+                    className="hover:opacity-80 transition-opacity"
+                  >
+                    <Badge
+                      variant="outline"
+                      className="rounded-full px-3 py-1 text-xs font-normal cursor-pointer"
+                    >
+                      {tag}
+                    </Badge>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="mt-5 flex flex-wrap gap-4 text-sm text-muted-foreground">

@@ -54,6 +54,8 @@ type StrapiCvRecord = {
   createdAt?: string;
   updatedAt?: string;
   publishedAt?: string | null;
+  // Теги (массив строк)
+  tags?: string[];
   // Премиум-закрепление
   premium_from?: string | null;
   premium_to?: string | null;
@@ -111,6 +113,8 @@ function mapStrapiCv(record: StrapiCvRecord): CvVacancy {
     createdAt: record.createdAt || "",
     updatedAt: record.updatedAt || "",
     publishedAt: record.publishedAt ?? null,
+    // Теги
+    tags: (record.tags as string[]) || [],
     // Премиум-закрепление
     premium_from: record.premium_from ?? null,
     premium_to: record.premium_to ?? null,
@@ -184,7 +188,7 @@ export async function getCvBySlug(slug: string): Promise<CvVacancy | null> {
   try {
     const response = await fetchAPI<StrapiListResponse<StrapiCvRecord>>(
       `${CV_ENDPOINT}?${params.toString()}`,
-      { next: { revalidate: 1, tags: ["cv"] } },
+      { next: { revalidate: 60, tags: ["cv"] } },
     );
 
     const record = response.data[0];
@@ -201,7 +205,7 @@ export async function getCvByDocumentId(documentId: string): Promise<CvVacancy |
     const params = buildPopulateParams();
     const json = await fetchAPI<{ data: StrapiCvRecord }>(
       `${CV_ENDPOINT}/${documentId}?${params.toString()}`,
-      { next: { revalidate: 1, tags: ["cv"] } },
+      { next: { revalidate: 60, tags: ["cv"] } },
     );
 
     if (!json.data) return null;
@@ -400,7 +404,7 @@ export async function getAllCvs(filters: CvFilters = {}): Promise<CvListResult> 
   try {
     const response = await fetchAPI<StrapiListResponse<StrapiCvRecord>>(
       `${CV_ENDPOINT}?${params.toString()}`,
-      { next: { revalidate: 1, tags: ["cv"] } },
+      { next: { revalidate: 60, tags: ["cv"] } },
     );
 
     return {

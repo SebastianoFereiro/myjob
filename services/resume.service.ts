@@ -162,7 +162,7 @@ export async function getResumeByDocumentId(documentId: string) {
 
     const response = await fetchAPI<{ data: StrapiResumeRecord }>(
       `${RESUME_ENDPOINT}/${documentId}?${params.toString()}`,
-      { next: { revalidate: 1, tags: ["resumes"] } },
+      { next: { revalidate: 60, tags: ["resumes"] } },
     );
 
     if (!response.data) return null;
@@ -180,7 +180,7 @@ export async function getResumeBySlug(slug: string) {
 
   const response = await fetchAPI<StrapiListResponse<StrapiResumeRecord>>(
     `${RESUME_ENDPOINT}?${params.toString()}`,
-    { next: { revalidate: 1, tags: ["resumes"] } },
+    { next: { revalidate: 60, tags: ["resumes"] } },
   );
 
   const record = response.data[0];

@@ -1,5 +1,7 @@
+import { Suspense } from 'react';
 import { JobCard } from '@/components/jobs/job-card';
 import { PremiumSection } from '@/components/jobs/premium-section';
+import { TagFilter } from '@/components/jobs/tag-filter';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getCategoriesWithCounts, getCategoryBySlug } from '@/services/categories.service';
@@ -13,6 +15,7 @@ type JobListProps = {
   contained?: boolean;
   categorySlug?: string;
   citySlug?: string;
+  tags?: string[];
 };
 
 function pageHref(
@@ -34,6 +37,7 @@ function pageHref(
   if (filters.education) params.set('education', filters.education);
   if (filters.position) params.set('position', filters.position);
   if (!citySlug && filters.city) params.set('city', filters.city);
+  if (filters.tag) params.set('tag', filters.tag);
   if (page > 1) params.set('page', String(page));
 
   const query = params.toString();
@@ -59,6 +63,7 @@ export async function JobList({
   contained = true,
   categorySlug,
   citySlug,
+  tags,
 }: JobListProps) {
   const [{ jobs, pagination }, { jobs: premiumJobs }, categories, company, categoryData] =
     await Promise.all([
@@ -95,23 +100,40 @@ export async function JobList({
             Найдено вакансий: {pagination.total + premiumJobs.length}
           </p>
         </div>
-        {filters.city && !filters.category ? (
-          <Button variant="outline" asChild>
-            <a href={`/jobs#vacancies`}>Сбросить город</a>
-          </Button>
-        ) : null}
-        {filters.category ? (
-          <Button variant="outline" asChild>
-            <a href={citySlug ? `/cities/${citySlug}#vacancies` : `${basePath}#vacancies`}>
-              {citySlug ? 'Сбросить категорию' : 'Сбросить категорию'}
-            </a>
-          </Button>
-        ) : null}
-        {filters.company && !filters.category ? (
-          <Button variant="outline" asChild>
-            <a href={`${basePath}#vacancies`}>Сбросить компанию</a>
-          </Button>
-        ) : null}
+      </div>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        {/* Левая группа - фильтры */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {tags && tags.length > 0 && (
+            <Suspense fallback={null}>
+              <TagFilter
+                tags={tags}
+                basePath={categorySlug ? `/categories/${categorySlug}` : basePath}
+              />
+            </Suspense>
+          )}
+        </div>
+
+        {/* Правая группа - кнопки сброса */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {filters.city && !filters.category && (
+            <Button variant="outline" asChild>
+              <a href={`/jobs#vacancies`}>Сбросить город</a>
+            </Button>
+          )}
+          {filters.category && (
+            <Button variant="outline" asChild>
+              <a href={citySlug ? `/cities/${citySlug}#vacancies` : `${basePath}#vacancies`}>
+                Сбросить категорию
+              </a>
+            </Button>
+          )}
+          {filters.company && !filters.category && (
+            <Button variant="outline" asChild>
+              <a href={`${basePath}#vacancies`}>Сбросить компанию</a>
+            </Button>
+          )}
+        </div>
       </div>
 
       <PremiumSection jobs={premiumJobs} />

@@ -758,6 +758,12 @@ export const CVSchema = {
       type: 'datetime',
       required: false,
     },
+    // --- Теги (strapi-plugin-tags-input) ---
+    tags: {
+      type: 'json',
+      required: false,
+      default: [],
+    },
     // --- Отношения ---
     // company: relation M:1 -> Company
     // category: relation M:1 -> Category

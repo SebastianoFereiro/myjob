@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
 export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { getCategories, getCategoryBySlug } from '@/services/categories.service';
+import { getCategoryTags } from '@/services/jobs.service';
 import { JobList } from '@/components/jobs/job-list';
 import type { EmploymentType, JobFilters } from '@/types/jobs';
 import Header from '@/components/header';
@@ -28,6 +30,7 @@ type Props = {
     education?: string;
     position?: string;
     city?: string;
+    tag?: string;
     page?: string;
   }>;
 };
@@ -62,9 +65,10 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const { category } = await params;
   const sp = await searchParams;
 
-  const [categoryName, categoryData] = await Promise.all([
+  const [categoryName, categoryData, tags] = await Promise.all([
     getCategoryName(category),
     getCategoryBySlug(category),
+    getCategoryTags(category),
   ]);
 
   if (!categoryName) {
@@ -81,6 +85,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     education: sp.education || '',
     position: sp.position || '',
     city: sp.city || '',
+    tag: sp.tag || '',
     page: normalizePage(sp.page),
   };
 
@@ -99,6 +104,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           contained={true}
           categorySlug={category}
           citySlug={sp.city}
+          tags={tags}
         />
         {text && (
           <section className="w-full py-12">

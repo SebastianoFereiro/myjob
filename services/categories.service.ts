@@ -107,7 +107,7 @@ export async function getCategories() {
 
     const response = await fetchAPI<StrapiListResponse<StrapiCategoryRecord>>(
       `${CATEGORY_ENDPOINT}?${params.toString()}`,
-      { next: { revalidate: 1, tags: ["categories"] } },
+      { next: { revalidate: 60, tags: ["categories"] } },
     );
     const categories = response.data
       .map((record) => mapStrapiCategory(unwrapStrapiRecord(record)))

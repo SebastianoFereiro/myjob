@@ -86,7 +86,7 @@ export async function getCompanies(): Promise<CompanyPublic[]> {
 
     const response = await fetchAPI<StrapiListResponse<StrapiCompanyRecord>>(
       `${COMPANY_ENDPOINT}?${params.toString()}`,
-      { next: { revalidate: 1, tags: ["companies"] } },
+      { next: { revalidate: 60, tags: ["companies"] } },
     );
 
     return response.data
@@ -108,7 +108,7 @@ export async function getCompanyBySlug(slug: string): Promise<CompanyPublic | nu
 
     const response = await fetchAPI<StrapiListResponse<StrapiCompanyRecord>>(
       `${COMPANY_ENDPOINT}?${params.toString()}`,
-      { next: { revalidate: 1, tags: ["companies"] } },
+      { next: { revalidate: 60, tags: ["companies"] } },
     );
 
     const record = response.data[0];
@@ -126,7 +126,7 @@ export async function getCompanyByDocumentId(documentId: string): Promise<Compan
   try {
     const response = await fetchAPI<StrapiSingleResponse<StrapiCompanyRecord>>(
       `${COMPANY_ENDPOINT}/${documentId}?populate=*`,
-      { next: { revalidate: 1, tags: ["companies"] } },
+      { next: { revalidate: 60, tags: ["companies"] } },
     );
 
     if (!response.data) return null;

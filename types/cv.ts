@@ -97,6 +97,8 @@ export interface CvVacancy {
   // Премиум-закрепление
   premium_from?: string | null;
   premium_to?: string | null;
+  // Теги (массив строк из Strapi tags-input)
+  tags?: string[];
   // Авто-поднятие
   push_from?: string | null;
   push_to?: string | null;
