@@ -27,25 +27,26 @@ export function TagFilter({ tags, basePath }: TagFilterProps) {
       const qs = params.toString();
       router.push(qs ? `${basePath}?${qs}` : basePath);
     },
-    [router, searchParams, activeTag, basePath],
+    [router, searchParams, activeTag, basePath]
   );
 
   if (tags.length === 0) return null;
 
   return (
-    <section className="container py-4">
-      <div className="flex flex-wrap gap-2">
+    <section className="container py-3 sm:py-4 px-0">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {tags.map((tag) => {
           const isActive = activeTag === tag;
+
           return (
             <button
               key={tag}
               onClick={() => handleTagClick(tag)}
               className={cn(
-                'inline-flex items-center rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors',
+                'w-full rounded-full border px-2 py-2 text-center text-xs font-medium transition-colors sm:text-sm',
                 isActive
-                  ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90'
-                  : 'border-border bg-background text-foreground hover:bg-muted',
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-background text-foreground hover:bg-muted'
               )}
             >
               {tag}

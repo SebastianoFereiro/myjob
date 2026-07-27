@@ -8,6 +8,7 @@ import { getCategoriesWithCounts, getCategoryBySlug } from '@/services/categorie
 import { getCompanyBySlug } from '@/services/companies.service';
 import { getJobs, getPremiumJobs } from '@/services/jobs.service';
 import type { JobFilters } from '@/types/jobs';
+import { X, Filter, SlidersHorizontal } from 'lucide-react';
 
 type JobListProps = {
   filters: JobFilters;
@@ -84,55 +85,128 @@ export async function JobList({
       ? `Вакансии: ${categoryName}`
       : 'Актуальные вакансии';
 
+  // Подсчет активных фильтров
+  const activeFiltersCount = [
+    filters.city,
+    filters.category,
+    filters.company,
+    filters.query,
+    filters.type,
+    filters.level,
+    filters.experience,
+    filters.education,
+    filters.position,
+    filters.tag,
+  ].filter(Boolean).length;
+
   return (
     <section id="vacancies" className={cn(contained ? 'container py-12' : 'py-0')}>
       <div className="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
         <div>
           {categoryData?.description && (
             <h1
-              className="pt-3 text-3xl font-bold tracking-tight md:text-5xl"
+              className="pt-3 text-2xl leading-[1.05] font-bold tracking-tight md:text-5xl mb-2"
               dangerouslySetInnerHTML={{ __html: categoryData.description }}
             />
           )}
-          <h2 className="text-xl mt-1 font-semibold tracking-tight">{heading}</h2>
+          <h2 className="text-xl mt-1 leading-[1.05] font-semibold tracking-tight">{heading}</h2>
 
-          <p className="mt-2 text-muted-foreground">
+          <p className="text-muted-foreground">
             Найдено вакансий: {pagination.total + premiumJobs.length}
           </p>
         </div>
       </div>
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        {/* Левая группа - фильтры */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {tags && tags.length > 0 && (
-            <Suspense fallback={null}>
-              <TagFilter
-                tags={tags}
-                basePath={categorySlug ? `/categories/${categorySlug}` : basePath}
-              />
-            </Suspense>
-          )}
-        </div>
 
-        {/* Правая группа - кнопки сброса */}
-        <div className="flex items-center gap-2 flex-wrap mb-3">
-          {filters.city && !filters.category && (
-            <Button variant="outline" asChild>
-              <a href={`/jobs#vacancies`}>Сбросить город</a>
-            </Button>
-          )}
-          {filters.category && (
-            <Button variant="outline" asChild>
-              <a href={citySlug ? `/cities/${citySlug}#vacancies` : `${basePath}#vacancies`}>
-                Сбросить категорию
-              </a>
-            </Button>
-          )}
-          {filters.company && !filters.category && (
-            <Button variant="outline" asChild>
-              <a href={`${basePath}#vacancies`}>Сбросить компанию</a>
-            </Button>
-          )}
+      {/* Премиум блок фильтров */}
+      <div className="relative mb-6 rounded-xl border bg-gradient-to-br from-background via-background to-muted/30 p-4 shadow-sm transition-all hover:shadow-md">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          {/* Левая группа - фильтры */}
+          <div className="flex items-center gap-1 flex-wrap">
+            {/* Иконка фильтров */}
+            <div className="hidden sm:flex items-center gap-2 mr-1">
+              <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                <SlidersHorizontal className="h-4 w-4" />
+              </div>
+              <span className="text-sm font-medium text-muted-foreground">Фильтры:</span>
+            </div>
+
+            {tags && tags.length > 0 && (
+              <Suspense fallback={null}>
+                <TagFilter
+                  tags={tags}
+                  basePath={categorySlug ? `/categories/${categorySlug}` : basePath}
+                />
+              </Suspense>
+            )}
+
+            {/* Кнопки сброса с премиум дизайном */}
+            <div className="flex items-center gap-1 flex-wrap ml-1">
+              {filters.city && !filters.category && (
+                <Button
+                  variant="ghost"
+                  asChild
+                  size="sm"
+                  className="group relative h-8 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-3 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30 sm:text-sm"
+                >
+                  <a href={`/jobs#vacancies`}>
+                    <X className="h-3 w-3 transition-transform group-hover:rotate-90" />
+                    <span>Город</span>
+                  </a>
+                </Button>
+              )}
+              {filters.category && (
+                <Button
+                  variant="ghost"
+                  asChild
+                  size="sm"
+                  className="group relative h-8 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-3 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30 sm:text-sm"
+                >
+                  <a href={citySlug ? `/cities/${citySlug}#vacancies` : `${basePath}#vacancies`}>
+                    <X className="h-3 w-3 transition-transform group-hover:rotate-90" />
+                    <span>Категория</span>
+                  </a>
+                </Button>
+              )}
+              {filters.company && !filters.category && (
+                <Button
+                  variant="ghost"
+                  asChild
+                  size="sm"
+                  className="group relative h-8 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-3 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30 sm:text-sm"
+                >
+                  <a href={`${basePath}#vacancies`}>
+                    <X className="h-3 w-3 transition-transform group-hover:rotate-90" />
+                    <span>Компания</span>
+                  </a>
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Правая группа - статистика фильтров */}
+          <div className="flex items-center gap-1">
+            {activeFiltersCount > 0 && (
+              <div className="flex items-center gap-2 mr-2 rounded-full bg-primary/5 px-3 py-1.5 text-xs text-muted-foreground">
+                <Filter className="h-3 w-3 " />
+                <span className="font-medium">{activeFiltersCount}</span>
+                <span className="hidden sm:inline">активных фильтра</span>
+              </div>
+            )}
+            {/* Опционально: кнопка "Сбросить все" */}
+            {activeFiltersCount > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1.5 border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                asChild
+              >
+                <a href={`${basePath}#vacancies`}>
+                  <X className="h-3 w-3" />
+                  <span className="hidden sm:inline">Сбросить все</span>
+                </a>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
