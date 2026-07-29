@@ -25,13 +25,13 @@ import type {
   ExperienceItem,
   EducationItem,
 } from "@/types/resume";
+import {
+  RESUME_EMPLOYMENT_OPTIONS,
+  RESUME_CURRENCY_OPTIONS,
+} from "@/lib/enum-options";
 
-const employmentOptions: { value: EmploymentType; label: string }[] = [
-  { value: "Полный день", label: "Полный день" },
-  { value: "Гибридный формат", label: "Гибридный формат" },
-  { value: "Удаленный формат", label: "Удаленный формат" },
-  { value: "Контракт", label: "Контракт" },
-];
+const employmentOptions: { value: EmploymentType; label: string }[] =
+  RESUME_EMPLOYMENT_OPTIONS.map((opt) => ({ value: opt.value as EmploymentType, label: opt.label }));
 
 const skillLevels = [
   { value: "beginner", label: "Начальный" },
@@ -368,9 +368,11 @@ export function ResumeForm({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="BYN">BYN</SelectItem>
-                  <SelectItem value="USD">USD</SelectItem>
-                  <SelectItem value="EUR">EUR</SelectItem>
+                  {RESUME_CURRENCY_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
