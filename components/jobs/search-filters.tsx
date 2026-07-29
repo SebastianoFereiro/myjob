@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { EmploymentType, JobCategory, JobFilters } from '@/types/jobs';
 import type { CityRef } from '@/types/strapi-collections';
+import { EMPLOYMENT_OPTIONS } from '@/lib/enum-options';
 
 type SearchFiltersProps = {
   initialFilters?: JobFilters;
@@ -19,11 +20,10 @@ type SearchFiltersProps = {
 
 const employmentOptions: Array<{ value: EmploymentType | ''; label: string }> = [
   { value: '', label: 'Любой формат' },
-  { value: 'full-time', label: 'Полная занятость' },
-  { value: 'part-time', label: 'Частичная занятость' },
-  { value: 'contract', label: 'Проектная работа' },
-  { value: 'internship', label: 'Стажировка' },
-  { value: 'remote', label: 'Удаленно' },
+  ...EMPLOYMENT_OPTIONS.map((opt) => ({
+    value: opt.value as EmploymentType,
+    label: opt.label,
+  })),
 ];
 
 export function SearchFilters({

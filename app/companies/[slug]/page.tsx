@@ -9,6 +9,7 @@ import {
   ArrowUpRight,
   Building2,
   ArrowLeft,
+  FileText,
 } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
@@ -20,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { markdownComponents } from '@/lib/markdown';
 import { navigationItems } from '@/app/data/navigation';
 import { getCompanyBySlug } from '@/services/companies.service';
+import { getOptionLabel, EMPLOYMENT_OPTIONS } from '@/lib/enum-options';
 import { getAllJobs } from '@/services/jobs.service';
 import { extractSeoMetadata } from '@/lib/extract-seo';
 
@@ -202,15 +204,7 @@ export default async function CompanyDetailsPage({ params }: Props) {
                                 {job.city ? `${job.city},` : ''} {job.location}
                               </div>
                               <div className="rounded-full bg-zinc-100 px-3 py-1.5">
-                                {job.employmentType === 'full-time'
-                                  ? 'Полная занятость'
-                                  : job.employmentType === 'part-time'
-                                    ? 'Частичная занятость'
-                                    : job.employmentType === 'contract'
-                                      ? 'Проектная работа'
-                                      : job.employmentType === 'internship'
-                                        ? 'Стажировка'
-                                        : 'Удаленно'}
+                                {getOptionLabel(EMPLOYMENT_OPTIONS, job.employmentType)}
                               </div>
                             </div>
                           </div>
@@ -241,6 +235,24 @@ export default async function CompanyDetailsPage({ params }: Props) {
                         >
                           {new URL(company.siteUrl).hostname}
                         </a>
+                      </div>
+                    </div>
+                  )}
+                  {company.ynp && (
+                    <div className="flex items-start gap-3">
+                      <FileText className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">УНП</p>
+                        <p className="font-medium">{company.ynp}</p>
+                      </div>
+                    </div>
+                  )}
+                  {company.address && (
+                    <div className="flex items-start gap-3">
+                      <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Адрес</p>
+                        <p className="font-medium">{company.address}</p>
                       </div>
                     </div>
                   )}

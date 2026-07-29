@@ -92,6 +92,11 @@ export const CompanySchema = {
       required: true,
       maxLength: 20,
     },
+    address: {
+      type: 'string',
+      required: false,
+      maxLength: 300,
+    },
     founded_year: {
       type: 'integer',
       required: false,
@@ -678,15 +683,15 @@ export const CVSchema = {
       min: 0,
     },
     currency: {
-      type: 'string',
+      type: 'enumeration',
+      enum: ['BYN', 'USD', 'EUR'],
       required: false,
       default: 'BYN',
-      maxLength: 3,
     },
     employmentType: {
-      type: 'string',
+      type: 'enumeration',
+      enum: ['full-time', 'part-time', 'contract', 'internship', 'remote'],
       required: false,
-      maxLength: 100,
     },
     location: {
       type: 'string',
@@ -700,19 +705,19 @@ export const CVSchema = {
       inversedBy: 'cvs',
     },
     level_job: {
-      type: 'string',
+      type: 'enumeration',
+      enum: ['top', 'middle', 'specialist', 'worker', 'junior', 'intern'],
       required: false,
-      maxLength: 100,
     },
     experience_job: {
-      type: 'string',
+      type: 'enumeration',
+      enum: ['none', '1-3', '3-5', '5+'],
       required: false,
-      maxLength: 100,
     },
     education_job: {
-      type: 'string',
+      type: 'enumeration',
+      enum: ['none', 'basic', 'secondary', 'specialized', 'vocational', 'higher'],
       required: false,
-      maxLength: 100,
     },
     deadline: {
       type: 'datetime',

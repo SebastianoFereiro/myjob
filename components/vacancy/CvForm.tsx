@@ -29,39 +29,25 @@ import type {
   CategoryRef,
 } from '@/types/cv';
 import type { CityRef } from '@/types/strapi-collections';
+import {
+  EMPLOYMENT_OPTIONS,
+  LEVEL_OPTIONS,
+  EXPERIENCE_OPTIONS,
+  EDUCATION_OPTIONS,
+  CURRENCY_OPTIONS,
+} from '@/lib/enum-options';
 
-const employmentOptions: { value: CvEmploymentType; label: string }[] = [
-  { value: 'Полная занятость', label: 'Полная занятость' },
-  { value: 'Частичная занятость', label: 'Частичная занятость' },
-  { value: 'Проектная работа', label: 'Проектная работа' },
-  { value: 'Стажировка', label: 'Стажировка' },
-  { value: 'Удаленно', label: 'Удаленно' },
-];
+const employmentOptions: { value: CvEmploymentType; label: string }[] =
+  EMPLOYMENT_OPTIONS.map((opt) => ({ value: opt.value as CvEmploymentType, label: opt.label }));
 
-const levelOptions: { value: CvLevelJob; label: string }[] = [
-  { value: 'Топ-менеджмент', label: 'Топ-менеджмент' },
-  { value: 'Руководители среднего звена', label: 'Руководители среднего звена' },
-  { value: 'Специалисты', label: 'Специалисты' },
-  { value: 'Рабочий персонал', label: 'Рабочий персонал' },
-  { value: 'Начинающие специалисты', label: 'Начинающие специалисты' },
-  { value: 'Стажеры', label: 'Стажеры' },
-];
+const levelOptions: { value: CvLevelJob; label: string }[] =
+  LEVEL_OPTIONS.map((opt) => ({ value: opt.value as CvLevelJob, label: opt.label }));
 
-const experienceOptions: { value: CvExperienceJob; label: string }[] = [
-  { value: 'Нет опыта', label: 'Нет опыта' },
-  { value: 'От 1 года до 3 лет', label: 'От 1 года до 3 лет' },
-  { value: 'От 3 до 5 лет', label: 'От 3 до 5 лет' },
-  { value: 'Более 5 лет', label: 'Более 5 лет' },
-];
+const experienceOptions: { value: CvExperienceJob; label: string }[] =
+  EXPERIENCE_OPTIONS.map((opt) => ({ value: opt.value as CvExperienceJob, label: opt.label }));
 
-const educationOptions: { value: CvEducationJob; label: string }[] = [
-  { value: 'Не требуется', label: 'Не требуется' },
-  { value: 'Базовое', label: 'Базовое' },
-  { value: 'Среднее', label: 'Среднее' },
-  { value: 'Средне специальное', label: 'Средне специальное' },
-  { value: 'Профессионально-техническое', label: 'Профессионально-техническое' },
-  { value: 'Высшее', label: 'Высшее' },
-];
+const educationOptions: { value: CvEducationJob; label: string }[] =
+  EDUCATION_OPTIONS.map((opt) => ({ value: opt.value as CvEducationJob, label: opt.label }));
 
 interface Props {
   company?: CompanyRef;

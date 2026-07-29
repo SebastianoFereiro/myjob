@@ -4,15 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import type { EmploymentType, Job } from '@/types/jobs';
-
-const employmentLabels: Record<EmploymentType, string> = {
-  'full-time': 'Полная занятость',
-  'part-time': 'Частичная занятость',
-  contract: 'Проектная работа',
-  internship: 'Стажировка',
-  remote: 'Удаленно',
-};
+import type { Job } from '@/types/jobs';
+import { getOptionLabel, EMPLOYMENT_OPTIONS } from '@/lib/enum-options';
 
 function formatSalary(job: Job) {
   if (!job.salaryFrom && !job.salaryTo) {
@@ -59,7 +52,7 @@ export function JobCard({ job, isPremium }: { job: Job; isPremium?: boolean }) {
               variant={job.employmentType === 'remote' ? 'secondary' : 'outline'}
               className="shrink-0 rounded-full text-[11px] px-2.5 py-0 font-normal"
             >
-              {employmentLabels[job.employmentType]}
+              {getOptionLabel(EMPLOYMENT_OPTIONS, job.employmentType)}
             </Badge>
           </div>
           <p className="text-[13px] text-muted-foreground truncate">{job.company.name}</p>

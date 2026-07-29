@@ -3,9 +3,15 @@
 // ========================================================================
 // Агент: изменяй этот файл синхронно с apps/backend/strapi-schema.ts
 // Источник истины: apps/backend/strapi-schema.ts
+// Enum-опции: lib/enum-options.ts
 // ========================================================================
 
 import type { SeoMetadata } from '@/types/seo';
+import type {
+  EMPLOYMENT_OPTIONS,
+  EXPERIENCE_LEVEL_OPTIONS,
+  CURRENCY_OPTIONS,
+} from '@/lib/enum-options';
 
 // ========================================================================
 // COMPANY
@@ -64,12 +70,9 @@ export interface Vacancy {
 
 export type SalaryPeriod = 'month' | 'year' | 'hour';
 
-export type EmploymentType =
-  | 'full-time' | 'part-time'
-  | 'contract' | 'internship' | 'remote';
+export type EmploymentType = (typeof EMPLOYMENT_OPTIONS)[number]['value'];
 
-export type ExperienceLevel =
-  | 'junior' | 'middle' | 'senior' | 'lead';
+export type ExperienceLevel = (typeof EXPERIENCE_LEVEL_OPTIONS)[number]['value'];
 
 export type VacancyStatus =
   | 'draft' | 'published' | 'archived';
@@ -272,7 +275,7 @@ export interface Page {
   updatedAt: string;
 }
 
-export type Currency = 'BYN' | 'USD' | 'EUR';
+export type Currency = (typeof CURRENCY_OPTIONS)[number]['value'];
 
 // ========================================================================
 // LEGACY TYPES from jobs.ts

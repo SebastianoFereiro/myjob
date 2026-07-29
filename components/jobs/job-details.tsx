@@ -4,16 +4,9 @@ import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
 import { markdownComponents } from '@/lib/markdown';
-import type { EmploymentType, Job } from '@/types/jobs';
+import type { Job } from '@/types/jobs';
 import { CheckCircle2, Layers3, MapPin, Sparkles, University } from 'lucide-react';
-
-const employmentLabels: Record<EmploymentType, string> = {
-  'full-time': 'Полная занятость',
-  'part-time': 'Частичная занятость',
-  contract: 'Проектная работа',
-  internship: 'Стажировка',
-  remote: 'Удаленно',
-};
+import { getOptionLabel, EMPLOYMENT_OPTIONS } from '@/lib/enum-options';
 
 function splitLines(value?: string) {
   return (value || '')
@@ -52,7 +45,7 @@ export function JobDetails({ job }: { job: Job }) {
                 variant={job.employmentType === 'remote' ? 'secondary' : 'outline'}
                 className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer"
               >
-                {employmentLabels[job.employmentType]}
+                {getOptionLabel(EMPLOYMENT_OPTIONS, job.employmentType)}
               </Badge>
             </Link>
             {job.level && (

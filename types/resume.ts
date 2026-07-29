@@ -1,6 +1,10 @@
-export type Currency = "BYN" | "USD" | "EUR";
+import type {
+  RESUME_EMPLOYMENT_OPTIONS,
+  RESUME_CURRENCY_OPTIONS,
+} from '@/lib/enum-options';
 
-export type EmploymentType = "Полный день" | "Гибридный формат" | "Удаленный формат" | "Контракт";
+export type EmploymentType = (typeof RESUME_EMPLOYMENT_OPTIONS)[number]['value'];
+export type Currency = (typeof RESUME_CURRENCY_OPTIONS)[number]['value'];
 
 export interface SkillItem {
   name: string;

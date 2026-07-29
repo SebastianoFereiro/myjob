@@ -1,36 +1,18 @@
 import type { SeoMetadata } from '@/types/seo';
 import type { CityRef } from '@/types/strapi-collections';
+import type {
+  EMPLOYMENT_OPTIONS,
+  LEVEL_OPTIONS,
+  EXPERIENCE_OPTIONS,
+  EDUCATION_OPTIONS,
+  CURRENCY_OPTIONS,
+} from '@/lib/enum-options';
 
-export type CvEmploymentType =
-  | 'Полная занятость'
-  | 'Частичная занятость'
-  | 'Проектная работа'
-  | 'Стажировка'
-  | 'Удаленно';
-
-export type CvLevelJob =
-  | 'Топ-менеджмент'
-  | 'Руководители среднего звена'
-  | 'Специалисты'
-  | 'Рабочий персонал'
-  | 'Начинающие специалисты'
-  | 'Стажеры';
-
-export type CvExperienceJob =
-  | 'Нет опыта'
-  | 'От 1 года до 3 лет'
-  | 'От 3 до 5 лет'
-  | 'Более 5 лет';
-
-export type CvEducationJob =
-  | 'Не требуется'
-  | 'Базовое'
-  | 'Среднее'
-  | 'Средне специальное'
-  | 'Профессионально-техническое'
-  | 'Высшее';
-
-export type CvCurrency = 'BYN' | 'USD' | 'EUR';
+export type CvEmploymentType = (typeof EMPLOYMENT_OPTIONS)[number]['value'];
+export type CvLevelJob = (typeof LEVEL_OPTIONS)[number]['value'];
+export type CvExperienceJob = (typeof EXPERIENCE_OPTIONS)[number]['value'];
+export type CvEducationJob = (typeof EDUCATION_OPTIONS)[number]['value'];
+export type CvCurrency = (typeof CURRENCY_OPTIONS)[number]['value'];
 
 export interface CompanyRef {
   id: number;
@@ -38,8 +20,8 @@ export interface CompanyRef {
   name: string;
   slug: string;
   ynp?: string;
-  logo?: { url: string; alternativeText?: string } | null;
   address?: string;
+  logo?: { url: string; alternativeText?: string } | null;
   description?: string;
   phone?: string;
   email?: string;

@@ -12,6 +12,10 @@ import type {
   CvFilters,
   CvListResult,
 } from "@/types/cv";
+import {
+  EMPLOYMENT_OPTIONS,
+  getOptionValue,
+} from "@/lib/enum-options";
 
 const CV_ENDPOINT = "/cvs";
 const PAGE_SIZE = 10;
@@ -93,7 +97,7 @@ function mapStrapiCv(record: StrapiCvRecord): CvVacancy {
     salaryFrom: record.salaryFrom ?? null,
     salaryTo: record.salaryTo ?? null,
     currency: (record.currency as CvVacancy["currency"]) || "BYN",
-    employmentType: (record.employmentType as CvVacancy["employmentType"]) || "Полная занятость",
+    employmentType: (record.employmentType as CvVacancy["employmentType"]) || EMPLOYMENT_OPTIONS[0].value,
     location: record.location || "",
     city: extractRef<CityRef>(record.city as Record<string, unknown> | null | undefined),
     level_job: (record.level_job as CvVacancy["level_job"]) ?? null,
@@ -386,7 +390,7 @@ function buildFiltersParams(filters: CvFilters): URLSearchParams {
   }
 
   if (filters.remote_possible != null) {
-    params.set("filters[employmentType][$eq]", "Удаленно");
+    params.set("filters[employmentType][$eq]", getOptionValue(EMPLOYMENT_OPTIONS, "Удаленно"));
   }
 
   return params;

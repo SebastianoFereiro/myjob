@@ -19,8 +19,9 @@ import { JobDetails } from '@/components/jobs/job-details';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getJobByDocumentId } from '@/services/jobs.service';
-import type { EmploymentType, Job } from '@/types/jobs';
+import type { Job } from '@/types/jobs';
 import { extractSeoMetadata } from '@/lib/extract-seo';
+import { getOptionLabel, EMPLOYMENT_OPTIONS } from '@/lib/enum-options';
 
 function firstPhone(value?: string): string | undefined {
   return value
@@ -43,13 +44,6 @@ type JobDetailsPageProps = {
   }>;
 };
 
-const employmentLabels: Record<EmploymentType, string> = {
-  'full-time': 'Полная занятость',
-  'part-time': 'Частичная занятость',
-  contract: 'Проектная работа',
-  internship: 'Стажировка',
-  remote: 'Удаленно',
-};
 
 function formatSalary(job: Job) {
   if (!job.salaryFrom && !job.salaryTo) {
@@ -178,7 +172,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                       )}
                       <span className="inline-flex items-center gap-2">
                         <BriefcaseBusiness className="size-4" />
-                        {employmentLabels[job.employmentType]}
+                        {getOptionLabel(EMPLOYMENT_OPTIONS, job.employmentType)}
                       </span>
                       <span className="inline-flex items-center gap-2">
                         <Clock3 className="size-4" />
@@ -235,7 +229,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                     <BriefcaseBusiness className="mt-0.5 size-5 text-muted-foreground" />
                     <div>
                       <p className="text-muted-foreground">Тип занятости</p>
-                      <p className="font-medium">{employmentLabels[job.employmentType]}</p>
+                      <p className="font-medium">{getOptionLabel(EMPLOYMENT_OPTIONS, job.employmentType)}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">

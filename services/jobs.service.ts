@@ -14,6 +14,11 @@ import type {
   PaginationMeta,
   SubscriptionPayload,
 } from "@/types/jobs";
+import {
+  EMPLOYMENT_OPTIONS,
+  getOptionsMap,
+  getReverseOptionsMap,
+} from "@/lib/enum-options";
 
 type NamedRecord = {
   documentId?: string;
@@ -175,18 +180,13 @@ function normalizeCategoryTag(tag: StrapiCategoryRef | string): JobCategory | nu
   return { slug, name, description: tag.description as string | undefined };
 }
 
-const employmentTypeMap: Record<string, EmploymentType> = {
-  "Полная занятость": "full-time",
-  "Частичная занятость": "part-time",
-  "Проектная работа": "contract",
-  "Стажировка": "internship",
-  "Удаленно": "remote",
-};
+// Инвертированный map: label -> value для маппинга русских значений из Strapi
+const _employmentLabelToValue = getReverseOptionsMap(EMPLOYMENT_OPTIONS);
 
 function normalizeEmploymentType(value?: string | null): EmploymentType {
   if (!value) return "full-time";
-  const mapped = employmentTypeMap[value];
-  if (mapped) return mapped;
+  const mapped = _employmentLabelToValue[value];
+  if (mapped) return mapped as EmploymentType;
 
   const lower = value.toLowerCase();
   if (lower.includes("удален")) return "remote";
@@ -314,13 +314,8 @@ function cvToJob(record: StrapiCVRecord): Job {
   };
 }
 
-const employmentTypeReverseMap: Record<EmploymentType, string> = {
-  "full-time": "Полная занятость",
-  "part-time": "Частичная занятость",
-  "contract": "Проектная работа",
-  "internship": "Стажировка",
-  "remote": "Удаленно",
-};
+// Map: value -> label для фильтрации Strapi по русским значениям
+const _employmentValueToLabel = getOptionsMap(EMPLOYMENT_OPTIONS);
 
 function buildFiltersParams(
   filters: JobFilters,
@@ -356,7 +351,7 @@ function buildFiltersParams(
   }
 
   if (filters.type) {
-    const russianType = employmentTypeReverseMap[filters.type as EmploymentType] || filters.type;
+    const russianType = _employmentValueToLabel[filters.type as EmploymentType] || filters.type;
     params.set("filters[employmentType][$eq]", russianType);
   }
 
@@ -462,7 +457,7 @@ export async function getPremiumJobs(filters: JobFilters = {}): Promise<JobListR
     }
 
     if (filters.type) {
-      const russianType = employmentTypeReverseMap[filters.type as EmploymentType] || filters.type;
+      const russianType = _employmentValueToLabel[filters.type as EmploymentType] || filters.type;
       params.set("filters[employmentType][$eq]", russianType);
     }
 

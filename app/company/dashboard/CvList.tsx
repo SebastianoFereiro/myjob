@@ -13,14 +13,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { authClient } from '@/lib/auth-client';
 import { getCvsByUserId, softDeleteCv, hardDeleteCv } from '@/services/cv.service';
 import type { CvVacancy } from '@/types/cv';
-
-const employmentLabels: Record<string, string> = {
-  'Полная занятость': 'Полная занятость',
-  'Частичная занятость': 'Частичная занятость',
-  'Проектная работа': 'Проектная работа',
-  Стажировка: 'Стажировка',
-  Удаленно: 'Удаленно',
-};
+import { getOptionLabel, EMPLOYMENT_OPTIONS } from '@/lib/enum-options';
 
 function formatSalary(vacancy: CvVacancy) {
   if (!vacancy.salaryFrom && !vacancy.salaryTo) {
@@ -162,7 +155,7 @@ export function CvList() {
               </p>
               <div className="flex flex-wrap items-center gap-1.5">
                 <Badge variant="outline" className="rounded-full text-[11px] px-2 py-0 font-normal">
-                  {employmentLabels[vacancy.employmentType] || vacancy.employmentType}
+                  {vacancy.employmentType ? getOptionLabel(EMPLOYMENT_OPTIONS, vacancy.employmentType) : ''}
                 </Badge>
               </div>
             </div>
