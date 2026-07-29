@@ -484,6 +484,9 @@ export const ResumeSchema = {
     },
     employmentType: {
       type: 'enumeration',
+      // ВНИМАНИЕ: Strapi enum хранит русские метки (метки из RESUME_EMPLOYMENT_OPTIONS.label).
+      // Фронтенд отправляет коды (value), сервис resume.service.ts маппит value→label.
+      // При обновлении Strapi admin — синхронизировать с enum-options.ts
       enum: ['Полный день', 'Гибридный формат', 'Удаленный формат', 'Контракт'],
     },
     location: {
@@ -492,11 +495,13 @@ export const ResumeSchema = {
     skills: {
       type: 'json',
     },
+    // ВНИМАНИЕ: В Strapi admin эти поля должны быть type: 'json' (не 'blocks').
+    // Фронтенд отправляет JSON-массив объектов, а не Strapi Blocks-формат.
     experience: {
-      type: 'blocks',
+      type: 'json',
     },
     education: {
-      type: 'blocks',
+      type: 'json',
     },
     languages: {
       type: 'json',

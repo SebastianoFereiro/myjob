@@ -4,8 +4,32 @@ import {
   type StrapiListResponse,
   unwrapStrapiRecord,
 } from "@/lib/strapi-record";
-import type { Resume, ResumeFormData } from "@/types/resume";
+import type { Resume, ResumeFormData, EmploymentType } from "@/types/resume";
 import { RESUME_EMPLOYMENT_OPTIONS } from "@/lib/enum-options";
+
+// ========================================================================
+// Маппинг employmentType: value (фронт) ↔ label (Strapi enum)
+// Strapi enum хранит русские метки, а не коды.
+// ========================================================================
+const EMPLOYMENT_VALUE_TO_LABEL: Record<string, string> = {
+  "full-day": "Полный день",
+  hybrid: "Гибридный формат",
+  remote: "Удаленный формат",
+  contract: "Контракт",
+};
+
+const EMPLOYMENT_LABEL_TO_VALUE: Record<string, EmploymentType> = {};
+for (const opt of RESUME_EMPLOYMENT_OPTIONS) {
+  EMPLOYMENT_LABEL_TO_VALUE[opt.label] = opt.value as EmploymentType;
+}
+
+function employmentTypeToStrapi(value: string): string {
+  return EMPLOYMENT_VALUE_TO_LABEL[value] ?? value;
+}
+
+function employmentTypeFromStrapi(label: string): EmploymentType {
+  return EMPLOYMENT_LABEL_TO_VALUE[label] ?? (RESUME_EMPLOYMENT_OPTIONS[0].value as EmploymentType);
+}
 
 const RESUME_ENDPOINT = "/resumes";
 
@@ -62,7 +86,7 @@ function mapStrapiResume(record: StrapiResumeRecord): Resume {
     position: record.position || "",
     salary: record.salary ?? null,
     currency: (record.currency as Resume["currency"]) || "BYN",
-    employmentType: (record.employmentType as Resume["employmentType"]) || RESUME_EMPLOYMENT_OPTIONS[0].value,
+    employmentType: employmentTypeFromStrapi(record.employmentType || ""),
     location: record.location || "",
     skills: parseJSONField(record.skills) as Resume["skills"],
     experience: parseJSONField(record.experience) as Resume["experience"],
@@ -99,7 +123,7 @@ function serializeFormData(data: ResumeFormData) {
     position: data.position,
     salary: data.salary,
     currency: data.currency,
-    employmentType: data.employmentType,
+    employmentType: employmentTypeToStrapi(data.employmentType),
     location: data.location,
     skills: JSON.stringify(data.skills),
     experience: JSON.stringify(data.experience),
@@ -254,7 +278,7 @@ export async function updateResume(
   if (data.position !== undefined) payload.position = data.position;
   if (data.salary !== undefined) payload.salary = data.salary;
   if (data.currency !== undefined) payload.currency = data.currency;
-  if (data.employmentType !== undefined) payload.employmentType = data.employmentType;
+  if (data.employmentType !== undefined) payload.employmentType = employmentTypeToStrapi(data.employmentType);
   if (data.location !== undefined) payload.location = data.location;
   if (data.skills !== undefined) payload.skills = JSON.stringify(data.skills);
   if (data.experience !== undefined) payload.experience = JSON.stringify(data.experience);

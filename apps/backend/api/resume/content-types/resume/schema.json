@@ -1,0 +1,82 @@
+{
+  "kind": "collectionType",
+  "collectionName": "resumes",
+  "info": {
+    "singularName": "resume",
+    "pluralName": "resumes",
+    "displayName": "Resume",
+    "description": "Резюме соискателей"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "firstName": {
+      "type": "string"
+    },
+    "lastName": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "photo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images", "files", "videos", "audios"]
+    },
+    "position": {
+      "type": "string"
+    },
+    "salary": {
+      "type": "integer"
+    },
+    "currency": {
+      "type": "enumeration",
+      "enum": ["USD", "EUR", "BYN"]
+    },
+    "employmentType": {
+      "type": "enumeration",
+      "enum": ["Полный день", "Гибридный формат", "Удаленный формат", "Контракт"]
+    },
+    "location": {
+      "type": "string"
+    },
+    "skills": {
+      "type": "json"
+    },
+    "experience": {
+      "type": "json"
+    },
+    "education": {
+      "type": "json"
+    },
+    "languages": {
+      "type": "json"
+    },
+    "about": {
+      "type": "richtext"
+    },
+    "isPublished": {
+      "type": "boolean"
+    },
+    "userId": {
+      "type": "string"
+    },
+    "userEmail": {
+      "type": "email"
+    }
+  }
+}
