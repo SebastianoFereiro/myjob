@@ -327,32 +327,32 @@ function buildFiltersParams(
   params.set("sort[0]", "publishedAt:desc");
 
   const hasExclude = options?.excludePremium === true;
-  const hasQuery = !!filters.query;
+  const query = filters.query ?? "";
 
   // excludePremium и query должны быть в разных группах $and,
   // иначе premium_from[$null] совпадает для всех обычных вакансий,
   // и query игнорируется (см. баг: query не фильтрует)
-  if (hasExclude && hasQuery) {
+  if (hasExclude && query) {
     const now = new Date().toISOString();
     // Группа A: исключение премиум-вакансий
     params.set("filters[$and][0][$or][0][premium_from][$null]", "true");
     params.set("filters[$and][0][$or][1][premium_to][$lt]", now);
     // Группа B: поисковый запрос
-    params.set(`filters[$and][1][$or][0][title][$contains]`, filters.query);
-    params.set(`filters[$and][1][$or][1][position][$contains]`, filters.query);
-    params.set(`filters[$and][1][$or][2][description][$contains]`, filters.query);
-    params.set(`filters[$and][1][$or][3][company][name][$contains]`, filters.query);
+    params.set(`filters[$and][1][$or][0][title][$contains]`, query);
+    params.set(`filters[$and][1][$or][1][position][$contains]`, query);
+    params.set(`filters[$and][1][$or][2][description][$contains]`, query);
+    params.set(`filters[$and][1][$or][3][company][name][$contains]`, query);
   } else if (hasExclude) {
     // Только исключение премиум — плоский $or
     const now = new Date().toISOString();
     params.set("filters[$or][0][premium_from][$null]", "true");
     params.set("filters[$or][1][premium_to][$lt]", now);
-  } else if (hasQuery) {
+  } else if (query) {
     // Только поисковый запрос — плоский $or
-    params.set(`filters[$or][0][title][$contains]`, filters.query);
-    params.set(`filters[$or][1][position][$contains]`, filters.query);
-    params.set(`filters[$or][2][description][$contains]`, filters.query);
-    params.set(`filters[$or][3][company][name][$contains]`, filters.query);
+    params.set(`filters[$or][0][title][$contains]`, query);
+    params.set(`filters[$or][1][position][$contains]`, query);
+    params.set(`filters[$or][2][description][$contains]`, query);
+    params.set(`filters[$or][3][company][name][$contains]`, query);
   }
 
   if (filters.location) {
