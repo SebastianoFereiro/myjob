@@ -75,7 +75,7 @@ export function ResumeForm({
     position: initialData?.position || "",
     salary: initialData?.salary || null,
     currency: initialData?.currency || "BYN",
-    employmentType: initialData?.employmentType || "Полный день",
+    employmentType: initialData?.employmentType || RESUME_EMPLOYMENT_OPTIONS[0].value,
     location: initialData?.location || "",
     skills: initialData?.skills || [],
     experience: initialData?.experience || [],

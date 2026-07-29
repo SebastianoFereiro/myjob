@@ -5,6 +5,7 @@ import {
   unwrapStrapiRecord,
 } from "@/lib/strapi-record";
 import type { Resume, ResumeFormData } from "@/types/resume";
+import { RESUME_EMPLOYMENT_OPTIONS } from "@/lib/enum-options";
 
 const RESUME_ENDPOINT = "/resumes";
 
@@ -61,7 +62,7 @@ function mapStrapiResume(record: StrapiResumeRecord): Resume {
     position: record.position || "",
     salary: record.salary ?? null,
     currency: (record.currency as Resume["currency"]) || "BYN",
-    employmentType: (record.employmentType as Resume["employmentType"]) || "Полный день",
+    employmentType: (record.employmentType as Resume["employmentType"]) || RESUME_EMPLOYMENT_OPTIONS[0].value,
     location: record.location || "",
     skills: parseJSONField(record.skills) as Resume["skills"],
     experience: parseJSONField(record.experience) as Resume["experience"],
