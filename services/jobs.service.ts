@@ -322,28 +322,37 @@ function buildFiltersParams(
   options?: { excludePremium?: boolean },
 ): URLSearchParams {
   const params = buildPopulateParams();
-  // excludePremium использует $or[0] и $or[1], query должен начинаться с $or[2]
-  let orIndex = options?.excludePremium ? 2 : 0;
 
   params.set("filters[isActive][$eq]", "true");
   params.set("sort[0]", "publishedAt:desc");
 
-  // Исключаем активные премиум-вакансии из обычной выдачи
-  if (options?.excludePremium) {
+  const hasExclude = options?.excludePremium === true;
+  const hasQuery = !!filters.query;
+
+  // excludePremium и query должны быть в разных группах $and,
+  // иначе premium_from[$null] совпадает для всех обычных вакансий,
+  // и query игнорируется (см. баг: query не фильтрует)
+  if (hasExclude && hasQuery) {
+    const now = new Date().toISOString();
+    // Группа A: исключение премиум-вакансий
+    params.set("filters[$and][0][$or][0][premium_from][$null]", "true");
+    params.set("filters[$and][0][$or][1][premium_to][$lt]", now);
+    // Группа B: поисковый запрос
+    params.set(`filters[$and][1][$or][0][title][$contains]`, filters.query);
+    params.set(`filters[$and][1][$or][1][position][$contains]`, filters.query);
+    params.set(`filters[$and][1][$or][2][description][$contains]`, filters.query);
+    params.set(`filters[$and][1][$or][3][company][name][$contains]`, filters.query);
+  } else if (hasExclude) {
+    // Только исключение премиум — плоский $or
     const now = new Date().toISOString();
     params.set("filters[$or][0][premium_from][$null]", "true");
     params.set("filters[$or][1][premium_to][$lt]", now);
-  }
-
-  if (filters.query) {
-    params.set(`filters[$or][${orIndex}][title][$contains]`, filters.query);
-    orIndex++;
-    params.set(`filters[$or][${orIndex}][position][$contains]`, filters.query);
-    orIndex++;
-    params.set(`filters[$or][${orIndex}][description][$contains]`, filters.query);
-    orIndex++;
-    params.set(`filters[$or][${orIndex}][company][name][$contains]`, filters.query);
-    orIndex++;
+  } else if (hasQuery) {
+    // Только поисковый запрос — плоский $or
+    params.set(`filters[$or][0][title][$contains]`, filters.query);
+    params.set(`filters[$or][1][position][$contains]`, filters.query);
+    params.set(`filters[$or][2][description][$contains]`, filters.query);
+    params.set(`filters[$or][3][company][name][$contains]`, filters.query);
   }
 
   if (filters.location) {
