@@ -22,10 +22,9 @@ export const EMPLOYMENT_OPTIONS = [
   { value: 'contract',    label: 'Проектная работа' },
   { value: 'internship',  label: 'Стажировка' },
   { value: 'remote',      label: 'Удаленно' },
-  { value: 'remote',      label: 'Удаленно' },
-  { value: 'vachta',    label: 'Работа вахтой' },
-{ value: 'podrabotka',    label: 'Подработка' },
-{ value: 'rabota-bez-opyta',    label: 'Работа без опыта' }
+  { value: 'vachta',      label: 'Работа вахтой' },
+  { value: 'podrabotka',  label: 'Подработка' },
+  { value: 'rabota-bez-opyta', label: 'Работа без опыта' },
 ] as const satisfies readonly EnumOption[];
 
 // ========================================================================
