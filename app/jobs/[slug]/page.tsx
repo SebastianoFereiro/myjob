@@ -4,12 +4,13 @@ import Link from 'next/link';
 import {
   ArrowLeft,
   BriefcaseBusiness,
-  Building2,
+  SquareUser,
   CalendarDays,
   Clock3,
   MapPin,
   Sparkles,
   Wallet,
+  Building2,
 } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
@@ -43,7 +44,6 @@ type JobDetailsPageProps = {
     slug: string;
   }>;
 };
-
 
 function formatSalary(job: Job) {
   if (!job.salaryFrom && !job.salaryTo) {
@@ -129,7 +129,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                         sizes="80px"
                       />
                     ) : (
-                      <Building2 className="size-9 text-muted-foreground" />
+                      <SquareUser className="size-9 text-muted-foreground" />
                     )}
                   </div>
 
@@ -229,7 +229,9 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                     <BriefcaseBusiness className="mt-0.5 size-5 text-muted-foreground" />
                     <div>
                       <p className="text-muted-foreground">Тип занятости</p>
-                      <p className="font-medium">{getOptionLabel(EMPLOYMENT_OPTIONS, job.employmentType)}</p>
+                      <p className="font-medium">
+                        {getOptionLabel(EMPLOYMENT_OPTIONS, job.employmentType)}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
