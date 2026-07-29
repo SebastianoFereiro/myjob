@@ -115,9 +115,8 @@ const PAGES: PageSeed[] = [
       },
       {
         __component: "page.contact-info",
-        email: "support@myjob.by",
-        phone: "+375 (00) 000-00-00",
-        address: "г. Минск, Республика Беларусь",
+        email: "support@myjob.by",      
+        address: "г. Минск, пр. Поблемный, 89, к3",
         work_hours: "Пн-Пт: 9:00 - 18:00",
       },
     ],
