@@ -29,19 +29,30 @@ export function SettingsForm() {
     setProfileError("");
     setProfileSuccess("");
 
-    if (!name.trim()) {
+    const trimmedName = name.trim();
+    if (!trimmedName) {
       setProfileError("Имя не может быть пустым");
+      return;
+    }
+    if (trimmedName.length < 2) {
+      setProfileError("Имя должно содержать минимум 2 символа");
       return;
     }
 
     setProfileLoading(true);
 
     try {
-      await authClient.updateUser({ name: name.trim() });
+      const { error: updateError } = await authClient.updateUser({ name: trimmedName });
+
+      if (updateError) {
+        setProfileError(updateError.message || "Не удалось обновить имя. Попробуйте ещё раз.");
+        return;
+      }
+
       setProfileSuccess("Имя успешно обновлено");
       refetch();
     } catch {
-      setProfileError("Не удалось обновить имя");
+      setProfileError("Не удалось обновить имя. Попробуйте ещё раз.");
     } finally {
       setProfileLoading(false);
     }

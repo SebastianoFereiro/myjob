@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import Link from "next/link";
 import { BriefcaseBusiness, Loader2, Mail, User } from "lucide-react";
 
@@ -25,7 +25,6 @@ export function RegisterForm() {
     register,
     handleSubmit,
     control,
-    watch,
     setError: setFieldError,
     clearErrors,
     formState: { errors, isSubmitting },
@@ -41,7 +40,7 @@ export function RegisterForm() {
     },
   });
 
-  const role = watch("role");
+  const role = useWatch({ control, name: "role" });
 
   async function onSubmit(values: RegisterInput) {
     setError("");
