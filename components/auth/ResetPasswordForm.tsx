@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -22,19 +21,37 @@ export function ResetPasswordForm({ token }: { token: string }) {
   const {
     register,
     handleSubmit,
+    setError: setFieldError,
+    clearErrors,
     formState: { errors },
   } = useForm<ResetPasswordInput>({
-    resolver: zodResolver(resetPasswordSchema),
     defaultValues: { password: "", confirmPassword: "" },
   });
 
   async function onSubmit(values: ResetPasswordInput) {
-    setLoading(true);
     setError("");
+    clearErrors();
+
+    // Валидация zod v4 напрямую, без резолвер-адаптеров
+    const result = resetPasswordSchema.safeParse(values);
+    if (!result.success) {
+      for (const issue of result.error.issues) {
+        const key = issue.path[0];
+        if (typeof key === "string") {
+          setFieldError(key as keyof ResetPasswordInput, {
+            type: issue.code,
+            message: issue.message,
+          });
+        }
+      }
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const { error: resetError } = await authClient.resetPassword({
-        newPassword: values.password,
+        newPassword: result.data.password,
         token,
       });
 

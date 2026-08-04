@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 
@@ -14,28 +13,42 @@ import { translateAuthError } from "@/lib/auth-errors";
 import { loginSchema, type LoginInput } from "@/lib/schemas/auth";
 
 export function LoginForm() {
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
 
   const {
     register,
     handleSubmit,
+    setError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
 
   async function onSubmit(values: LoginInput) {
-    setError("");
+    setServerError("");
+    clearErrors();
+
+    // Валидация zod v4 напрямую, без резолвер-адаптеров
+    const result = loginSchema.safeParse(values);
+    if (!result.success) {
+      for (const issue of result.error.issues) {
+        const key = issue.path[0];
+        if (typeof key === "string") {
+          setError(key as keyof LoginInput, { type: issue.code, message: issue.message });
+        }
+      }
+      return;
+    }
 
     try {
       const { data, error: authError } = await authClient.signIn.email({
-        email: values.email,
-        password: values.password,
+        email: result.data.email,
+        password: result.data.password,
       });
 
       if (authError) {
-        setError(translateAuthError(authError));
+        setServerError(translateAuthError(authError));
         return;
       }
 
@@ -46,7 +59,7 @@ export function LoginForm() {
         window.location.href = `/auth/callback?redirect=${encodeURIComponent(redirectTo)}`;
       }
     } catch {
-      setError("Ошибка при входе. Попробуйте позже.");
+      setServerError("Ошибка при входе. Попробуйте позже.");
     }
   }
 
@@ -87,7 +100,7 @@ export function LoginForm() {
         </Link>
       </div>
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {serverError && <p className="text-sm text-destructive">{serverError}</p>}
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? (

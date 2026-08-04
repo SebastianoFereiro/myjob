@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -18,25 +17,42 @@ export function ForgotPasswordForm() {
   const {
     register,
     handleSubmit,
+    setError: setFieldError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<ForgotPasswordInput>({
-    resolver: zodResolver(forgotPasswordSchema),
     defaultValues: { email: "" },
   });
 
   async function onSubmit(values: ForgotPasswordInput) {
     setError("");
+    clearErrors();
+
+    // Валидация zod v4 напрямую, без резолвер-адаптеров
+    const result = forgotPasswordSchema.safeParse(values);
+    if (!result.success) {
+      for (const issue of result.error.issues) {
+        const key = issue.path[0];
+        if (typeof key === "string") {
+          setFieldError(key as keyof ForgotPasswordInput, {
+            type: issue.code,
+            message: issue.message,
+          });
+        }
+      }
+      return;
+    }
 
     try {
       const { error: reqError } = await authClient.requestPasswordReset({
-        email: values.email,
+        email: result.data.email,
         redirectTo: "/reset-password",
       });
 
       if (reqError) {
         console.error("[AUTH] requestPasswordReset:", reqError);
       }
-      setSent(values.email);
+      setSent(result.data.email);
     } catch {
       setError("Не удалось отправить инструкцию. Попробуйте позже.");
     }

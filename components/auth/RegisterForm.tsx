@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { BriefcaseBusiness, Loader2, Mail, User } from "lucide-react";
 
@@ -27,9 +26,10 @@ export function RegisterForm() {
     handleSubmit,
     control,
     watch,
+    setError: setFieldError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<RegisterInput>({
-    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -45,14 +45,32 @@ export function RegisterForm() {
 
   async function onSubmit(values: RegisterInput) {
     setError("");
+    clearErrors();
+
+    // Валидация zod v4 напрямую, без резолвер-адаптеров
+    const result = registerSchema.safeParse(values);
+    if (!result.success) {
+      for (const issue of result.error.issues) {
+        const key = issue.path[0];
+        if (typeof key === "string") {
+          setFieldError(key as keyof RegisterInput, {
+            type: issue.code,
+            message: issue.message,
+          });
+        }
+      }
+      return;
+    }
+
+    const data = result.data;
 
     try {
       const { error: authError } = await authClient.signUp.email({
-        name: values.name,
-        email: values.email,
-        password: values.password,
+        name: data.name,
+        email: data.email,
+        password: data.password,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ...({ role: values.role } as any),
+        ...({ role: data.role } as any),
       });
 
       if (authError) {
@@ -61,24 +79,24 @@ export function RegisterForm() {
       }
 
       // Создаём компанию в фоне (не блокируем следующий шаг)
-      if (values.role === "company") {
+      if (data.role === "company") {
         fetch("/api/company/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            name: values.name,
-            ynp: values.ynp?.trim() || "",
+            name: data.name,
+            ynp: data.ynp?.trim() || "",
           }),
         }).catch(() => {});
       }
 
       if (REQUIRE_EMAIL_VERIFICATION) {
-        setVerificationPending(values.email);
+        setVerificationPending(data.email);
         return;
       }
 
       // Редирект через публичный callback для избежания middleware redirect
-      const redirectTo = values.role === "company" ? "/company/dashboard" : "/dashboard";
+      const redirectTo = data.role === "company" ? "/company/dashboard" : "/dashboard";
       window.location.href = `/auth/callback?redirect=${encodeURIComponent(redirectTo)}`;
     } catch {
       setError("Ошибка при регистрации. Попробуйте позже.");

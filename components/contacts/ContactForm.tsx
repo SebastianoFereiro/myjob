@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Send } from "lucide-react";
 
 import { contactSchema, type ContactInput } from "@/lib/schemas/auth";
@@ -20,22 +19,40 @@ export function ContactForm() {
   const {
     register,
     handleSubmit,
+    setError: setFieldError,
+    clearErrors,
     reset,
     formState: { errors },
   } = useForm<ContactInput>({
-    resolver: zodResolver(contactSchema),
     defaultValues: { name: "", email: "", subject: "", message: "" },
   });
 
   async function onSubmit(values: ContactInput) {
     setStatus("sending");
     setError("");
+    clearErrors();
+
+    // Валидация zod v4 напрямую, без резолвер-адаптеров
+    const result = contactSchema.safeParse(values);
+    if (!result.success) {
+      for (const issue of result.error.issues) {
+        const key = issue.path[0];
+        if (typeof key === "string") {
+          setFieldError(key as keyof ContactInput, {
+            type: issue.code,
+            message: issue.message,
+          });
+        }
+      }
+      setStatus("idle");
+      return;
+    }
 
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify(result.data),
       });
       const data = (await res.json().catch(() => null)) as
         | { error?: { message?: string } }
