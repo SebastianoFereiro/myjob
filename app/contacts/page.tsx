@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import { Mail, Phone, MapPin, Globe, Clock3, Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, Clock3 } from 'lucide-react';
 
 import Header from '@/components/header';
 import { Footer } from '@/components/footer';
+import { ContactForm } from '@/components/contacts/ContactForm';
 
 import { navigationItems } from '@/app/data/navigation';
 
@@ -48,57 +49,7 @@ export default function ContactsPage() {
                 <p className="mt-3 text-muted-foreground">Мы отвечаем в течение 24 часов.</p>
               </div>
 
-              <form className="space-y-5">
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium">Ваше имя</label>
-
-                    <input
-                      type="text"
-                      placeholder="Введите имя"
-                      className="h-12 w-full rounded-2xl border bg-zinc-50 px-4 outline-none transition focus:border-black"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-sm font-medium">Email</label>
-
-                    <input
-                      type="email"
-                      placeholder="you@example.com"
-                      className="h-12 w-full rounded-2xl border bg-zinc-50 px-4 outline-none transition focus:border-black"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium">Тема</label>
-
-                  <input
-                    type="text"
-                    placeholder="Например: Размещение вакансии"
-                    className="h-12 w-full rounded-2xl border bg-zinc-50 px-4 outline-none transition focus:border-black"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium">Сообщение</label>
-
-                  <textarea
-                    rows={6}
-                    placeholder="Введите сообщение..."
-                    className="w-full rounded-2xl border bg-zinc-50 p-4 outline-none transition focus:border-black"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-2 rounded-2xl bg-black px-6 py-3 font-medium text-white transition hover:scale-[1.02]"
-                >
-                  <Send className="h-4 w-4" />
-                  Отправить сообщение
-                </button>
-              </form>
+              <ContactForm />
             </div>
 
             {/* SIDEBAR */}
