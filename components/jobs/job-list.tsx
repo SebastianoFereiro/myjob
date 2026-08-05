@@ -107,6 +107,8 @@ export async function JobList({
     filters.tag,
   ].filter(Boolean).length;
 
+  const hasFilterContent = (tags?.length ?? 0) > 0 || activeFiltersCount > 0;
+
   return (
     <section id="vacancies" className={cn(contained ? 'container py-12' : 'py-0')}>
       <div className="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
@@ -126,6 +128,7 @@ export async function JobList({
       </div>
 
       {/* Премиум блок фильтров */}
+      {hasFilterContent ? (
       <div className="relative mb-5 rounded-xl border bg-gradient-to-br from-background via-background to-muted/30 p-2.5 shadow-sm transition-all hover:shadow-md sm:p-3">
         <div className="flex items-center justify-between gap-2 flex-wrap">
           {/* Левая группа - фильтры */}
@@ -182,7 +185,7 @@ export async function JobList({
                   size="sm"
                   className="group relative h-7 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-2.5 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30"
                 >
-                  <a href={citySlug ? `/cities/${citySlug}#vacancies` : `${basePath}#vacancies`}>
+                  <a href={citySlug ? `/cities/${citySlug}#vacancies` : '/jobs#vacancies'}>
                     <X className="h-3 w-3 transition-transform group-hover:rotate-90" />
                     <span>Категория</span>
                   </a>
@@ -195,7 +198,15 @@ export async function JobList({
                   size="sm"
                   className="group relative h-7 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-2.5 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30"
                 >
-                  <a href={`${basePath}#vacancies`}>
+                  <a
+                    href={
+                      citySlug
+                        ? `/cities/${citySlug}#vacancies`
+                        : regionSlug
+                          ? `/regions/${regionSlug}#vacancies`
+                          : `${basePath}#vacancies`
+                    }
+                  >
                     <X className="h-3 w-3 transition-transform group-hover:rotate-90" />
                     <span>Компания</span>
                   </a>
@@ -221,7 +232,13 @@ export async function JobList({
                 className="h-7 gap-1.5 border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive"
                 asChild
               >
-                <a href={`${basePath}#vacancies`}>
+                <a
+                  href={
+                    categorySlug || citySlug || regionSlug
+                      ? '/jobs#vacancies'
+                      : `${basePath}#vacancies`
+                  }
+                >
                   <X className="h-3 w-3" />
                   <span className="hidden sm:inline">Сбросить все</span>
                 </a>
@@ -230,6 +247,7 @@ export async function JobList({
           </div>
         </div>
       </div>
+      ) : null}
 
       <PremiumSection jobs={premiumJobs} />
 
