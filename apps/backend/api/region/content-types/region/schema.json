@@ -1,10 +1,10 @@
 {
   "kind": "collectionType",
-  "collectionName": "cities",
+  "collectionName": "regions",
   "info": {
-    "singularName": "city",
-    "pluralName": "cities",
-    "displayName": "City"
+    "singularName": "region",
+    "pluralName": "regions",
+    "displayName": "region"
   },
   "options": {
     "draftAndPublish": true
@@ -32,13 +32,13 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::cv.cv",
-      "mappedBy": "city"
+      "mappedBy": "region"
     },
-    "region": {
+    "cities": {
       "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::region.region",
-      "inversedBy": "cities"
+      "relation": "oneToMany",
+      "target": "api::city.city",
+      "mappedBy": "region"
     }
   }
 }

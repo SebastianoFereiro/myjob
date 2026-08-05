@@ -1,5 +1,5 @@
 import type { SeoMetadata } from '@/types/seo';
-import type { CityRef } from '@/types/strapi-collections';
+import type { CityRef, RegionRef } from '@/types/strapi-collections';
 import type {
   EMPLOYMENT_OPTIONS,
   LEVEL_OPTIONS,
@@ -55,6 +55,7 @@ export interface CvVacancy {
   employmentType: CvEmploymentType;
   location: string;
   city?: CityRef | null;
+  region?: RegionRef | null;
   level_job?: CvLevelJob | null;
   experience_job?: CvExperienceJob | null;
   education_job?: CvEducationJob | null;

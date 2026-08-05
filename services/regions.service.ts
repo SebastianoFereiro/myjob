@@ -1,9 +1,9 @@
 import { getStrapiURL } from "@/lib/strapi-client";
 import { unwrapStrapiRecord } from "@/lib/strapi-record";
 import type { SeoMetadata } from "@/types/seo";
-import type { City, CityRef } from "@/types/strapi-collections";
+import type { Region, RegionRef } from "@/types/strapi-collections";
 
-type StrapiCityRecord = {
+type StrapiRegionRecord = {
   id?: number;
   documentId?: string;
   title?: string;
@@ -13,7 +13,7 @@ type StrapiCityRecord = {
   SEO?: SeoMetadata | null;
 };
 
-function mapStrapiCity(record: StrapiCityRecord): CityRef {
+function mapStrapiRegion(record: StrapiRegionRecord): RegionRef {
   return {
     id: Number(record.id ?? 0),
     documentId: record.documentId ?? "",
@@ -23,7 +23,7 @@ function mapStrapiCity(record: StrapiCityRecord): CityRef {
   };
 }
 
-export async function getCities(): Promise<CityRef[]> {
+export async function getRegions(): Promise<RegionRef[]> {
   try {
     const strapiUrl = getStrapiURL();
     const token = process.env.STRAPI_API_TOKEN;
@@ -31,7 +31,7 @@ export async function getCities(): Promise<CityRef[]> {
     params.set("pagination[pageSize]", "100");
     params.set("sort[0]", "title:asc");
 
-    const res = await fetch(`${strapiUrl}/api/cities?${params.toString()}`, {
+    const res = await fetch(`${strapiUrl}/api/regions?${params.toString()}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       next: { revalidate: 14400 },
     });
@@ -45,14 +45,14 @@ export async function getCities(): Promise<CityRef[]> {
 
     return data.map((record: Record<string, unknown>) => {
       const unwrapped = unwrapStrapiRecord(record);
-      return mapStrapiCity(unwrapped as unknown as StrapiCityRecord);
+      return mapStrapiRegion(unwrapped as unknown as StrapiRegionRecord);
     });
   } catch {
     return [];
   }
 }
 
-export async function getCityBySlug(slug: string): Promise<City | null> {
+export async function getRegionBySlug(slug: string): Promise<Region | null> {
   try {
     const strapiUrl = getStrapiURL();
     const token = process.env.STRAPI_API_TOKEN;
@@ -61,7 +61,7 @@ export async function getCityBySlug(slug: string): Promise<City | null> {
     params.set("populate", "*");
     params.set("pagination[pageSize]", "1");
 
-    const res = await fetch(`${strapiUrl}/api/cities?${params.toString()}`, {
+    const res = await fetch(`${strapiUrl}/api/regions?${params.toString()}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       next: { revalidate: 14400 },
     });
@@ -89,38 +89,6 @@ export async function getCityBySlug(slug: string): Promise<City | null> {
   }
 }
 
-export async function getCitiesByRegion(regionSlug: string): Promise<CityRef[]> {
-  if (!regionSlug) return [];
-
-  try {
-    const strapiUrl = getStrapiURL();
-    const token = process.env.STRAPI_API_TOKEN;
-    const params = new URLSearchParams();
-    params.set("filters[region][slug][$eq]", regionSlug);
-    params.set("pagination[pageSize]", "100");
-    params.set("sort[0]", "title:asc");
-
-    const res = await fetch(`${strapiUrl}/api/cities?${params.toString()}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      next: { revalidate: 14400 },
-    });
-
-    if (!res.ok) return [];
-
-    const json = await res.json();
-    const data = json?.data;
-
-    if (!data || !Array.isArray(data)) return [];
-
-    return data.map((record: Record<string, unknown>) => {
-      const unwrapped = unwrapStrapiRecord(record);
-      return mapStrapiCity(unwrapped as unknown as StrapiCityRecord);
-    });
-  } catch {
-    return [];
-  }
-}
-
-export async function getCitiesWithCounts(): Promise<CityRef[]> {
-  return getCities();
+export async function getRegionsWithCounts(): Promise<RegionRef[]> {
+  return getRegions();
 }

@@ -22,7 +22,7 @@ import { markdownComponents } from '@/lib/markdown';
 import { navigationItems } from '@/app/data/navigation';
 import { getCompanyBySlug } from '@/services/companies.service';
 import { getOptionLabel, EMPLOYMENT_OPTIONS } from '@/lib/enum-options';
-import { getAllJobs } from '@/services/jobs.service';
+import { getCompanyJobs } from '@/services/jobs.service';
 import { extractSeoMetadata } from '@/lib/extract-seo';
 
 type Props = {
@@ -53,8 +53,7 @@ export default async function CompanyDetailsPage({ params }: Props) {
     notFound();
   }
 
-  const allJobs = await getAllJobs();
-  const companyJobs = allJobs.filter((job) => job.company.slug === company.slug);
+  const companyJobs = await getCompanyJobs(company.slug);
 
   return (
     <>

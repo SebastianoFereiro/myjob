@@ -625,6 +625,57 @@ export const CitySchema = {
     },
     // --- Отношения ---
     // cvs: relation 1:M (inverse от CV.city)
+    // region: relation M:1 -> Region (inverse от Region.cities)
+    region: {
+      type: 'relation',
+      relation: 'manyToOne',
+      target: 'api::region.region',
+      inversedBy: 'cities',
+    },
+  },
+} as const;
+
+// ========================================================================
+// 9.5. КОЛЛЕКЦИЯ: Region
+// ========================================================================
+// Тип: Collection Type
+// API ID: region, regions
+// Отношения: CV (1:M), City (1:M)
+// ========================================================================
+
+export const RegionSchema = {
+  collectionName: 'regions',
+  info: {
+    singularName: 'region',
+    pluralName: 'regions',
+    displayName: 'Region',
+    description: 'Регионы для вакансий и городов',
+  },
+  options: {
+    draftAndPublish: true,
+  },
+  pluginOptions: {},
+  attributes: {
+    title: {
+      type: 'string',
+    },
+    description: {
+      type: 'string',
+    },
+    slug: {
+      type: 'uid',
+    },
+    text: {
+      type: 'richtext',
+    },
+    SEO: {
+      type: 'component',
+      repeatable: false,
+      component: 'shared.seo',
+    },
+    // --- Отношения ---
+    // cvs: relation 1:M (inverse от CV.region)
+    // cities: relation 1:M (inverse от City.region)
   },
 } as const;
 
@@ -707,6 +758,12 @@ export const CVSchema = {
       type: 'relation',
       relation: 'manyToOne',
       target: 'api::city.city',
+      inversedBy: 'cvs',
+    },
+    region: {
+      type: 'relation',
+      relation: 'manyToOne',
+      target: 'api::region.region',
       inversedBy: 'cvs',
     },
     level_job: {
@@ -816,6 +873,8 @@ export const EducationObject = {
 /*
   Компания ──1:M──> Вакансия
   Категория ──1:M──> Вакансия
+  Регион ──1:M──> Город
+  Регион ──1:M──> Вакансия (CV)
   Пользователь ──1:M──> Резюме (created_by)
   Пользователь ──1:M──> Компания (created_by)
 */

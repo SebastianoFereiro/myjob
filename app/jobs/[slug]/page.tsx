@@ -156,6 +156,17 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                         <Building2 className="size-4" />
                         {job.company.name}
                       </Link>
+                      {job.regionRef?.slug && (
+                        <span className="inline-flex items-center gap-2">
+                          <MapPin className="size-4" />
+                          <a
+                            href={`/regions/${job.regionRef.slug}`}
+                            className="hover:text-foreground hover:underline"
+                          >
+                            {job.regionRef.title || job.region}
+                          </a>
+                        </span>
+                      )}
                       {job.cityRef?.slug && (
                         <span className="inline-flex items-center gap-2">
                           <MapPin className="size-4" />

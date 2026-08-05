@@ -5,7 +5,16 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { markdownComponents } from '@/lib/markdown';
 import type { Job } from '@/types/jobs';
-import { CheckCircle2, Layers3, MapPin, Sparkles, University } from 'lucide-react';
+import {
+  BadgeCheck,
+  BriefcaseBusiness,
+  CheckCircle2,
+  Clock3,
+  Layers3,
+  MapPin,
+  Sparkles,
+  University,
+} from 'lucide-react';
 import { getOptionLabel, EMPLOYMENT_OPTIONS } from '@/lib/enum-options';
 
 function splitLines(value?: string) {
@@ -36,69 +45,75 @@ export function JobDetails({ job }: { job: Job }) {
         </div>
 
         <div className="rounded-lg border bg-background p-5 md:p-7">
-          <div className="flex flex-wrap gap-2">
-            <Link
-              href={`/jobs${searchParamsString({ type: job.employmentType })}`}
-              className="hover:opacity-80 transition-opacity"
-            >
-              <Badge
-                variant={job.employmentType === 'remote' ? 'secondary' : 'outline'}
-                className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer"
-              >
-                {getOptionLabel(EMPLOYMENT_OPTIONS, job.employmentType)}
-              </Badge>
-            </Link>
-            {job.level && (
+          <div className="rounded-2xl border bg-gradient-to-br from-background via-background to-muted/50 p-4 shadow-sm md:p-5">
+            <div className="flex flex-wrap items-center gap-2">
               <Link
-                href={`/jobs${searchParamsString({ level: job.level })}`}
-                className="hover:opacity-80 transition-opacity"
+                href={`/jobs${searchParamsString({ type: job.employmentType })}`}
+                className="transition-transform hover:-translate-y-0.5"
               >
                 <Badge
-                  variant="outline"
-                  className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer"
+                  variant="default"
+                  className="h-auto min-h-7 cursor-pointer rounded-full bg-gradient-to-r from-primary to-primary/80 px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm ring-1 ring-primary/20 transition-all hover:shadow-md"
                 >
-                  {job.level}
+                  <BriefcaseBusiness className="size-3.5" />
+                  {getOptionLabel(EMPLOYMENT_OPTIONS, job.employmentType)}
                 </Badge>
               </Link>
-            )}
-            {job.experience && (
-              <Link
-                href={`/jobs${searchParamsString({ experience: job.experience })}`}
-                className="hover:opacity-80 transition-opacity"
-              >
-                <Badge
-                  variant="outline"
-                  className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer"
+              {job.level && (
+                <Link
+                  href={`/jobs${searchParamsString({ level: job.level })}`}
+                  className="transition-transform hover:-translate-y-0.5"
                 >
-                  {job.experience}
-                </Badge>
-              </Link>
-            )}
-            {job.position && (
-              <Link
-                href={`/jobs${searchParamsString({ position: job.position })}`}
-                className="hover:opacity-80 transition-opacity"
-              >
-                <Badge
-                  variant="outline"
-                  className="rounded-full px-4 py-1 text-xs font-medium cursor-pointer"
+                  <Badge
+                    variant="outline"
+                    className="h-auto min-h-7 cursor-pointer rounded-full border bg-white/70 px-4 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur transition-all hover:border-primary/40 hover:bg-white hover:shadow-md"
+                  >
+                    <Layers3 className="size-3.5" />
+                    {job.level}
+                  </Badge>
+                </Link>
+              )}
+              {job.experience && (
+                <Link
+                  href={`/jobs${searchParamsString({ experience: job.experience })}`}
+                  className="transition-transform hover:-translate-y-0.5"
                 >
-                  {job.position}
-                </Badge>
-              </Link>
-            )}
+                  <Badge
+                    variant="outline"
+                    className="h-auto min-h-7 cursor-pointer rounded-full border bg-white/70 px-4 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur transition-all hover:border-primary/40 hover:bg-white hover:shadow-md"
+                  >
+                    <Clock3 className="size-3.5" />
+                    {job.experience}
+                  </Badge>
+                </Link>
+              )}
+              {job.position && (
+                <Link
+                  href={`/jobs${searchParamsString({ position: job.position })}`}
+                  className="transition-transform hover:-translate-y-0.5"
+                >
+                  <Badge
+                    variant="outline"
+                    className="h-auto min-h-7 cursor-pointer rounded-full border bg-white/70 px-4 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur transition-all hover:border-primary/40 hover:bg-white hover:shadow-md"
+                  >
+                    <BadgeCheck className="size-3.5" />
+                    {job.position}
+                  </Badge>
+                </Link>
+              )}
+            </div>
 
             {job.tags && job.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-3">
+              <div className="mt-3 flex w-full flex-wrap gap-1.5 border-t border-border/60 pt-3">
                 {job.tags.map((tag) => (
                   <Link
                     key={tag}
                     href={`/categories/${job.category?.slug || ''}?tag=${encodeURIComponent(tag)}`}
-                    className="hover:opacity-80 transition-opacity"
+                    className="transition-transform hover:-translate-y-0.5"
                   >
                     <Badge
                       variant="outline"
-                      className="rounded-full px-3 py-1 text-xs font-normal cursor-pointer"
+                      className="h-auto min-h-6 cursor-pointer rounded-full bg-muted/50 px-3 py-1 text-xs font-normal text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                     >
                       {tag}
                     </Badge>

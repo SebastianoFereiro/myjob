@@ -1,6 +1,6 @@
 import { fetchAPI, getStrapiMediaURL } from "@/lib/strapi-client";
 import type { SeoMetadata } from '@/types/seo';
-import type { CityRef } from '@/types/strapi-collections';
+import type { CityRef, RegionRef } from '@/types/strapi-collections';
 import {
   type StrapiListResponse,
   unwrapStrapiRecord,
@@ -82,6 +82,7 @@ type StrapiCVRecord = {
   sortOrder?: number;
   isActive?: boolean;
   city?: Record<string, unknown> | string | null;
+  region?: Record<string, unknown> | string | null;
   location?: string | null;
   position?: string | null;
   requirements?: string | null;
@@ -251,6 +252,17 @@ function cvToJob(record: StrapiCVRecord): Job {
     };
   }
 
+  function extractRegionRef(region: Record<string, unknown> | string | null | undefined): RegionRef | undefined {
+    if (!region || typeof region === "string") return undefined;
+    return {
+      id: Number((region as Record<string, unknown>).id ?? 0),
+      documentId: String((region as Record<string, unknown>).documentId ?? ""),
+      title: String((region as Record<string, unknown>).title ?? ""),
+      slug: String((region as Record<string, unknown>).slug ?? ""),
+      description: (region as Record<string, unknown>).description as string | undefined,
+    };
+  }
+
   return {
     id,
     documentId: record.documentId || id,
@@ -277,6 +289,7 @@ function cvToJob(record: StrapiCVRecord): Job {
     cities: extractCityName(record.city) ? [extractCityName(record.city)!] : [],
     city: extractCityName(record.city),
     cityRef: extractCityRef(record.city),
+    regionRef: extractRegionRef(record.region),
     location: record.location || extractCityName(record.city) || "Не указано",
     employmentType: normalizeEmploymentType(record.employmentType),
 
@@ -396,6 +409,10 @@ function buildFiltersParams(
     params.set("filters[city][slug][$eq]", filters.city);
   }
 
+  if (filters.region) {
+    params.set("filters[region][slug][$eq]", filters.region);
+  }
+
   // Фильтрация по тегам делается на клиенте — Strapi 5 $contains не работает на JSON-полях
   const safePage = filters.page && Number.isFinite(filters.page) && filters.page > 0 ? filters.page : 1;
   params.set("pagination[page]", String(safePage));
@@ -496,6 +513,10 @@ export async function getPremiumJobs(filters: JobFilters = {}): Promise<JobListR
 
     if (filters.position) {
       params.set("filters[position][$contains]", filters.position);
+    }
+
+    if (filters.region) {
+      params.set("filters[region][slug][$eq]", filters.region);
     }
 
     if (filters.city) {
@@ -631,6 +652,31 @@ export async function getAllJobs() {
     // Исключаем премиум-вакансии из общего подсчёта (они уже в premium-секции)
     params.set("filters[$or][0][premium_from][$null]", "true");
     params.set("filters[$or][1][premium_to][$lt]", now);
+    params.set("sort[0]", "publishedAt:desc");
+    params.set("pagination[pageSize]", "100");
+
+    const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
+      `${CV_ENDPOINT}?${params.toString()}`,
+      { next: { revalidate: 60, tags: ["cv"] } },
+    );
+
+    return response.data.map((record) => cvToJob(unwrapStrapiRecord(record)));
+  } catch {
+    return [];
+  }
+}
+
+// Вакансии компании по slug. Учитывает isActive=true И isActive=null:
+// в маппинге cvToJob null трактуется как активная (isActive !== false),
+// но фильтр $eq=true его отбрасывал — из-за этого на странице компании было 0 вакансий.
+export async function getCompanyJobs(slug: string): Promise<Job[]> {
+  if (!slug) return [];
+
+  try {
+    const params = buildPopulateParams();
+    params.set("filters[company][slug][$eq]", slug);
+    params.set("filters[$or][0][isActive][$eq]", "true");
+    params.set("filters[$or][1][isActive][$null]", "true");
     params.set("sort[0]", "publishedAt:desc");
     params.set("pagination[pageSize]", "100");
 

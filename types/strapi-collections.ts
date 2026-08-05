@@ -117,6 +117,30 @@ export interface CityRef {
 }
 
 // ========================================================================
+// REGION
+// ========================================================================
+export interface Region {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  text: string | null;
+  SEO: SeoMetadata | null;
+  count?: number;
+  cities?: CityRef[];
+}
+
+export interface RegionRef {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  description?: string;
+  [key: string]: unknown;
+}
+
+// ========================================================================
 // BLOG POST
 // ========================================================================
 export interface BlogPost {
@@ -344,6 +368,7 @@ export interface Job {
   push_to?: string | null;
   isPremium?: boolean;
   cityRef?: CityRef;
+  regionRef?: RegionRef;
 }
 
 export interface JobFilters {
@@ -357,6 +382,7 @@ export interface JobFilters {
   education?: string;
   position?: string;
   city?: string;
+  region?: string;
   tag?: string;
   page?: number;
 }

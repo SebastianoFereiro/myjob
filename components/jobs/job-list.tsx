@@ -16,6 +16,7 @@ type JobListProps = {
   contained?: boolean;
   categorySlug?: string;
   citySlug?: string;
+  regionSlug?: string;
   tags?: string[];
 };
 
@@ -24,7 +25,8 @@ function pageHref(
   page: number,
   basePath: string,
   categorySlug?: string,
-  citySlug?: string
+  citySlug?: string,
+  regionSlug?: string
 ) {
   const params = new URLSearchParams();
 
@@ -42,6 +44,11 @@ function pageHref(
   if (page > 1) params.set('page', String(page));
 
   const query = params.toString();
+
+  if (regionSlug && !filters.category) {
+    const base = `/regions/${regionSlug}`;
+    return query ? `${base}?${query}#vacancies` : `${base}#vacancies`;
+  }
 
   if (citySlug && !filters.category) {
     const base = `/cities/${citySlug}`;
@@ -64,6 +71,7 @@ export async function JobList({
   contained = true,
   categorySlug,
   citySlug,
+  regionSlug,
   tags,
 }: JobListProps) {
   const [{ jobs, pagination }, { jobs: premiumJobs }, categories, company, categoryData] =
@@ -118,16 +126,16 @@ export async function JobList({
       </div>
 
       {/* Премиум блок фильтров */}
-      <div className="relative mb-6 rounded-xl border bg-gradient-to-br from-background via-background to-muted/30 p-4 shadow-sm transition-all hover:shadow-md">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
+      <div className="relative mb-5 rounded-xl border bg-gradient-to-br from-background via-background to-muted/30 p-2.5 shadow-sm transition-all hover:shadow-md sm:p-3">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
           {/* Левая группа - фильтры */}
-          <div className="flex items-center gap-1 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
             {/* Иконка фильтров */}
-            <div className="hidden sm:flex items-center gap-2 mr-1">
-              <div className="rounded-lg bg-primary/10 p-2 text-primary">
-                <SlidersHorizontal className="h-4 w-4" />
+            <div className="hidden sm:flex items-center gap-1.5 mr-1">
+              <div className="rounded-lg bg-primary/10 p-1.5 text-primary">
+                <SlidersHorizontal className="h-3.5 w-3.5" />
               </div>
-              <span className="text-sm font-medium text-muted-foreground">Фильтры:</span>
+              <span className="text-xs font-medium text-muted-foreground">Фильтры:</span>
             </div>
 
             {tags && tags.length > 0 && (
@@ -141,12 +149,25 @@ export async function JobList({
 
             {/* Кнопки сброса с премиум дизайном */}
             <div className="flex items-center gap-1 flex-wrap ml-1">
+              {filters.region && !filters.category && (
+                <Button
+                  variant="ghost"
+                  asChild
+                  size="sm"
+                  className="group relative h-7 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-2.5 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30"
+                >
+                  <a href={`/jobs#vacancies`}>
+                    <X className="h-3 w-3 transition-transform group-hover:rotate-90" />
+                    <span>Регион</span>
+                  </a>
+                </Button>
+              )}
               {filters.city && !filters.category && (
                 <Button
                   variant="ghost"
                   asChild
                   size="sm"
-                  className="group relative h-8 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-3 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30 sm:text-sm"
+                  className="group relative h-7 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-2.5 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30"
                 >
                   <a href={`/jobs#vacancies`}>
                     <X className="h-3 w-3 transition-transform group-hover:rotate-90" />
@@ -159,7 +180,7 @@ export async function JobList({
                   variant="ghost"
                   asChild
                   size="sm"
-                  className="group relative h-8 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-3 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30 sm:text-sm"
+                  className="group relative h-7 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-2.5 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30"
                 >
                   <a href={citySlug ? `/cities/${citySlug}#vacancies` : `${basePath}#vacancies`}>
                     <X className="h-3 w-3 transition-transform group-hover:rotate-90" />
@@ -172,7 +193,7 @@ export async function JobList({
                   variant="ghost"
                   asChild
                   size="sm"
-                  className="group relative h-8 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-3 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30 sm:text-sm"
+                  className="group relative h-7 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-2.5 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30"
                 >
                   <a href={`${basePath}#vacancies`}>
                     <X className="h-3 w-3 transition-transform group-hover:rotate-90" />
@@ -186,8 +207,8 @@ export async function JobList({
           {/* Правая группа - статистика фильтров */}
           <div className="flex items-center gap-1">
             {activeFiltersCount > 0 && (
-              <div className="flex items-center gap-2 mr-2 rounded-full bg-primary/5 px-3 py-1.5 text-xs text-muted-foreground">
-                <Filter className="h-3 w-3 " />
+              <div className="flex items-center gap-1.5 mr-2 rounded-full bg-primary/5 px-2.5 py-1 text-xs text-muted-foreground">
+                <Filter className="h-3 w-3" />
                 <span className="font-medium">{activeFiltersCount}</span>
                 <span className="hidden sm:inline">активных фильтра</span>
               </div>
@@ -197,7 +218,7 @@ export async function JobList({
               <Button
                 variant="outline"
                 size="sm"
-                className="h-8 gap-1.5 border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                className="h-7 gap-1.5 border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive"
                 asChild
               >
                 <a href={`${basePath}#vacancies`}>
@@ -221,20 +242,20 @@ export async function JobList({
             ))}
           </div>
         </div>
-      ) : (
+      ) : premiumJobs.length === 0 ? (
         <div className="rounded-lg border bg-background p-8 text-center">
           <h3 className="text-xl font-medium">Вакансии не найдены</h3>
           <p className="mt-2 text-muted-foreground">
             Попробуйте изменить запрос, город, категорию или тип занятости.
           </p>
         </div>
-      )}
+      ) : null}
 
       {pagination.pageCount > 1 ? (
         <div className="mt-8 flex items-center justify-center gap-2">
           <Button variant="outline" disabled={pagination.page <= 1} asChild={pagination.page > 1}>
             {pagination.page > 1 ? (
-              <a href={pageHref(filters, pagination.page - 1, basePath, categorySlug)}>Назад</a>
+              <a href={pageHref(filters, pagination.page - 1, basePath, categorySlug, citySlug, regionSlug)}>Назад</a>
             ) : (
               <span>Назад</span>
             )}
@@ -248,7 +269,7 @@ export async function JobList({
             asChild={pagination.page < pagination.pageCount}
           >
             {pagination.page < pagination.pageCount ? (
-              <a href={pageHref(filters, pagination.page + 1, basePath, categorySlug)}>Вперед</a>
+              <a href={pageHref(filters, pagination.page + 1, basePath, categorySlug, citySlug, regionSlug)}>Вперед</a>
             ) : (
               <span>Вперед</span>
             )}

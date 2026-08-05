@@ -1,7 +1,7 @@
 import { fetchAPI } from "@/lib/strapi-client";
 import { formatStrapiError } from "@/lib/strapi-errors";
 import type { SeoMetadata } from '@/types/seo';
-import type { CityRef } from '@/types/strapi-collections';
+import type { CityRef, RegionRef } from '@/types/strapi-collections';
 import {
   type StrapiListResponse,
   unwrapStrapiRecord,
@@ -41,6 +41,7 @@ type StrapiCvRecord = {
   employmentType?: string;
   location?: string;
   city?: Record<string, unknown> | null;
+  region?: Record<string, unknown> | null;
   level_job?: string | null;
   experience_job?: string | null;
   education_job?: string | null;
@@ -100,6 +101,7 @@ function mapStrapiCv(record: StrapiCvRecord): CvVacancy {
     employmentType: (record.employmentType as CvVacancy["employmentType"]) || EMPLOYMENT_OPTIONS[0].value,
     location: record.location || "",
     city: extractRef<CityRef>(record.city as Record<string, unknown> | null | undefined),
+    region: extractRef<RegionRef>(record.region as Record<string, unknown> | null | undefined),
     level_job: (record.level_job as CvVacancy["level_job"]) ?? null,
     experience_job: (record.experience_job as CvVacancy["experience_job"]) ?? null,
     education_job: (record.education_job as CvVacancy["education_job"]) ?? null,

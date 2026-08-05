@@ -33,27 +33,25 @@ export function TagFilter({ tags, basePath }: TagFilterProps) {
   if (tags.length === 0) return null;
 
   return (
-    <section className="container py-3 sm:py-4 px-0">
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {tags.map((tag) => {
-          const isActive = activeTag === tag;
+    <div className="flex flex-wrap items-center gap-1.5">
+      {tags.map((tag) => {
+        const isActive = activeTag === tag;
 
-          return (
-            <button
-              key={tag}
-              onClick={() => handleTagClick(tag)}
-              className={cn(
-                'w-full rounded-full border px-2 py-2 text-center text-xs font-medium transition-colors sm:text-sm',
-                isActive
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border bg-background text-foreground hover:bg-muted'
-              )}
-            >
-              {tag}
-            </button>
-          );
-        })}
-      </div>
-    </section>
+        return (
+          <button
+            key={tag}
+            onClick={() => handleTagClick(tag)}
+            className={cn(
+              'whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-medium leading-none transition-colors sm:px-3 sm:py-1.5 sm:text-xs',
+              isActive
+                ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                : 'border-border bg-background text-foreground hover:bg-muted'
+            )}
+          >
+            {tag}
+          </button>
+        );
+      })}
+    </div>
   );
 }
