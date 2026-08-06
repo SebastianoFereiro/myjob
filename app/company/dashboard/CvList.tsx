@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CalendarDays, Edit, Eye, FilePlus, Loader2, Trash2 } from 'lucide-react';
+import { CalendarDays, Edit, Eye, EyeOff, FilePlus, Loader2, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import { EmptyState } from '@/components/dashboard/EmptyState';
 import { Badge } from '@/components/ui/badge';
 import { Pagination } from '@/components/ui/pagination';
 import { authClient } from '@/lib/auth-client';
-import { getCvsByUserId, softDeleteCv, hardDeleteCv } from '@/services/cv.service';
+import { getCvsByUserId, updateCv, softDeleteCv, hardDeleteCv } from '@/services/cv.service';
 import type { CvVacancy } from '@/types/cv';
 import { getOptionLabel, EMPLOYMENT_OPTIONS } from '@/lib/enum-options';
 
@@ -90,6 +90,18 @@ export function CvList() {
       setVacancies((prev) => prev.filter((v) => v.documentId !== vacancy.documentId));
     } catch {
       alert(isArchived ? 'Не удалось удалить вакансию' : 'Не удалось архивировать вакансию');
+    }
+  }
+
+  async function handleToggleActive(vacancy: CvVacancy) {
+    const next = !vacancy.isActive;
+    try {
+      await updateCv(vacancy.documentId, { isActive: next });
+      setVacancies((prev) =>
+        prev.map((v) => (v.documentId === vacancy.documentId ? { ...v, isActive: next } : v)),
+      );
+    } catch {
+      alert(next ? 'Не удалось опубликовать вакансию' : 'Не удалось снять вакансию с публикации');
     }
   }
 
@@ -196,6 +208,24 @@ export function CvList() {
                   <Eye className="size-3.5 sm:mr-1.5" />
                   <span className="hidden sm:inline">Просмотр</span>
                 </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2.5 sm:h-9 sm:px-3"
+                onClick={() => handleToggleActive(vacancy)}
+              >
+                {vacancy.isActive ? (
+                  <>
+                    <EyeOff className="size-3.5 sm:mr-1.5" />
+                    <span className="hidden sm:inline">Снять с публикации</span>
+                  </>
+                ) : (
+                  <>
+                    <Eye className="size-3.5 sm:mr-1.5" />
+                    <span className="hidden sm:inline">Опубликовать</span>
+                  </>
+                )}
               </Button>
               <Button
                 variant="ghost"

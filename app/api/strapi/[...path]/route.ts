@@ -109,6 +109,13 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
       revalidateTag("resumes", {});
     }
 
+    // Аналогично для вакансий: после мутаций cvs инвалидируем тег "cv"
+    const isCvsMutation =
+      isWriteMethod && (strapiPath === "cvs" || strapiPath.startsWith("cvs/"));
+    if (isCvsMutation && response.ok) {
+      revalidateTag("cv", {});
+    }
+
     // Strapi может вернуть 204 No Content (успешный DELETE без тела)
     if (response.status === 204) {
       return new NextResponse(null, { status: 204 });

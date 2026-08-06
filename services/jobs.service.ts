@@ -586,6 +586,7 @@ export async function getJobByDocumentId(documentId: string) {
   try {
     const params = buildPopulateParams();
     params.set("filters[documentId][$eq]", documentId);
+    params.set("filters[isActive][$eq]", "true");
 
     const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
       `${CV_ENDPOINT}?${params.toString()}`,
