@@ -56,6 +56,7 @@ type StrapiCVRecord = {
   currency?: string;
   employmentType?: string | null;
   location?: string | null;
+  phone?: string | null;
   city?: string | { name?: string; title?: string; slug?: string } | null;
   region?: string | { name?: string; title?: string; slug?: string } | null;
   level_job?: string | null;
@@ -184,9 +185,9 @@ function buildStoreAdXml(
   const company = record.company;
   const companyName = getRecordName(company);
 
-  // Телефон
-  const phone = company?.phone || null;
-  const phoneFormatted = formatPhones(phone);
+  // Телефон: из CV, фолбэк на профиль компании
+  const phoneRaw = record.phone || company?.phone || null;
+  const phoneFormatted = formatPhones(phoneRaw);
 
   // Город -> регион (из коллекций city/region, фолбэк на статический справочник)
   const cityName = getRecordName(record.city);
@@ -259,9 +260,8 @@ function buildStoreAdXml(
   if (companyName) {
     fields.push({ name: "contact", value: escapeXml(companyName) });
   }
-  if (phoneFormatted) {
-    fields.push({ name: "phone", value: escapeXml(phoneFormatted) });
-  }
+  // Телефон всегда в custom-fields; несколько номеров — через запятую (formatPhones)
+  fields.push({ name: "phone", value: escapeXml(phoneFormatted || "") });
 
   fields.push({ name: "sex", value: CFD_IRRBY_SEX_DEFAULT });
   fields.push({ name: "experience", value: experience });
