@@ -5,7 +5,7 @@ import { BlogLatestTech, type BlogPost } from '@/components/blog-latest-tech';
 import { Button } from '@/components/ui/button';
 import { getServerSession } from '@/lib/auth-guard';
 import { getBlogArticles } from '@/services/blog.service';
-import { getCategoriesWithCounts } from '@/services/categories.service';
+import { getCategoriesWithCountsForHome } from '@/services/categories.service';
 import { getCities } from '@/services/cities.service';
 import { Feature154 } from './feature-list';
 import { SearchFilters } from './jobs/search-filters';
@@ -33,7 +33,7 @@ const PatternPlaceholder = async () => {
   const session = await getServerSession();
   const [{ articles }, categories, cities] = await Promise.all([
     getBlogArticles(1, 5),
-    getCategoriesWithCounts(),
+    getCategoriesWithCountsForHome(),
     getCities(),
   ]);
 

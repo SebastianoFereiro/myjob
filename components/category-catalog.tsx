@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import { getCategoriesWithCounts } from '@/services/categories.service';
+import { getCategoriesWithCountsForHome } from '@/services/categories.service';
 
 type CategoryLayout = 'default' | 'wide' | 'tall';
 
@@ -34,7 +34,7 @@ const layoutClasses: Record<CategoryLayout, string> = {
 
 const layouts: CategoryLayout[] = ['default', 'wide', 'tall', 'wide', 'default', 'wide', 'wide'];
 
-function mapCategoriesToItems(categories: Awaited<ReturnType<typeof getCategoriesWithCounts>>) {
+function mapCategoriesToItems(categories: Awaited<ReturnType<typeof getCategoriesWithCountsForHome>>) {
   return categories
     .map((category, index) => ({
       title: category.name,
@@ -127,7 +127,7 @@ export async function CategoryCatalog({
   items,
   activeCategory,
 }: CategoryCatalogProps) {
-  const catalogItems = items || mapCategoriesToItems(await getCategoriesWithCounts());
+  const catalogItems = items || mapCategoriesToItems(await getCategoriesWithCountsForHome());
 
   return (
     <section className="relative h-full w-full overflow-hidden md:py-8 py-4">

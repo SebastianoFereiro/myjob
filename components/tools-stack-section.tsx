@@ -1,10 +1,10 @@
 import Link from 'next/link';
 
 import { Card } from '@/components/ui/card';
-import { getCategoriesWithCounts } from '@/services/categories.service';
+import { getCategoriesWithCountsForHome } from '@/services/categories.service';
 
 export async function ToolsStackSection() {
-  const categories = await getCategoriesWithCounts();
+  const categories = await getCategoriesWithCountsForHome();
   const top = categories
     .filter((c) => (c.count ?? 0) > 0)
     .sort((a, b) => (b.count ?? 0) - (a.count ?? 0))

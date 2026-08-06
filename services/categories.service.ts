@@ -3,7 +3,10 @@ import {
   type StrapiListResponse,
   unwrapStrapiRecord,
 } from "@/lib/strapi-record";
-import { getCategoryCounts } from "@/services/jobs.service";
+import {
+  getCategoryCounts,
+  getHomeCategoryCounts,
+} from "@/services/jobs.service";
 import type { JobCategory } from "@/types/jobs";
 import type { Category, PageBlock } from "@/types/strapi-collections";
 import type { SeoMetadata } from "@/types/seo";
@@ -157,4 +160,11 @@ export async function getCategoryBySlug(
 export async function getCategoriesWithCounts() {
   const categories = await getCategories();
   return getCategoryCounts(categories);
+}
+
+// Счётчики для главной страницы: включают premium-вакансии
+// и не ограничены первыми 100 вакансиями.
+export async function getCategoriesWithCountsForHome() {
+  const categories = await getCategories();
+  return getHomeCategoryCounts(categories);
 }

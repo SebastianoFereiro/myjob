@@ -645,6 +645,22 @@ export async function getCategoryCounts(categories: JobCategory[] = []) {
   }
 }
 
+// Счётчики для главной страницы («Популярные направления», «Вакансии по направлениям»):
+// включают premium-вакансии (на странице категории итог = обычные + premium)
+// и перебирают все страницы, а не только первые 100.
+export async function getHomeCategoryCounts(categories: JobCategory[] = []) {
+  try {
+    const allJobs = await getAllJobsIncludingPremium();
+
+    return categories.map((category) => ({
+      ...category,
+      count: allJobs.filter((job) => job.category?.slug === category.slug).length,
+    }));
+  } catch {
+    return categories.map((category) => ({ ...category, count: 0 }));
+  }
+}
+
 export async function getAllJobs() {
   try {
     const now = new Date().toISOString();
@@ -662,6 +678,43 @@ export async function getAllJobs() {
     );
 
     return response.data.map((record) => cvToJob(unwrapStrapiRecord(record)));
+  } catch {
+    return [];
+  }
+}
+
+// Все активные вакансии, включая premium, по всем страницам (для счётчиков главной).
+export async function getAllJobsIncludingPremium(): Promise<Job[]> {
+  try {
+    const baseParams = new URLSearchParams();
+    baseParams.set("populate", "*");
+    baseParams.set("filters[isActive][$eq]", "true");
+    baseParams.set("sort[0]", "publishedAt:desc");
+    baseParams.set("pagination[pageSize]", "100");
+
+    const jobs: Job[] = [];
+    let page = 1;
+    let pageCount = 1;
+
+    do {
+      const params = new URLSearchParams(baseParams);
+      params.set("pagination[page]", String(page));
+
+      const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
+        `${CV_ENDPOINT}?${params.toString()}`,
+        { next: { revalidate: 60, tags: ["cv"] } },
+      );
+
+      jobs.push(
+        ...response.data.map((record) => cvToJob(unwrapStrapiRecord(record))),
+      );
+
+      // Если данных нет — не зацикливаемся (pageCount останется 1)
+      pageCount = response.meta?.pagination?.pageCount ?? 1;
+      page += 1;
+    } while (page <= pageCount);
+
+    return jobs;
   } catch {
     return [];
   }
