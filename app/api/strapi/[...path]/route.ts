@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { auth } from "@/lib/auth";
 
 const STRAPI_URL = (process.env.STRAPI_URL || "https://atlantis.myjob.by").replace(/\/$/, "");
@@ -99,6 +100,14 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
       },
       body,
     });
+
+    // После успешной мутации резюме инвалидируем серверный кэш (тег "resumes"),
+    // иначе страницы редактирования/листинга показывают устаревшие данные до 60с
+    const isResumesMutation =
+      isWriteMethod && (strapiPath === "resumes" || strapiPath.startsWith("resumes/"));
+    if (isResumesMutation && response.ok) {
+      revalidateTag("resumes");
+    }
 
     // Strapi может вернуть 204 No Content (успешный DELETE без тела)
     if (response.status === 204) {

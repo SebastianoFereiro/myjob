@@ -24,6 +24,8 @@ import type {
   EmploymentType,
   ExperienceItem,
   EducationItem,
+  SkillItem,
+  LanguageItem,
 } from "@/types/resume";
 import {
   RESUME_EMPLOYMENT_OPTIONS,
@@ -56,6 +58,54 @@ interface Props {
   mode?: "create" | "edit";
 }
 
+// Нормализация элементов: все ключи обязательны (контролируемые инпуты).
+// Данные из Strapi могут не содержать часть полей -> value={undefined} ломает правку.
+function toDateInputValue(value?: string | null): string {
+  if (!value) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function normalizeExperience(items: ExperienceItem[] | null | undefined): ExperienceItem[] {
+  return (Array.isArray(items) ? items : []).map((item) => ({
+    company: item.company ?? "",
+    position: item.position ?? "",
+    startDate: toDateInputValue(item.startDate),
+    endDate: toDateInputValue(item.endDate),
+    current: item.current ?? false,
+    description: item.description ?? "",
+  }));
+}
+
+function normalizeEducation(items: EducationItem[] | null | undefined): EducationItem[] {
+  return (Array.isArray(items) ? items : []).map((item) => ({
+    institution: item.institution ?? "",
+    degree: item.degree ?? "",
+    specialty: item.specialty ?? "",
+    startYear: item.startYear ?? new Date().getFullYear(),
+    endYear: item.endYear ?? undefined,
+  }));
+}
+
+function normalizeSkills(items: SkillItem[] | null | undefined): SkillItem[] {
+  return (Array.isArray(items) ? items : []).map((item) => ({
+    name: item.name ?? "",
+    level: item.level ?? "intermediate",
+  }));
+}
+
+function normalizeLanguages(items: LanguageItem[] | null | undefined): LanguageItem[] {
+  return (Array.isArray(items) ? items : []).map((item) => ({
+    language: item.language ?? "",
+    level: item.level ?? "b1",
+  }));
+}
+
 export function ResumeForm({
   initialData,
   documentId,
@@ -77,10 +127,10 @@ export function ResumeForm({
     currency: initialData?.currency || "BYN",
     employmentType: initialData?.employmentType || RESUME_EMPLOYMENT_OPTIONS[0].value,
     location: initialData?.location || "",
-    skills: initialData?.skills || [],
-    experience: initialData?.experience || [],
-    education: initialData?.education || [],
-    languages: initialData?.languages || [],
+    skills: normalizeSkills(initialData?.skills),
+    experience: normalizeExperience(initialData?.experience),
+    education: normalizeEducation(initialData?.education),
+    languages: normalizeLanguages(initialData?.languages),
     about: initialData?.about || "",
     isPublished: initialData?.isPublished !== false,
   };
@@ -100,6 +150,8 @@ export function ResumeForm({
       company: "",
       position: "",
       startDate: "",
+      endDate: "",
+      current: false,
       description: "",
     };
     setFormData((prev) => ({
@@ -457,9 +509,10 @@ export function ResumeForm({
                 type="checkbox"
                 id={`current-${index}`}
                 checked={item.current || false}
-                onChange={(e) =>
-                  updateExperience(index, "current", e.target.checked)
-                }
+                onChange={(e) => {
+                  updateExperience(index, "current", e.target.checked);
+                  if (e.target.checked) updateExperience(index, "endDate", "");
+                }}
                 className="rounded border-gray-300"
               />
               <label
@@ -593,20 +646,17 @@ export function ResumeForm({
         )}
 
         {formData.skills.map((item, index) => (
-          <div key={index} className="flex items-end gap-3">
-            <div className="flex-1 space-y-2">
-              <Input
-                placeholder="Название навыка"
-                value={item.name}
-                onChange={(e) => updateSkill(index, "name", e.target.value)}
-              />
-            </div>
-            <div className="w-40 space-y-2">
+          <div key={index} className="flex items-center gap-3">
+            <Input
+              placeholder="Название навыка"
+              value={item.name}
+              onChange={(e) => updateSkill(index, "name", e.target.value)}
+              className="flex-1"
+            />
+            <div className="w-40 shrink-0">
               <Select
                 value={item.level}
-                onValueChange={(value) =>
-                  updateSkill(index, "level", value)
-                }
+                onValueChange={(value) => updateSkill(index, "level", value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -656,22 +706,17 @@ export function ResumeForm({
         )}
 
         {formData.languages.map((item, index) => (
-          <div key={index} className="flex items-end gap-3">
-            <div className="flex-1 space-y-2">
-              <Input
-                placeholder="Язык"
-                value={item.language}
-                onChange={(e) =>
-                  updateLanguage(index, "language", e.target.value)
-                }
-              />
-            </div>
-            <div className="w-48 space-y-2">
+          <div key={index} className="flex items-center gap-3">
+            <Input
+              placeholder="Язык"
+              value={item.language}
+              onChange={(e) => updateLanguage(index, "language", e.target.value)}
+              className="flex-1"
+            />
+            <div className="w-48 shrink-0">
               <Select
                 value={item.level}
-                onValueChange={(value) =>
-                  updateLanguage(index, "level", value)
-                }
+                onValueChange={(value) => updateLanguage(index, "level", value)}
               >
                 <SelectTrigger>
                   <SelectValue />

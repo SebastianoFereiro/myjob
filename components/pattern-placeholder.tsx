@@ -1,7 +1,9 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { CategoryCatalog, type CategoryItem } from '@/components/category-catalog';
 import { BlogLatestTech, type BlogPost } from '@/components/blog-latest-tech';
 import { Button } from '@/components/ui/button';
+import { getServerSession } from '@/lib/auth-guard';
 import { getBlogArticles } from '@/services/blog.service';
 import { getCategoriesWithCounts } from '@/services/categories.service';
 import { getCities } from '@/services/cities.service';
@@ -28,11 +30,15 @@ const layouts: Array<'default' | 'wide' | 'tall'> = [
 ];
 
 const PatternPlaceholder = async () => {
+  const session = await getServerSession();
   const [{ articles }, categories, cities] = await Promise.all([
     getBlogArticles(1, 5),
     getCategoriesWithCounts(),
     getCities(),
   ]);
+
+  // Неавторизованный -> логин, авторизованный -> личный кабинет (резюме из личного кабинета)
+  const resumeHref = session ? '/dashboard' : '/auth/login';
 
   const cat: CategoryItem[] = categories.slice(0, 7).map((category, index) => ({
     title: category.name,
@@ -69,7 +75,7 @@ const PatternPlaceholder = async () => {
               <a href="#vacancies">Искать работу</a>
             </Button>
             <Button variant="secondary" asChild>
-              <a href="#resume">Разместить резюме</a>
+              <Link href={resumeHref}>Разместить резюме</Link>
             </Button>
           </div>
           <Suspense fallback={null}>

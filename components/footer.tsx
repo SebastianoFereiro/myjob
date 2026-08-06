@@ -1,10 +1,11 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { SubmitResumeLink } from "@/components/auth/SubmitResumeLink";
 import { getFooterPages } from "@/services/pages.service";
 import type { Page, FooterGroup } from "@/types/strapi-collections";
 
-type FooterLink = { label: string; href: string };
+type FooterLink = { label: string; href: string; slug?: string };
 
 type FooterColumn = {
   title: string;
@@ -23,14 +24,18 @@ type FooterProps = {
 const footerHrefMap: Record<string, string> = {
   "find-job": "/jobs",
   "submit-resume": "/resume/submit",
+  "razmestit-rezyume": "/resume/submit",
   professions: "/categories",
   tips: "/help",
   "post-vacancy": "/company/dashboard",
-  "find-candidates": "/companies",
+  "find-candidates": "/resumes",
   support: "/contacts",
   companies: "/companies",
   contacts: "/contacts",
 };
+
+// Slugs футер-страниц «Разместить резюме» (в т.ч. транслитерация из живого Strapi)
+const RESUME_SUBMIT_SLUGS = new Set(["submit-resume", "razmestit-rezyume"]);
 
 function getPageHref(page: Page): string {
   return footerHrefMap[page.slug] ?? `/${page.slug}`;
@@ -64,6 +69,7 @@ function groupPages(pages: Page[]): FooterColumn[] {
       links: items.map((p) => ({
         label: p.footer_label ?? p.title,
         href: getPageHref(p),
+        slug: p.slug,
       })),
     });
   }
@@ -78,7 +84,19 @@ function getBottomLinks(pages: Page[]): FooterLink[] {
     .map((p) => ({
       label: p.footer_label ?? p.title,
       href: getPageHref(p),
+      slug: p.slug,
     })));
+}
+
+function renderFooterLink(link: FooterLink, className?: string) {
+  if (RESUME_SUBMIT_SLUGS.has(link.slug ?? "")) {
+    return <SubmitResumeLink className={className}>{link.label}</SubmitResumeLink>;
+  }
+  return (
+    <Link href={link.href} className={className}>
+      {link.label}
+    </Link>
+  );
 }
 
 export async function Footer({
@@ -125,7 +143,7 @@ export async function Footer({
                 <ul className="space-y-4 text-sm text-muted-foreground">
                   {col.links.map((link) => (
                     <li key={link.label} className="font-medium hover:text-primary">
-                      <Link href={link.href}>{link.label}</Link>
+                      {renderFooterLink(link)}
                     </li>
                   ))}
                 </ul>
@@ -143,7 +161,7 @@ export async function Footer({
             <ul className="flex flex-wrap gap-x-4 gap-y-2">
               {bottomLinks.map((link) => (
                 <li key={link.label} className="underline hover:text-primary">
-                  <Link href={link.href}>{link.label}</Link>
+                  {renderFooterLink(link)}
                 </li>
               ))}
             </ul>

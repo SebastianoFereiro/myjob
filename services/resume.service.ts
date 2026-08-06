@@ -65,11 +65,15 @@ function parseJSONField(value: unknown): unknown[] {
   if (Array.isArray(value)) return value;
   if (typeof value === "string") {
     try {
-      return JSON.parse(value);
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) return parsed;
+      if (parsed && typeof parsed === "object") return [parsed];
+      return [];
     } catch {
       return [];
     }
   }
+  if (typeof value === "object") return [value];
   return [];
 }
 
@@ -212,6 +216,71 @@ export async function getResumeBySlug(slug: string) {
   if (!record) return null;
 
   return mapStrapiResume(unwrapStrapiRecord(record));
+}
+
+// ========================================================================
+// Публичные функции: только опубликованные резюме (isPublished + publishedAt)
+// Используются на страницах /resumes и /resumes/{slug}-{id}
+// ========================================================================
+
+const PUBLIC_PAGE_SIZE = 12;
+
+function applyPublishedFilters(params: URLSearchParams): URLSearchParams {
+  params.set("filters[isPublished][$eq]", "true");
+  params.set("filters[publishedAt][$notNull]", "true");
+  return params;
+}
+
+export async function getPublishedResumes(page = 1): Promise<ResumeListResult> {
+  try {
+    const params = new URLSearchParams();
+    applyPublishedFilters(params);
+    params.set("sort[0]", "updatedAt:desc");
+    params.set("pagination[page]", String(page));
+    params.set("pagination[pageSize]", String(PUBLIC_PAGE_SIZE));
+    params.set("populate", "*");
+
+    const response = await fetchAPI<StrapiListResponse<StrapiResumeRecord>>(
+      `${RESUME_ENDPOINT}?${params.toString()}`,
+      { next: { revalidate: 60, tags: ["resumes"] } },
+    );
+
+    return {
+      resumes: (response.data || []).map((record) =>
+        mapStrapiResume(unwrapStrapiRecord(record)),
+      ),
+      pagination: response.meta?.pagination || {
+        page: 1,
+        pageSize: PUBLIC_PAGE_SIZE,
+        pageCount: 0,
+        total: 0,
+      },
+    };
+  } catch {
+    return { resumes: [], pagination: { page: 1, pageSize: PUBLIC_PAGE_SIZE, pageCount: 0, total: 0 } };
+  }
+}
+
+export async function getPublishedResumeByDocumentId(documentId: string) {
+  if (!documentId) return null;
+  try {
+    const params = new URLSearchParams();
+    applyPublishedFilters(params);
+    params.set("filters[documentId][$eq]", documentId);
+    params.set("populate", "*");
+
+    const response = await fetchAPI<StrapiListResponse<StrapiResumeRecord>>(
+      `${RESUME_ENDPOINT}?${params.toString()}`,
+      { next: { revalidate: 60, tags: ["resumes"] } },
+    );
+
+    const record = response.data[0];
+    if (!record) return null;
+
+    return mapStrapiResume(unwrapStrapiRecord(record));
+  } catch {
+    return null;
+  }
 }
 
 async function strapiClientFetch<T>(path: string, options?: RequestInit): Promise<T> {
