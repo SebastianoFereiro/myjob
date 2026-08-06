@@ -45,7 +45,13 @@ export const belarusCities: Record<string, CityInfo> = {
 const DEFAULT_REGION = "Минская";
 const DEFAULT_CITY = "Минск";
 
-export function lookupCity(cityName?: string | null): CityInfo {
+export function lookupCity(
+  cityName?: string | { name?: string; title?: string } | null,
+): CityInfo {
+  if (!cityName) return { region: DEFAULT_REGION, regionalCenter: DEFAULT_CITY };
+  if (typeof cityName !== "string") {
+    cityName = cityName.name || cityName.title || "";
+  }
   if (!cityName) return { region: DEFAULT_REGION, regionalCenter: DEFAULT_CITY };
 
   const trimmed = cityName.trim();

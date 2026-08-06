@@ -42,7 +42,8 @@ type StrapiCVRecord = {
   currency?: string;
   employmentType?: string | null;
   location?: string | null;
-  city?: string | null;
+  city?: string | { name?: string; title?: string; slug?: string } | null;
+  region?: string | { name?: string; title?: string; slug?: string } | null;
   level_job?: string | null;
   experience_job?: string | null;
   education_job?: string | null;
@@ -189,10 +190,13 @@ function buildVacancyXml(
         : "")
     : "";
 
-  // Build location
+  // Build location (коллекции region/city, фолбэк на location)
+  const cityName = getRecordName(record.city);
+  const regionName = getRecordName(record.region);
   const locationParts: string[] = [];
-  if (record.city) locationParts.push(record.city);
-  if (record.location && record.location !== record.city) {
+  if (cityName) locationParts.push(cityName);
+  if (regionName && regionName !== cityName) locationParts.push(regionName);
+  if (record.location && record.location !== cityName && record.location !== regionName) {
     locationParts.push(record.location);
   }
   const locationStr = locationParts.length > 0
@@ -277,7 +281,7 @@ export async function generateYandexFeedXml(): Promise<string> {
 
   const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
     `/cvs?${params.toString()}`,
-    { next: { revalidate: 0, tags: ["yandex-feed"] } },
+    { next: { revalidate: 1800, tags: ["yandex-feed"] } },
   );
 
   const records = response.data || [];

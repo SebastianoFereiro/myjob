@@ -56,7 +56,8 @@ type StrapiCVRecord = {
   currency?: string;
   employmentType?: string | null;
   location?: string | null;
-  city?: string | null;
+  city?: string | { name?: string; title?: string; slug?: string } | null;
+  region?: string | { name?: string; title?: string; slug?: string } | null;
   level_job?: string | null;
   experience_job?: string | null;
   education_job?: string | null;
@@ -187,9 +188,10 @@ function buildStoreAdXml(
   const phone = company?.phone || null;
   const phoneFormatted = formatPhones(phone);
 
-  // Город -> регион
-  const cityName = record.city || null;
-  const cityInfo = lookupCity(cityName);
+  // Город -> регион (из коллекций city/region, фолбэк на статический справочник)
+  const cityName = getRecordName(record.city);
+  const regionName = getRecordName(record.region);
+  const cityInfo = lookupCity(cityName || undefined);
 
   // Price: числовое значение (приоритет salaryTo, затем salaryFrom)
   const priceValue = record.salaryTo ?? record.salaryFrom ?? null;
@@ -250,8 +252,8 @@ function buildStoreAdXml(
   // ================================================================
   const fields: { name: string; value: string }[] = [];
 
-  fields.push({ name: "region", value: cityInfo.region });
-  fields.push({ name: "address_city", value: cityInfo.regionalCenter });
+  fields.push({ name: "region", value: regionName || cityInfo.region });
+  fields.push({ name: "address_city", value: cityName || cityInfo.regionalCenter });
   fields.push({ name: "web", value: escapeXml(url) });
 
   if (companyName) {
