@@ -106,7 +106,7 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
     const isResumesMutation =
       isWriteMethod && (strapiPath === "resumes" || strapiPath.startsWith("resumes/"));
     if (isResumesMutation && response.ok) {
-      revalidateTag("resumes");
+      revalidateTag("resumes", {});
     }
 
     // Strapi может вернуть 204 No Content (успешный DELETE без тела)

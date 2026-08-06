@@ -756,6 +756,29 @@ export function ResumeForm({
         />
       </div>
 
+      {/* Publish toggle */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">Публикация</h2>
+        <Separator />
+        <div className="flex items-center gap-2 rounded-lg border bg-muted/30 p-4">
+          <input
+            type="checkbox"
+            id="isPublished"
+            checked={formData.isPublished}
+            onChange={(e) => updateField("isPublished", e.target.checked)}
+            className="rounded border-gray-300"
+          />
+          <label htmlFor="isPublished" className="text-sm font-medium text-foreground">
+            Опубликовать резюме
+          </label>
+          <span className="ml-auto text-xs text-muted-foreground">
+            {formData.isPublished
+              ? "Резюме видно работодателям в каталоге"
+              : "Резюме скрыто из каталога"}
+          </span>
+        </div>
+      </div>
+
       {error && (
         <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
           {error}
