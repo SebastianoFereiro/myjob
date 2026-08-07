@@ -109,7 +109,10 @@ export async function JobList({
   const hasFilterContent = (tags?.length ?? 0) > 0 || activeFiltersCount > 0;
 
   return (
-    <section id="vacancies" className={cn(contained ? 'px-4 py-8 sm:px-6 lg:px-8' : 'py-0')}>
+    <section
+      id="vacancies"
+      className={cn(contained ? 'container px-4 py-8 sm:px-6 lg:px-8' : 'py-0')}
+    >
       <div className="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
         <div>
           {categoryData?.description && (
