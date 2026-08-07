@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { getBlogArticleBySlug } from '@/services/blog.service';
 import { markdownComponents } from '@/lib/markdown';
 import { extractSeoMetadata } from '@/lib/extract-seo';
+import { withAutoCanonical } from '@/lib/canonical';
 
 type BlogArticlePageProps = {
   params: Promise<{
@@ -33,12 +34,15 @@ export async function generateMetadata({ params }: BlogArticlePageProps): Promis
     return { title: 'Статья не найдена | MyJOB' };
   }
 
-  return extractSeoMetadata({
-    SEO: article.SEO,
-    fallbackTitle: article.title,
-    fallbackDescription: article.excerpt || article.title,
-    fallbackImage: article.coverUrl,
-  });
+  return withAutoCanonical(
+    extractSeoMetadata({
+      SEO: article.SEO,
+      fallbackTitle: article.title,
+      fallbackDescription: article.excerpt || article.title,
+      fallbackImage: article.coverUrl,
+    }),
+    `/blog/${slug}`,
+  );
 }
 
 export default async function BlogArticlePage({ params }: BlogArticlePageProps) {

@@ -6,12 +6,24 @@ import { Footer } from '@/components/footer';
 import Header from '@/components/header';
 import { Badge } from '@/components/ui/badge';
 import { getBlogArticles } from '@/services/blog.service';
-import { extractSeoMetadata } from '@/lib/extract-seo';
+import { withAutoCanonical } from '@/lib/canonical';
 
-export const metadata: Metadata = {
-  title: 'Блог | MyJOB',
-  description: 'Статьи MyJOB о поиске работы, вакансиях и карьере.',
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}): Promise<Metadata> {
+  const sp = await searchParams;
+  return withAutoCanonical(
+    {
+      title: 'Блог | MyJOB',
+      description: 'Статьи MyJOB о поиске работы, вакансиях и карьере.',
+    },
+    '/blog',
+    sp,
+    ['page'],
+  );
+}
 
 const PAGE_SIZE = 20;
 

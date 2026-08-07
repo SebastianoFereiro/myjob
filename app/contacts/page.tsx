@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Mail, Phone, MapPin, Globe, Clock3 } from 'lucide-react';
+import { buildCanonicalUrl } from '@/lib/canonical';
 
 import Header from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -10,6 +11,7 @@ import { navigationItems } from '@/app/data/navigation';
 export const metadata: Metadata = {
   title: 'Контакты | MyJOB',
   description: 'Свяжитесь с командой MyJOB для сотрудничества, поддержки и размещения вакансий.',
+  alternates: { canonical: buildCanonicalUrl('/contacts') },
 };
 
 export default function ContactsPage() {

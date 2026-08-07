@@ -24,6 +24,7 @@ import { getCompanyBySlug } from '@/services/companies.service';
 import { getOptionLabel, EMPLOYMENT_OPTIONS } from '@/lib/enum-options';
 import { getCompanyJobs } from '@/services/jobs.service';
 import { extractSeoMetadata } from '@/lib/extract-seo';
+import { withAutoCanonical } from '@/lib/canonical';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -37,12 +38,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Компания не найдена | MyJOB' };
   }
 
-  return extractSeoMetadata({
-    SEO: company.SEO,
-    fallbackTitle: company.name,
-    fallbackDescription: company.description || `Вакансии компании ${company.name}`,
-    fallbackImage: company.logoUrl,
-  });
+  return withAutoCanonical(
+    extractSeoMetadata({
+      SEO: company.SEO,
+      fallbackTitle: company.name,
+      fallbackDescription: company.description || `Вакансии компании ${company.name}`,
+      fallbackImage: company.logoUrl,
+    }),
+    `/companies/${slug}`,
+  );
 }
 
 export default async function CompanyDetailsPage({ params }: Props) {

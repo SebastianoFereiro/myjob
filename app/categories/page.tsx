@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { buildCanonicalUrl } from '@/lib/canonical';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
   title: 'Резюме и вакансии по категориям | MyJOB',
   description:
     'Найди работу или профессионалов в нужной категории на MyJOB. Логистика, IT, Маркетинг и многое другое.',
+  alternates: { canonical: buildCanonicalUrl('/categories') },
 };
 
 export default async function CVSPage() {

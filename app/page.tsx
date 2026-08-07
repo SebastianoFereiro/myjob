@@ -1,10 +1,17 @@
+import type { Metadata } from 'next';
+
 import { Footer } from "@/components/footer";
 import Header from "@/components/header";
 import { PatternPlaceholder } from "@/components/pattern-placeholder";
 import { ProfessionsSection } from "@/components/professions-section";
 import { navigationItems } from "./data/navigation";
+import { buildCanonicalUrl } from "@/lib/canonical";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  alternates: { canonical: buildCanonicalUrl('/') },
+};
 
 export default function Home() {
   return (

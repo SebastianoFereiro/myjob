@@ -10,11 +10,7 @@ import { JobList } from '@/components/jobs/job-list';
 import { getCategoriesWithCounts } from '@/services/categories.service';
 import { getCities } from '@/services/cities.service';
 import type { EmploymentType, JobFilters } from '@/types/jobs';
-
-export const metadata: Metadata = {
-  title: 'Вакансии | MyJOB',
-  description: 'Каталог вакансий MyJOB с фильтрацией по категории, городу и формату занятости.',
-};
+import { withAutoCanonical } from '@/lib/canonical';
 
 type JobsPageProps = {
   searchParams: Promise<{
@@ -31,6 +27,32 @@ type JobsPageProps = {
     page?: string;
   }>;
 };
+
+export async function generateMetadata({ searchParams }: JobsPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  return withAutoCanonical(
+    {
+      title: 'Вакансии | MyJOB',
+      description:
+        'Каталог вакансий MyJOB с фильтрацией по категории, городу и формату занятости.',
+    },
+    '/jobs',
+    params,
+    [
+      'query',
+      'location',
+      'type',
+      'category',
+      'company',
+      'level',
+      'experience',
+      'education',
+      'position',
+      'city',
+      'page',
+    ],
+  );
+}
 
 function normalizePage(value?: string) {
   const page = value ? parseInt(value, 10) : 1;

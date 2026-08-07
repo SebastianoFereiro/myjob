@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildCanonicalUrl } from '@/lib/canonical';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,7 @@ import CompanyListingClient from './CompanyListingClient';
 export const metadata: Metadata = {
   title: 'Компании | MyJOB',
   description: 'Каталог компаний с открытыми вакансиями, фильтрацией и поиском.',
+  alternates: { canonical: buildCanonicalUrl('/companies') },
 };
 
 export default async function CompaniesPage() {

@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { getJobByDocumentId } from '@/services/jobs.service';
 import type { Job } from '@/types/jobs';
 import { extractSeoMetadata } from '@/lib/extract-seo';
+import { withAutoCanonical } from '@/lib/canonical';
 import { getOptionLabel, EMPLOYMENT_OPTIONS } from '@/lib/enum-options';
 
 function firstPhone(value?: string): string | undefined {
@@ -86,12 +87,15 @@ export async function generateMetadata({ params }: JobDetailsPageProps): Promise
     return { title: 'Вакансия не найдена | MyJOB' };
   }
 
-  return extractSeoMetadata({
-    SEO: job.SEO,
-    fallbackTitle: job.title,
-    fallbackDescription: job.description || `Вакансия ${job.title} в ${job.company.name}`,
-    fallbackImage: job.image,
-  });
+  return withAutoCanonical(
+    extractSeoMetadata({
+      SEO: job.SEO,
+      fallbackTitle: job.title,
+      fallbackDescription: job.description || `Вакансия ${job.title} в ${job.company.name}`,
+      fallbackImage: job.image,
+    }),
+    `/jobs/${rawSlug}`,
+  );
 }
 
 export default async function JobDetailsPage({ params }: JobDetailsPageProps) {

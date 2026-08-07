@@ -6,6 +6,7 @@ import Header from '@/components/header';
 import { Footer } from '@/components/footer';
 import { JobList } from '@/components/jobs/job-list';
 import { extractSeoMetadata } from '@/lib/extract-seo';
+import { withAutoCanonical } from '@/lib/canonical';
 import { getCitiesByRegion } from '@/services/cities.service';
 import { getRegionBySlug } from '@/services/regions.service';
 import type { EmploymentType, JobFilters } from '@/types/jobs';
@@ -32,22 +33,28 @@ function normalizePage(value?: string) {
   return Number.isFinite(page) && page > 0 ? page : 1;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const sp = await searchParams;
   const region = await getRegionBySlug(slug);
 
   if (!region) {
     return { title: 'Регион не найден | MyJOB' };
   }
 
-  return extractSeoMetadata({
-    SEO: region.SEO,
-    fallbackTitle: `Работа в ${region.title}`,
-    fallbackDescription:
-      region.description ||
-      `Вакансии и работа в регионе ${region.title}. Поиск работы в ${region.title} на MyJOB.`,
-    siteName: 'MyJOB',
-  });
+  return withAutoCanonical(
+    extractSeoMetadata({
+      SEO: region.SEO,
+      fallbackTitle: `Работа в ${region.title}`,
+      fallbackDescription:
+        region.description ||
+        `Вакансии и работа в регионе ${region.title}. Поиск работы в ${region.title} на MyJOB.`,
+      siteName: 'MyJOB',
+    }),
+    `/regions/${slug}`,
+    sp,
+    ['query', 'type', 'level', 'experience', 'education', 'position', 'page'],
+  );
 }
 
 export default async function RegionPage({ params, searchParams }: Props) {

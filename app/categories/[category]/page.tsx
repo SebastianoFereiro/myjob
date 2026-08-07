@@ -12,6 +12,7 @@ import Header from '@/components/header';
 import { navigationItems } from '@/app/data/navigation';
 import { Footer } from '@/components/footer';
 import { extractSeoMetadata } from '@/lib/extract-seo';
+import { withAutoCanonical } from '@/lib/canonical';
 import { PageBlocks } from '@/components/page-blocks';
 import { markdownComponents } from '@/lib/markdown';
 import ReactMarkdown from 'react-markdown';
@@ -46,19 +47,25 @@ async function getCategoryName(categorySlug: string): Promise<string | null> {
   return category?.name || null;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { category } = await params;
+  const sp = await searchParams;
   const [categoryData, categoryName] = await Promise.all([
     getCategoryBySlug(category),
     getCategoryName(category),
   ]);
-  return extractSeoMetadata({
-    SEO: categoryData?.SEO,
-    fallbackTitle: categoryName ? `${categoryName} - Резюме и вакансии` : 'Категория не найдена',
-    fallbackDescription: categoryName
-      ? `Профессионалы и вакансии в категории "${categoryName}". Найди свою идеальную работу на MyJOB.`
-      : undefined,
-  });
+  return withAutoCanonical(
+    extractSeoMetadata({
+      SEO: categoryData?.SEO,
+      fallbackTitle: categoryName ? `${categoryName} - Резюме и вакансии` : 'Категория не найдена',
+      fallbackDescription: categoryName
+        ? `Профессионалы и вакансии в категории "${categoryName}". Найди свою идеальную работу на MyJOB.`
+        : undefined,
+    }),
+    `/categories/${category}`,
+    sp,
+    ['query', 'location', 'type', 'level', 'experience', 'education', 'position', 'city', 'tag', 'page'],
+  );
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {
