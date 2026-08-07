@@ -24,16 +24,18 @@ export async function ToolsStackSection() {
             <li key={category.slug}>
               <Link href={`/categories/${category.slug}#vacancies`} className="block">
                 <Card className="bg-hatch rounded-2xl border-0 p-2 shadow-none transition-colors hover:bg-accent/50">
-                  <div className="flex items-center justify-between gap-2 md:gap-10">
+                  <div className="flex items-center justify-between gap-2 md:gap-8">
                     <div className="flex items-center gap-0 md:gap-4">
                       <div className="flex size-12 items-center justify-center rounded-2xl bg-background/70 text-lg font-bold text-foreground">
                         {category.name.charAt(0).toUpperCase()}
                       </div>
 
                       <div>
-                        <h3 className="text-xl font-semibold tracking-tight">{category.name}</h3>
+                        <h3 className="text-xl font-semibold tracking-tight leading-[1.05]">
+                          {category.name}
+                        </h3>
                         {category.description ? (
-                          <p className="text-[8px] sm:text-xs uppercase text-foreground/50 md:text-sm">
+                          <p className="text-[8px] mt-2 sm:text-xs uppercase text-foreground/50 md:text-sm leading-[1.1]">
                             {category.description}
                           </p>
                         ) : null}
