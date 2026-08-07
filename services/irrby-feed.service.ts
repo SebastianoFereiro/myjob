@@ -134,12 +134,17 @@ function addDays(dateStr: string | undefined | null, days: number): string {
 // SOURCE-ID: hash от documentId
 // ================================================================
 
+// Позиционно-зависимый хеш (djb2): в отличие от простой суммы кодов символов,
+// разные documentId дают разные значения, что исключает коллизии source-id.
+// К сформированному значению (90000 + hash) добавляется префикс "90002",
+// чтобы уйти из диапазона уже существующих на площадке идентификаторов.
 function hashDocumentId(docId: string): number {
-  let hash = 0;
+  let hash = 5381;
   for (let i = 0; i < docId.length; i++) {
-    hash += docId.charCodeAt(i);
+    hash = ((hash << 5) + hash) ^ docId.charCodeAt(i);
   }
-  return 90000 + hash;
+  const h = hash >>> 0;
+  return Number(`90002${90000 + h}`);
 }
 
 // ================================================================
