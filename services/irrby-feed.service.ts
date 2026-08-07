@@ -260,7 +260,8 @@ function buildStoreAdXml(
 
   fields.push({ name: "region", value: regionName || cityInfo.region });
   fields.push({ name: "address_city", value: cityName || cityInfo.regionalCenter });
-  fields.push({ name: "web", value: escapeXml(url) });
+  // fields.push({ name: "web", value: escapeXml(url) });
+
 
   if (companyName) {
     fields.push({ name: "contact", value: escapeXml(companyName) });
