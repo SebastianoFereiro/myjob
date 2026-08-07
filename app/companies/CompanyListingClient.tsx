@@ -35,7 +35,7 @@ export default function CompanyListingClient({ companies }: Props) {
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
-      <div className="container mx-auto px-4 py-8 md:px-6 lg:px-8">
+      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {/* HEADER */}
         <div className="mb-8 rounded-[32px] border bg-white p-6 shadow-sm md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">

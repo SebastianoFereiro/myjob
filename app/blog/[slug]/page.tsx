@@ -25,7 +25,6 @@ function formatDate(date: string) {
   }).format(new Date(date));
 }
 
-
 export async function generateMetadata({ params }: BlogArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
   const article = await getBlogArticleBySlug(slug);
@@ -58,7 +57,7 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
       <main className="flex-1 bg-background">
         <article>
           <section className="border-b bg-muted/30">
-            <div className="container py-10 md:py-14">
+            <div className="container px-4 py-8 sm:px-6 lg:px-8">
               <Badge variant="outline">Блог</Badge>
               <h1 className="mt-4 max-w-4xl text-3xl font-semibold tracking-tight md:text-5xl">
                 {article.title}
@@ -71,7 +70,7 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
             </div>
           </section>
 
-          <section className="container py-8 md:py-12">
+          <section className="container px-4 py-8 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl">
               <div className="relative mb-8 aspect-video w-full overflow-hidden rounded-lg">
                 <Image

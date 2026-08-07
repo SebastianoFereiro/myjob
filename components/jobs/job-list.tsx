@@ -1,14 +1,13 @@
 import { Suspense } from 'react';
 import { JobCard } from '@/components/jobs/job-card';
 import { PremiumSection } from '@/components/jobs/premium-section';
-import { TagFilter } from '@/components/jobs/tag-filter';
+import { FilterPanel } from '@/components/jobs/filter-panel';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getCategoriesWithCounts, getCategoryBySlug } from '@/services/categories.service';
 import { getCompanyBySlug } from '@/services/companies.service';
 import { getJobs, getPremiumJobs } from '@/services/jobs.service';
 import type { JobFilters } from '@/types/jobs';
-import { X, Filter, SlidersHorizontal } from 'lucide-react';
 
 type JobListProps = {
   filters: JobFilters;
@@ -110,7 +109,7 @@ export async function JobList({
   const hasFilterContent = (tags?.length ?? 0) > 0 || activeFiltersCount > 0;
 
   return (
-    <section id="vacancies" className={cn(contained ? 'container py-12' : 'py-0')}>
+    <section id="vacancies" className={cn(contained ? 'px-4 py-8 sm:px-6 lg:px-8' : 'py-0')}>
       <div className="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
         <div>
           {categoryData?.description && (
@@ -119,7 +118,7 @@ export async function JobList({
               dangerouslySetInnerHTML={{ __html: categoryData.description }}
             />
           )}
-          <h2 className="text-xl mt-1 leading-[1.05] font-semibold tracking-tight">{heading}</h2>
+          {/* <h2 className="text-xl mt-1 leading-[1.05] font-semibold tracking-tight">{heading}</h2> */}
 
           <p className="text-muted-foreground">
             Найдено вакансий: {pagination.total + premiumJobs.length}
@@ -127,127 +126,22 @@ export async function JobList({
         </div>
       </div>
 
-      {/* Премиум блок фильтров */}
-      {hasFilterContent ? (
-      <div className="relative mb-5 rounded-xl border bg-gradient-to-br from-background via-background to-muted/30 p-2.5 shadow-sm transition-all hover:shadow-md sm:p-3">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          {/* Левая группа - фильтры */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {/* Иконка фильтров */}
-            <div className="hidden sm:flex items-center gap-1.5 mr-1">
-              <div className="rounded-lg bg-primary/10 p-1.5 text-primary">
-                <SlidersHorizontal className="h-3.5 w-3.5" />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground">Фильтры:</span>
-            </div>
-
-            {tags && tags.length > 0 && (
-              <Suspense fallback={null}>
-                <TagFilter
-                  tags={tags}
-                  basePath={categorySlug ? `/categories/${categorySlug}` : basePath}
-                />
-              </Suspense>
-            )}
-
-            {/* Кнопки сброса с премиум дизайном */}
-            <div className="flex items-center gap-1 flex-wrap ml-1">
-              {filters.region && !filters.category && (
-                <Button
-                  variant="ghost"
-                  asChild
-                  size="sm"
-                  className="group relative h-7 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-2.5 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30"
-                >
-                  <a href={`/jobs#vacancies`}>
-                    <X className="h-3 w-3 transition-transform group-hover:rotate-90" />
-                    <span>Регион</span>
-                  </a>
-                </Button>
-              )}
-              {filters.city && !filters.category && (
-                <Button
-                  variant="ghost"
-                  asChild
-                  size="sm"
-                  className="group relative h-7 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-2.5 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30"
-                >
-                  <a href={`/jobs#vacancies`}>
-                    <X className="h-3 w-3 transition-transform group-hover:rotate-90" />
-                    <span>Город</span>
-                  </a>
-                </Button>
-              )}
-              {filters.category && (
-                <Button
-                  variant="ghost"
-                  asChild
-                  size="sm"
-                  className="group relative h-7 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-2.5 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30"
-                >
-                  <a href={citySlug ? `/cities/${citySlug}#vacancies` : '/jobs#vacancies'}>
-                    <X className="h-3 w-3 transition-transform group-hover:rotate-90" />
-                    <span>Категория</span>
-                  </a>
-                </Button>
-              )}
-              {filters.company && !filters.category && (
-                <Button
-                  variant="ghost"
-                  asChild
-                  size="sm"
-                  className="group relative h-7 gap-1 rounded-full border border-destructive/20 bg-destructive/5 px-2.5 text-xs font-medium text-destructive transition-all hover:bg-destructive/10 hover:border-destructive/30"
-                >
-                  <a
-                    href={
-                      citySlug
-                        ? `/cities/${citySlug}#vacancies`
-                        : regionSlug
-                          ? `/regions/${regionSlug}#vacancies`
-                          : `${basePath}#vacancies`
-                    }
-                  >
-                    <X className="h-3 w-3 transition-transform group-hover:rotate-90" />
-                    <span>Компания</span>
-                  </a>
-                </Button>
-              )}
-            </div>
+      {/* Кнопка фильтров — открывает Popover (десктоп) / Sheet (мобильный) */}
+      {hasFilterContent && (
+        <Suspense fallback={null}>
+          <div className="mb-5">
+            <FilterPanel
+              filters={filters}
+              basePath={basePath}
+              categorySlug={categorySlug}
+              citySlug={citySlug}
+              regionSlug={regionSlug}
+              tags={tags}
+              activeFiltersCount={activeFiltersCount}
+            />
           </div>
-
-          {/* Правая группа - статистика фильтров */}
-          <div className="flex items-center gap-1">
-            {activeFiltersCount > 0 && (
-              <div className="flex items-center gap-1.5 mr-2 rounded-full bg-primary/5 px-2.5 py-1 text-xs text-muted-foreground">
-                <Filter className="h-3 w-3" />
-                <span className="font-medium">{activeFiltersCount}</span>
-                <span className="hidden sm:inline">активных фильтра</span>
-              </div>
-            )}
-            {/* Опционально: кнопка "Сбросить все" */}
-            {activeFiltersCount > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 gap-1.5 border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                asChild
-              >
-                <a
-                  href={
-                    categorySlug || citySlug || regionSlug
-                      ? '/jobs#vacancies'
-                      : `${basePath}#vacancies`
-                  }
-                >
-                  <X className="h-3 w-3" />
-                  <span className="hidden sm:inline">Сбросить все</span>
-                </a>
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-      ) : null}
+        </Suspense>
+      )}
 
       <PremiumSection jobs={premiumJobs} />
 
@@ -273,7 +167,18 @@ export async function JobList({
         <div className="mt-8 flex items-center justify-center gap-2">
           <Button variant="outline" disabled={pagination.page <= 1} asChild={pagination.page > 1}>
             {pagination.page > 1 ? (
-              <a href={pageHref(filters, pagination.page - 1, basePath, categorySlug, citySlug, regionSlug)}>Назад</a>
+              <a
+                href={pageHref(
+                  filters,
+                  pagination.page - 1,
+                  basePath,
+                  categorySlug,
+                  citySlug,
+                  regionSlug
+                )}
+              >
+                Назад
+              </a>
             ) : (
               <span>Назад</span>
             )}
@@ -287,7 +192,18 @@ export async function JobList({
             asChild={pagination.page < pagination.pageCount}
           >
             {pagination.page < pagination.pageCount ? (
-              <a href={pageHref(filters, pagination.page + 1, basePath, categorySlug, citySlug, regionSlug)}>Вперед</a>
+              <a
+                href={pageHref(
+                  filters,
+                  pagination.page + 1,
+                  basePath,
+                  categorySlug,
+                  citySlug,
+                  regionSlug
+                )}
+              >
+                Вперед
+              </a>
             ) : (
               <span>Вперед</span>
             )}

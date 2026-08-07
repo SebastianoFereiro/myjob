@@ -670,7 +670,7 @@ export async function getAllJobs() {
     params.set("filters[$or][0][premium_from][$null]", "true");
     params.set("filters[$or][1][premium_to][$lt]", now);
     params.set("sort[0]", "publishedAt:desc");
-    params.set("pagination[pageSize]", "100");
+    params.set("pagination[pageSize]", "1000");
 
     const response = await fetchAPI<StrapiListResponse<StrapiCVRecord>>(
       `${CV_ENDPOINT}?${params.toString()}`,

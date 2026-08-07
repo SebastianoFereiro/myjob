@@ -107,7 +107,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           tags={tags}
         />
         {text && (
-          <section className="w-full py-12">
+          <section className="w-full px-4 py-8 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-4xl px-4">
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                 {text}

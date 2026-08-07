@@ -60,7 +60,7 @@ const PatternPlaceholder = async () => {
   }));
   return (
     <div className="relative z-10">
-      <div className="container py-28 md:py-32">
+      <div className="container px-4 py-12 sm:px-6 lg:px-8 lg:pt-24 ">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 text-center">
           <div className="max-w-3xl">
             <h1 className="mb-6 text-4xl font-medium tracking-tight text-pretty text-foreground md:text-5xl lg:text-6xl">

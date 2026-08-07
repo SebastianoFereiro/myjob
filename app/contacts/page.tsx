@@ -20,7 +20,7 @@ export default function ContactsPage() {
       <main className="min-h-screen bg-[#fafafa]">
         {/* HERO */}
         <section className="border-b bg-white">
-          <div className="container py-8 md:py-12">
+          <div className="container px-4 py-8 sm:px-6 lg:px-8">
             <div className="rounded-[32px] border bg-gradient-to-br from-white to-zinc-50 p-6 shadow-sm md:p-10">
               <div className="max-w-3xl">
                 <div className="mb-4 inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">

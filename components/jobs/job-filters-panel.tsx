@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal } from 'lucide-react';
 
-import { SearchFilters } from "@/components/jobs/search-filters";
-import { Button } from "@/components/ui/button";
+import { SearchFilters } from '@/components/jobs/search-filters';
+import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
@@ -11,9 +11,9 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import type { JobCategory, JobFilters } from "@/types/jobs";
-import type { CityRef } from "@/types/strapi-collections";
+} from '@/components/ui/sheet';
+import type { JobCategory, JobFilters } from '@/types/jobs';
+import type { CityRef } from '@/types/strapi-collections';
 
 type JobFiltersPanelProps = {
   filters: JobFilters;
@@ -60,9 +60,7 @@ export function JobFiltersPanel({ filters, categories, cities }: JobFiltersPanel
           <SheetContent side="left" className="w-[88vw] overflow-y-auto p-0">
             <SheetHeader>
               <SheetTitle>Фильтры вакансий</SheetTitle>
-              <SheetDescription>
-                Настройте параметры поиска и примените фильтр.
-              </SheetDescription>
+              <SheetDescription>Настройте параметры поиска и примените фильтр.</SheetDescription>
             </SheetHeader>
             <div className="px-4 pb-6">
               <SearchFilters

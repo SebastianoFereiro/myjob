@@ -78,7 +78,7 @@ export default async function RegionPage({ params, searchParams }: Props) {
       <Header navigationData={navigationItems} />
       <main className="flex-1 bg-muted/30">
         <section className="border-b bg-background">
-          <div className="container py-8">
+          <div className="container px-4 py-8 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
               {region.description && (
                 <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
@@ -94,7 +94,7 @@ export default async function RegionPage({ params, searchParams }: Props) {
 
         {cities.length > 0 && (
           <section className="border-b bg-background">
-            <div className="container py-4">
+            <div className="container px-4 py-8 sm:px-6 lg:px-8">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm font-medium text-muted-foreground">Города региона:</span>
                 {cities.map((city) => (
@@ -112,7 +112,7 @@ export default async function RegionPage({ params, searchParams }: Props) {
         )}
 
         {region.text && (
-          <section className="w-full py-12 py-4">
+          <section className="w-full px-4 py-8 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-4xl px-4">
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                 {region.text}

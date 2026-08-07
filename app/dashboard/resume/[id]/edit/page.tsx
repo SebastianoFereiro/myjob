@@ -1,14 +1,14 @@
-import { Metadata } from "next";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { notFound } from "next/navigation";
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { notFound } from 'next/navigation';
 
-import { Button } from "@/components/ui/button";
-import { ResumeForm } from "@/components/resume/ResumeForm";
-import { getResumeByDocumentId } from "@/services/resume.service";
+import { Button } from '@/components/ui/button';
+import { ResumeForm } from '@/components/resume/ResumeForm';
+import { getResumeByDocumentId } from '@/services/resume.service';
 
 export const metadata: Metadata = {
-  title: "Редактирование резюме | MyJOB",
+  title: 'Редактирование резюме | MyJOB',
 };
 
 interface Props {
@@ -24,7 +24,7 @@ export default async function EditResumePage({ params }: Props) {
   }
 
   return (
-    <div className="container py-8">
+    <div className="px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <div className="mb-8 flex items-center gap-4">
           <Button variant="ghost" size="icon" asChild>
@@ -33,9 +33,7 @@ export default async function EditResumePage({ params }: Props) {
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight">
-              Редактирование резюме
-            </h1>
+            <h1 className="text-3xl font-semibold tracking-tight">Редактирование резюме</h1>
           </div>
         </div>
 

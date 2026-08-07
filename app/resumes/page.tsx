@@ -32,7 +32,7 @@ export default async function ResumesPage({ searchParams }: ResumesPageProps) {
       <Header />
       <main className="flex-1 bg-muted/30">
         <section className="border-b bg-background">
-          <div className="container py-8">
+          <div className="container px-4 py-8 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
               <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
                 Резюме соискателей
@@ -44,7 +44,7 @@ export default async function ResumesPage({ searchParams }: ResumesPageProps) {
           </div>
         </section>
 
-        <section className="container py-6 lg:py-8">
+        <section className="container px-4 py-8 sm:px-6 lg:px-8">
           <ResumeList page={page} />
         </section>
       </main>

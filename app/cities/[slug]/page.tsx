@@ -41,7 +41,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return extractSeoMetadata({
     SEO: city.SEO,
     fallbackTitle: `Работа в ${city.title}`,
-    fallbackDescription: city.description || `Вакансии и работа в городе ${city.title}. Поиск работы в ${city.title} на MyJOB.`,
+    fallbackDescription:
+      city.description ||
+      `Вакансии и работа в городе ${city.title}. Поиск работы в ${city.title} на MyJOB.`,
     siteName: 'MyJOB',
   });
 }
@@ -72,29 +74,20 @@ export default async function CityPage({ params, searchParams }: Props) {
       <Header navigationData={navigationItems} />
       <main className="flex-1 bg-muted/30">
         <section className="border-b bg-background">
-          <div className="container py-8">
+          <div className="container px-4 py-8 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
               <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
                 Работа в {city.title}
               </h1>
-              {city.description && (
-                <p className="mt-3 text-muted-foreground">
-                  {city.description}
-                </p>
-              )}
+              {city.description && <p className="mt-3 text-muted-foreground">{city.description}</p>}
             </div>
           </div>
         </section>
 
-        <JobList
-          filters={filters}
-          basePath="/cities"
-          contained={true}
-          citySlug={slug}
-        />
+        <JobList filters={filters} basePath="/cities" contained={true} citySlug={slug} />
 
         {city.text && (
-          <section className="w-full py-12">
+          <section className="w-full px-4 py-8 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-4xl px-4">
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                 {city.text}

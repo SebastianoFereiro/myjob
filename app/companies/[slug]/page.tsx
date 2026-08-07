@@ -60,7 +60,7 @@ export default async function CompanyDetailsPage({ params }: Props) {
       <Header navigationData={navigationItems} />
 
       <main className="min-h-screen bg-[#fafafa]">
-        <div className="container py-4">
+        <div className="container px-4 py-2 sm:px-6 lg:px-8">
           <Button variant="ghost" className="gap-2 px-0" asChild>
             <Link href="/companies">
               <ArrowLeft className="size-4" />К списку компаний
@@ -70,7 +70,7 @@ export default async function CompanyDetailsPage({ params }: Props) {
 
         {/* HERO */}
         <section className="border-b bg-white">
-          <div className="container py-6 md:py-10">
+          <div className="container px-4 py-8 sm:px-6 lg:px-8">
             <div className="rounded-[32px] border bg-gradient-to-br from-white to-zinc-50 p-6 shadow-sm md:p-8">
               <div className="flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
                 {/* LEFT */}
@@ -147,7 +147,7 @@ export default async function CompanyDetailsPage({ params }: Props) {
         </section>
 
         {/* CONTENT */}
-        <section className="container py-6 md:py-8">
+        <section className="container px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
             {/* MAIN */}
             <div className="space-y-6">

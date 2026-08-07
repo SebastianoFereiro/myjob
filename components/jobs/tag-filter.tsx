@@ -7,9 +7,10 @@ import { cn } from '@/lib/utils';
 type TagFilterProps = {
   tags: string[];
   basePath: string;
+  onSelect?: () => void;
 };
 
-export function TagFilter({ tags, basePath }: TagFilterProps) {
+export function TagFilter({ tags, basePath, onSelect }: TagFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTag = searchParams.get('tag');
@@ -26,8 +27,9 @@ export function TagFilter({ tags, basePath }: TagFilterProps) {
 
       const qs = params.toString();
       router.push(qs ? `${basePath}?${qs}` : basePath);
+      onSelect?.();
     },
-    [router, searchParams, activeTag, basePath]
+    [router, searchParams, activeTag, basePath, onSelect]
   );
 
   if (tags.length === 0) return null;

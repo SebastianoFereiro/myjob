@@ -37,7 +37,7 @@ export default async function BlogPage({
       <Header />
       <main className="flex-1 bg-muted/30">
         <section className="border-b bg-background">
-          <div className="container py-10">
+          <div className="container px-4 py-8 sm:px-6 lg:px-8">
             <Badge variant="outline">Блог</Badge>
             <h1 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
               Советы для поиска работы
@@ -48,7 +48,7 @@ export default async function BlogPage({
           </div>
         </section>
 
-        <section className="container py-8 md:py-12">
+        <section className="container px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {articles.map((article) => (
               <Link

@@ -109,7 +109,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
 
       <main className="flex-1 bg-muted/30">
         <section className="border-b bg-background">
-          <div className="container py-6 md:py-10">
+          <div className="container px-4 py-8 sm:px-6 lg:px-8">
             <Button variant="ghost" className="mb-5 gap-2 px-0" asChild>
               <Link href="/jobs">
                 <ArrowLeft className="size-4" />К списку вакансий
