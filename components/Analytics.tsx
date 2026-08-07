@@ -5,7 +5,7 @@ import Script from 'next/script';
 import { Suspense, useEffect } from 'react';
 
 const YM_ID = 111377953;
-const GA_ID = 'G-XXXXXXXXXX';
+const GA_ID = 'G-V2DFQY7TME';
 
 declare global {
   interface Window {
