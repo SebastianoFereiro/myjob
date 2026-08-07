@@ -69,7 +69,8 @@ export async function generateMetadata({ params }: ResumeDetailsPageProps): Prom
 
   return {
     title: `${resume.position || resume.title} | MyJOB`,
-    description: `Резюме: ${resume.position || resume.title}. ${resume.location || ''} ${formatSalary(resume)}`.trim(),
+    description:
+      `Резюме: ${resume.position || resume.title}. ${resume.location || ''} ${formatSalary(resume)}`.trim(),
     robots: { index: false, follow: false },
   };
 }
@@ -83,7 +84,8 @@ export default async function ResumeDetailPage({ params }: ResumeDetailsPageProp
     notFound();
   }
 
-  const fullName = [resume.firstName, resume.lastName].filter(Boolean).join(' ') || resume.userEmail;
+  const fullName =
+    [resume.firstName, resume.lastName].filter(Boolean).join(' ') || resume.userEmail;
   const contactHref = getContactHref(resume);
 
   return (
@@ -156,7 +158,7 @@ export default async function ResumeDetailPage({ params }: ResumeDetailsPageProp
           </div>
         </section>
 
-        <section className="container py-6 md:py-8">
+        <section className="container px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
             <div className="rounded-lg border bg-background p-5 shadow-sm md:p-8">
               <ResumeDetails resume={resume} />

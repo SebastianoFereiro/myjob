@@ -219,7 +219,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
           </div>
         </section>
 
-        <section className="container py-6 md:py-8">
+        <section className="container px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
             <div className="rounded-lg border bg-background p-5 shadow-sm md:p-8">
               <JobDetails job={job} />
