@@ -37,14 +37,15 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
 
   if (request.method === "GET") {
     const searchParams = new URLSearchParams(request.nextUrl.searchParams);
-    // Компания видит вакансии, привязанные к её аккаунту через relation company.
-    // Это покрывает и вакансии, созданные онлайн (userId + company), и созданные
-    // через админку Strapi (только relation company, без совпадающего userId).
+    // Компания видит вакансии, привязанные к её аккаунту: через relation company
+    // (онлайн и через админку Strapi) или через userId (легаси-записи без relation).
+    // $or покрывает оба случая.
     if (
       strapiPath === "cvs" || strapiPath === "cvs/"
     ) {
       if (session.user.role === "company" && session.user.companyId) {
-        searchParams.set("filters[company][documentId][$eq]", session.user.companyId);
+        searchParams.set("filters[$or][0][company][documentId][$eq]", session.user.companyId);
+        searchParams.set("filters[$or][1][userId][$eq]", userId);
       } else {
         searchParams.set("filters[userId][$eq]", userId);
       }
