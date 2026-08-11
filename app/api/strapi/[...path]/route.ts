@@ -37,9 +37,18 @@ async function handleStrapiProxy(request: NextRequest, params: { path: string[] 
 
   if (request.method === "GET") {
     const searchParams = new URLSearchParams(request.nextUrl.searchParams);
-    // Добавляем userId для списков cvs и resumes
+    // Компания видит вакансии, привязанные к её аккаунту через relation company.
+    // Это покрывает и вакансии, созданные онлайн (userId + company), и созданные
+    // через админку Strapi (только relation company, без совпадающего userId).
     if (
-      strapiPath === "cvs" || strapiPath === "cvs/" ||
+      strapiPath === "cvs" || strapiPath === "cvs/"
+    ) {
+      if (session.user.role === "company" && session.user.companyId) {
+        searchParams.set("filters[company][documentId][$eq]", session.user.companyId);
+      } else {
+        searchParams.set("filters[userId][$eq]", userId);
+      }
+    } else if (
       strapiPath === "resumes" || strapiPath === "resumes/"
     ) {
       searchParams.set("filters[userId][$eq]", userId);

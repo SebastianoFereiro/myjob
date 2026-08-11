@@ -89,13 +89,35 @@ function extractRef<T extends { id?: number; documentId?: string; [key: string]:
 /** value (код) -> label (русская метка) — при отправке в Strapi */
 function toStrapiLabel(options: readonly EnumOption[], value?: string | null): string | undefined {
   if (!value) return undefined;
-  return options.find((o) => o.value === value)?.label ?? value;
+  const byValue = options.find((o) => o.value === value);
+  if (byValue) return byValue.label;
+  // Уже передана метка
+  const byLabel = options.find((o) => o.label === value);
+  if (byLabel) return byLabel.label;
+  // Легаси/чужое значение: нечёткое сопоставление по первому слову метки
+  const lower = value.toLowerCase();
+  const fuzzy = options.find((o) => {
+    const firstWord = o.label.toLowerCase().split(" ")[0];
+    return lower.includes(firstWord) || firstWord.includes(lower);
+  });
+  return fuzzy?.label ?? options[0]?.label;
 }
 
 /** label (русская метка) -> value (код) — при чтении из Strapi */
 function fromStrapiLabel(options: readonly EnumOption[], label?: string | null): string | undefined {
   if (!label) return undefined;
-  return options.find((o) => o.label === label)?.value ?? label;
+  const byLabel = options.find((o) => o.label === label);
+  if (byLabel) return byLabel.value;
+  // В базе уже код
+  const byValue = options.find((o) => o.value === label);
+  if (byValue) return byValue.value;
+  // Легаси/чужое значение: нечёткое сопоставление по первому слову метки
+  const lower = label.toLowerCase();
+  const fuzzy = options.find((o) => {
+    const firstWord = o.label.toLowerCase().split(" ")[0];
+    return lower.includes(firstWord) || firstWord.includes(lower);
+  });
+  return fuzzy?.value ?? options[0]?.value;
 }
 
 function employmentTypeToStrapi(value?: string | null): string | undefined {

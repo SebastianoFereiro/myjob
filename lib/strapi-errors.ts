@@ -20,6 +20,24 @@ function translateField(path: string[]): string {
   return path.map((p) => FIELD_LABELS[p] || p).join(" → ");
 }
 
+function extractEnumValues(message?: string): string[] {
+  if (!message) return [];
+  const match = message.match(/must be one of the following values:\s*(.*?)(?:\.\s*|\s*$)/i);
+  if (!match) return [];
+  return match[1]
+    .split(",")
+    .map((s) => s.trim().replace(/^["']|["']$/g, ""))
+    .filter(Boolean);
+}
+
+function formatEmploymentTypeError(message?: string): string {
+  const values = extractEnumValues(message);
+  if (values.length === 0) {
+    return "Выбран недопустимый тип занятости. Проверьте значение.";
+  }
+  return `Выбран недопустимый тип занятости. Выберите один из: ${values.join(", ")}.`;
+}
+
 const ERROR_MAP: Record<string, (err: StrapiErrorDetail, details?: StrapiErrorDetail[]) => string> = {
   ValidationError(err, all) {
     const field = translateField(err.path || []);
@@ -32,7 +50,7 @@ const ERROR_MAP: Record<string, (err: StrapiErrorDetail, details?: StrapiErrorDe
     }
 
     if (err.message?.startsWith("employmentType must be one of")) {
-      return `Выбран недопустимый тип занятости. Выберите один из: Полный день, Гибридный формат, Удаленный формат, Контракт.`;
+      return formatEmploymentTypeError(err.message);
     }
 
     if (err.message?.includes("must be")) {
@@ -95,7 +113,7 @@ export function formatStrapiError(json: unknown): string {
 
   // Общее сообщение
   if (error.message?.startsWith("employmentType must be one of")) {
-    return 'Выбран недопустимый тип занятости. Выберите один из: Полный день, Гибридный формат, Удаленный формат, Контракт.';
+    return formatEmploymentTypeError(error.message);
   }
 
   return `Ошибка: ${error.message || errorName}. Попробуйте позже.`;
