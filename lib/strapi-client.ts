@@ -66,8 +66,14 @@ export async function fetchAPI<T>(
         ? payload
         : null;
     const message =
-      errorPayload?.error?.message || "Ошибка запроса к Strapi";
-    throw new Error(message || "Ошибка запроса к Strapi");
+      errorPayload?.error?.message || `Ошибка запроса к Strapi (${response.status})`;
+    const err = new Error(message || `Ошибка запроса к Strapi (${response.status})`) as Error & {
+      status?: number;
+      body?: unknown;
+    };
+    err.status = response.status;
+    err.body = payload;
+    throw err;
   }
 
   return payload as T;

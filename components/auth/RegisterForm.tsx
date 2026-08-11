@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
-import { translateAuthError } from "@/lib/auth-errors";
+import { translateRegisterError } from "@/lib/register-errors";
 import { registerSchema, type RegisterInput } from "@/lib/schemas/auth";
 
 // true => после регистрации показать экран «Проверьте почту» вместо входа
@@ -64,6 +64,56 @@ export function RegisterForm() {
     const data = result.data;
 
     try {
+      // Компания: сначала создаём компанию в Strapi, затем регистрируем
+      // пользователя в Better-Auth на сервере. Регистрация происходит только
+      // после успешного создания компании (нет «пользователя без компании»).
+      if (data.role === "company") {
+        const res = await fetch("/api/company/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: data.name,
+            ynp: data.ynp?.trim() || "",
+            email: data.email,
+            password: data.password,
+            consent: data.consent,
+          }),
+        });
+
+        const payload = (await res.json().catch(() => null)) as {
+          code?: string;
+          message?: string;
+          fieldErrors?: Record<string, string>;
+          verificationPending?: boolean;
+        } | null;
+
+        if (!res.ok) {
+          const fieldErrors = payload?.fieldErrors;
+          if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+            for (const [key, msg] of Object.entries(fieldErrors)) {
+              const field = key as keyof RegisterInput;
+              if (["email", "password", "name", "ynp", "consent"].includes(field)) {
+                setFieldError(field, { type: "server", message: msg });
+              } else {
+                setError(msg);
+              }
+            }
+            return;
+          }
+          setError(translateRegisterError(payload));
+          return;
+        }
+
+        if (REQUIRE_EMAIL_VERIFICATION && payload?.verificationPending) {
+          setVerificationPending(data.email);
+          return;
+        }
+
+        window.location.href = `/auth/callback?redirect=${encodeURIComponent("/company/dashboard")}`;
+        return;
+      }
+
+      // Соискатель: регистрация через клиентский Better-Auth
       const { error: authError } = await authClient.signUp.email({
         name: data.name,
         email: data.email,
@@ -73,20 +123,8 @@ export function RegisterForm() {
       });
 
       if (authError) {
-        setError(translateAuthError(authError));
+        setError(translateRegisterError(authError));
         return;
-      }
-
-      // Создаём компанию в фоне (не блокируем следующий шаг)
-      if (data.role === "company") {
-        fetch("/api/company/create", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: data.name,
-            ynp: data.ynp?.trim() || "",
-          }),
-        }).catch(() => {});
       }
 
       if (REQUIRE_EMAIL_VERIFICATION) {
@@ -95,8 +133,7 @@ export function RegisterForm() {
       }
 
       // Редирект через публичный callback для избежания middleware redirect
-      const redirectTo = data.role === "company" ? "/company/dashboard" : "/dashboard";
-      window.location.href = `/auth/callback?redirect=${encodeURIComponent(redirectTo)}`;
+      window.location.href = `/auth/callback?redirect=${encodeURIComponent("/dashboard")}`;
     } catch {
       setError("Ошибка при регистрации. Попробуйте позже.");
     }

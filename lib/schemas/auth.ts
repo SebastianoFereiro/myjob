@@ -30,12 +30,21 @@ export const registerSchema = z
         message: "Пароли не совпадают",
       });
     }
-    if (data.role === "company" && !data.ynp?.trim()) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["ynp"],
-        message: "Укажите УНП компании",
-      });
+    if (data.role === "company") {
+      const ynp = data.ynp?.trim();
+      if (!ynp) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["ynp"],
+          message: "Укажите УНП компании",
+        });
+      } else if (!/^\d{9}$/.test(ynp)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["ynp"],
+          message: "УНП должен содержать 9 цифр",
+        });
+      }
     }
   });
 

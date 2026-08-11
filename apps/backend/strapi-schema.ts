@@ -14,6 +14,11 @@
 // Отношения: User (created_by), Vacancy (1:M)
 // ========================================================================
 
+// ВНИМАНИЕ: схема приведена в соответствие с фактически развёрнутой коллекцией
+// Company (проверено по REST API Strapi). Поля industry/size/location/website/
+// founded_year в развёрнутой коллекции ОТСУТСТВУЮТ и удалены из документации.
+// Регистрация компании: POST /api/company/register создаёт запись с полями
+// name, slug (uid от name), ynp, isActive=false.
 export const CompanySchema = {
   collectionName: 'companies',
   info: {
@@ -42,66 +47,43 @@ export const CompanySchema = {
       targetField: 'name',
       required: true,
     },
-    description: {
-      type: 'richtext',
-      required: true,
-      pluginOptions: { i18n: { localized: true } },
-    },
-    logo: {
-      type: 'media',
-      allowedTypes: ['images'],
-      multiple: false,
-      required: false,
-    },
-    website: {
-      type: 'string',
-      required: false,
-    },
-    industry: {
-      type: 'enumeration',
-      enum: [
-        'IT',
-        'Finance',
-        'Healthcare',
-        'Education',
-        'Manufacturing',
-        'Retail',
-        'Construction',
-        'Transportation',
-        'Energy',
-        'Media',
-        'Agriculture',
-        'Real Estate',
-        'Other',
-      ],
-      required: true,
-    },
-    size: {
-      type: 'enumeration',
-      enum: ['1-10', '11-50', '51-200', '201-500', '500+'],
-      required: true,
-    },
-    location: {
-      type: 'string',
-      required: true,
-      maxLength: 300,
-      pluginOptions: { i18n: { localized: true } },
-    },
     ynp: {
       type: 'string',
       required: true,
       maxLength: 20,
+    },
+    description: {
+      type: 'richtext',
+      required: false,
+      pluginOptions: { i18n: { localized: true } },
+    },
+    siteUrl: {
+      type: 'string',
+      required: false,
     },
     address: {
       type: 'string',
       required: false,
       maxLength: 300,
     },
-    founded_year: {
-      type: 'integer',
+    phone: {
+      type: 'string',
       required: false,
-      min: 1800,
-      max: 2030,
+    },
+    email: {
+      type: 'email',
+      required: false,
+    },
+    isActive: {
+      type: 'boolean',
+      required: false,
+      default: false,
+    },
+    logo: {
+      type: 'media',
+      allowedTypes: ['images'],
+      multiple: false,
+      required: false,
     },
     // --- Отношения ---
     // vacancies: relation 1:M (inverse от Vacancy.company)
