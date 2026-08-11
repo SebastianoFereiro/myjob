@@ -164,11 +164,14 @@ export async function POST(request: Request) {
     const code = signUpBody?.code;
     console.error("[company/register] Better-Auth signUp failed:", signUpRes.status, JSON.stringify(signUpBody));
     await deleteCompany(companyDocumentId);
+    // Отправляем русское сообщение сразу — не полагаемся на клиентский словарь
+    const isDuplicate =
+      code === "USER_ALREADY_EXISTS" || code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL";
     return jsonError(
-      code === "USER_ALREADY_EXISTS" || code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL"
-        ? "USER_ALREADY_EXISTS"
-        : "USER_CREATE_FAILED",
-      signUpBody?.message || "Не удалось создать аккаунт",
+      isDuplicate ? "USER_ALREADY_EXISTS" : "USER_CREATE_FAILED",
+      isDuplicate
+        ? "Пользователь с таким email уже зарегистрирован"
+        : "Не удалось создать аккаунт. Попробуйте позже.",
       signUpRes.status || 500,
     );
   }

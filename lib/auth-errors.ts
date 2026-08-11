@@ -3,9 +3,11 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
   INVALID_EMAIL_OR_PASSWORD: "Неверный email или пароль",
   EMAIL_NOT_VERIFIED: "Email не подтверждён. Проверьте почту и перейдите по ссылке из письма.",
   USER_ALREADY_EXISTS: "Пользователь с таким email уже зарегистрирован",
+  USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: "Пользователь с таким email уже зарегистрирован",
   EMAIL_TAKEN: "Пользователь с таким email уже зарегистрирован",
+  INVALID_EMAIL: "Введите корректный email",
   USER_NOT_FOUND: "Пользователь не найден",
-  PASSWORD_TOO_SHORT: "Пароль слишком короткий",
+  PASSWORD_TOO_SHORT: "Пароль слишком короткий (минимум 8 символов)",
   WEAK_PASSWORD: "Пароль слишком слабый",
   PASSWORD_MISMATCH: "Пароли не совпадают",
   INVALID_PASSWORD: "Неверный пароль",
@@ -14,6 +16,8 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
   ACCOUNT_BANNED: "Аккаунт заблокирован",
   BANNED: "Аккаунт заблокирован",
   RATE_LIMITED: "Слишком много попыток. Попробуйте позже.",
+  FAILED_TO_CREATE_USER: "Не удалось создать аккаунт. Попробуйте позже.",
+  FAILED_TO_CREATE_SESSION: "Не удалось создать сессию. Попробуйте позже.",
 };
 
 export type AuthErrorLike = { code?: string; message?: string } | null | undefined;
