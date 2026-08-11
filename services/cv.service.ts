@@ -13,8 +13,11 @@ import type {
   CvListResult,
 } from "@/types/cv";
 import {
+  type EnumOption,
   EMPLOYMENT_OPTIONS,
-  getOptionValue,
+  LEVEL_OPTIONS,
+  EXPERIENCE_OPTIONS,
+  EDUCATION_OPTIONS,
 } from "@/lib/enum-options";
 
 const CV_ENDPOINT = "/cvs";
@@ -77,6 +80,49 @@ function extractRef<T extends { id?: number; documentId?: string; [key: string]:
   return unwrapped as T;
 }
 
+// ========================================================================
+// Маппинг enum-полей CV: value (код, фронт) ↔ label (русская метка, Strapi)
+// Живой Strapi enum для CV хранит русские метки, а не коды
+// (расхождение со схемой apps/backend/strapi-schema.ts).
+// ========================================================================
+
+/** value (код) -> label (русская метка) — при отправке в Strapi */
+function toStrapiLabel(options: readonly EnumOption[], value?: string | null): string | undefined {
+  if (!value) return undefined;
+  return options.find((o) => o.value === value)?.label ?? value;
+}
+
+/** label (русская метка) -> value (код) — при чтении из Strapi */
+function fromStrapiLabel(options: readonly EnumOption[], label?: string | null): string | undefined {
+  if (!label) return undefined;
+  return options.find((o) => o.label === label)?.value ?? label;
+}
+
+function employmentTypeToStrapi(value?: string | null): string | undefined {
+  return toStrapiLabel(EMPLOYMENT_OPTIONS, value);
+}
+function employmentTypeFromStrapi(label?: string | null): string | undefined {
+  return fromStrapiLabel(EMPLOYMENT_OPTIONS, label);
+}
+function levelToStrapi(value?: string | null): string | undefined {
+  return toStrapiLabel(LEVEL_OPTIONS, value);
+}
+function levelFromStrapi(label?: string | null): string | undefined {
+  return fromStrapiLabel(LEVEL_OPTIONS, label);
+}
+function experienceToStrapi(value?: string | null): string | undefined {
+  return toStrapiLabel(EXPERIENCE_OPTIONS, value);
+}
+function experienceFromStrapi(label?: string | null): string | undefined {
+  return fromStrapiLabel(EXPERIENCE_OPTIONS, label);
+}
+function educationToStrapi(value?: string | null): string | undefined {
+  return toStrapiLabel(EDUCATION_OPTIONS, value);
+}
+function educationFromStrapi(label?: string | null): string | undefined {
+  return fromStrapiLabel(EDUCATION_OPTIONS, label);
+}
+
 function mapStrapiCv(record: StrapiCvRecord): CvVacancy {
   const company = extractRef<import("@/types/cv").CompanyRef>(
     record.company as Record<string, unknown> | null | undefined,
@@ -98,13 +144,13 @@ function mapStrapiCv(record: StrapiCvRecord): CvVacancy {
     salaryFrom: record.salaryFrom ?? null,
     salaryTo: record.salaryTo ?? null,
     currency: (record.currency as CvVacancy["currency"]) || "BYN",
-    employmentType: (record.employmentType as CvVacancy["employmentType"]) || EMPLOYMENT_OPTIONS[0].value,
+    employmentType: (employmentTypeFromStrapi(record.employmentType) as CvVacancy["employmentType"]) || EMPLOYMENT_OPTIONS[0].value,
     location: record.location || "",
     city: extractRef<CityRef>(record.city as Record<string, unknown> | null | undefined),
     region: extractRef<RegionRef>(record.region as Record<string, unknown> | null | undefined),
-    level_job: (record.level_job as CvVacancy["level_job"]) ?? null,
-    experience_job: (record.experience_job as CvVacancy["experience_job"]) ?? null,
-    education_job: (record.education_job as CvVacancy["education_job"]) ?? null,
+    level_job: (levelFromStrapi(record.level_job) as CvVacancy["level_job"]) ?? null,
+    experience_job: (experienceFromStrapi(record.experience_job) as CvVacancy["experience_job"]) ?? null,
+    education_job: (educationFromStrapi(record.education_job) as CvVacancy["education_job"]) ?? null,
     deadline: record.deadline ?? null,
     datetime_start: record.datetime_start ?? null,
     datetime_finish: record.datetime_finish ?? null,
@@ -251,12 +297,12 @@ export async function createCv(data: CvVacancyFormData) {
     salaryFrom: data.salaryFrom,
     salaryTo: data.salaryTo,
     currency: data.currency,
-    employmentType: data.employmentType,
+    employmentType: employmentTypeToStrapi(data.employmentType),
     location: data.location,
     city: data.cityDocumentId || undefined,
-    level_job: data.level_job || undefined,
-    experience_job: data.experience_job || undefined,
-    education_job: data.education_job || undefined,
+    level_job: levelToStrapi(data.level_job) || undefined,
+    experience_job: experienceToStrapi(data.experience_job) || undefined,
+    education_job: educationToStrapi(data.education_job) || undefined,
     deadline: data.deadline || undefined,
     sortOrder: 100,
     isActive: data.isActive,
@@ -295,12 +341,12 @@ export async function updateCv(documentId: string, data: Partial<CvVacancyFormDa
   if (data.salaryFrom !== undefined) payload.salaryFrom = data.salaryFrom;
   if (data.salaryTo !== undefined) payload.salaryTo = data.salaryTo;
   if (data.currency !== undefined) payload.currency = data.currency;
-  if (data.employmentType !== undefined) payload.employmentType = data.employmentType;
+  if (data.employmentType !== undefined) payload.employmentType = employmentTypeToStrapi(data.employmentType);
   if (data.location !== undefined) payload.location = data.location;
   if (data.cityDocumentId !== undefined) payload.city = data.cityDocumentId || null;
-  if (data.level_job !== undefined) payload.level_job = data.level_job || undefined;
-  if (data.experience_job !== undefined) payload.experience_job = data.experience_job || undefined;
-  if (data.education_job !== undefined) payload.education_job = data.education_job || undefined;
+  if (data.level_job !== undefined) payload.level_job = levelToStrapi(data.level_job) || undefined;
+  if (data.experience_job !== undefined) payload.experience_job = experienceToStrapi(data.experience_job) || undefined;
+  if (data.education_job !== undefined) payload.education_job = educationToStrapi(data.education_job) || undefined;
   if (data.deadline !== undefined) payload.deadline = data.deadline || undefined;
   if (data.isActive !== undefined) payload.isActive = data.isActive;
   if (data.requirements !== undefined) payload.requirements = data.requirements || undefined;
@@ -360,7 +406,7 @@ function buildFiltersParams(filters: CvFilters): URLSearchParams {
   }
 
   if (filters.type) {
-    params.set("filters[employmentType][$eq]", filters.type);
+    params.set("filters[employmentType][$eq]", employmentTypeToStrapi(filters.type) ?? filters.type);
   }
 
   if (filters.category) {
@@ -372,15 +418,15 @@ function buildFiltersParams(filters: CvFilters): URLSearchParams {
   }
 
   if (filters.level_job) {
-    params.set("filters[level_job][$eq]", filters.level_job);
+    params.set("filters[level_job][$eq]", levelToStrapi(filters.level_job) ?? filters.level_job);
   }
 
   if (filters.experience_job) {
-    params.set("filters[experience_job][$eq]", filters.experience_job);
+    params.set("filters[experience_job][$eq]", experienceToStrapi(filters.experience_job) ?? filters.experience_job);
   }
 
   if (filters.education_job) {
-    params.set("filters[education_job][$eq]", filters.education_job);
+    params.set("filters[education_job][$eq]", educationToStrapi(filters.education_job) ?? filters.education_job);
   }
 
   if (filters.salary_min != null) {
@@ -392,7 +438,7 @@ function buildFiltersParams(filters: CvFilters): URLSearchParams {
   }
 
   if (filters.remote_possible != null) {
-    params.set("filters[employmentType][$eq]", getOptionValue(EMPLOYMENT_OPTIONS, "Удаленно"));
+    params.set("filters[employmentType][$eq]", employmentTypeToStrapi("remote") ?? "remote");
   }
 
   return params;

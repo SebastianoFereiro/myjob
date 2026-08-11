@@ -728,7 +728,9 @@ export const CVSchema = {
     },
     employmentType: {
       type: 'enumeration',
-      enum: ['full-time', 'part-time', 'contract', 'internship', 'remote'],
+      // Живой Strapi enum хранит русские метки (см. lib/enum-options.ts EMPLOYMENT_OPTIONS.label).
+      // Фронтенд отправляет коды (value), сервис cv.service.ts маппит value→label.
+      enum: ['Полная занятость', 'Частичная занятость', 'Проектная работа', 'Стажировка', 'Удаленно', 'Работа вахтой', 'Подработка', 'Работа без опыта'],
       required: false,
     },
     location: {
@@ -750,17 +752,17 @@ export const CVSchema = {
     },
     level_job: {
       type: 'enumeration',
-      enum: ['top', 'middle', 'specialist', 'worker', 'junior', 'intern'],
+      enum: ['Топ-менеджмент', 'Руководители среднего звена', 'Специалисты', 'Рабочий персонал', 'Начинающие специалисты', 'Стажеры'],
       required: false,
     },
     experience_job: {
       type: 'enumeration',
-      enum: ['none', '1-3', '3-5', '5+'],
+      enum: ['Нет опыта', 'От 1 года до 3 лет', 'От 3 до 5 лет', 'Более 5 лет'],
       required: false,
     },
     education_job: {
       type: 'enumeration',
-      enum: ['none', 'basic', 'secondary', 'specialized', 'vocational', 'higher'],
+      enum: ['Не требуется', 'Базовое', 'Среднее', 'Средне специальное', 'Профессионально-техническое', 'Высшее'],
       required: false,
     },
     deadline: {
