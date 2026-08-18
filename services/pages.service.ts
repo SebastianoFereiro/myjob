@@ -88,7 +88,7 @@ const fallbackPages: Record<string, Page> = {
       {
         __component: 'page.contact-info',
         id: 'fb-ci-1',
-        email: 'support@myjob.by',
+        email: 'rabota@irr.by',
         phone: '',
         address: 'г. Минск, Республика Беларусь',
         work_hours: 'Пн-Пт: 9:00 - 18:00',

@@ -108,7 +108,7 @@ export function resetPasswordEmailText(opts: { name: string; url: string }): str
   ].join("\n\n");
 }
 
-/** Уведомление о заявке из контактной формы (на support@myjob.by). */
+/** Уведомление о заявке из контактной формы (на rabota@irr.by). */
 export function contactNotificationHtml(input: {
   name: string;
   email: string;

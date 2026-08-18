@@ -80,9 +80,9 @@ export type ContactMailInput = {
   message: string;
 };
 
-/** Уведомление из контактной формы на support@myjob.by (от support@myjob.by, Reply-To = автор). */
+/** Уведомление из контактной формы на rabota@irr.by (от rabota@irr.by, Reply-To = автор). */
 export async function sendContactMail(input: ContactMailInput): Promise<boolean> {
-  const to = process.env.MAIL_TO_SUPPORT || "support@myjob.by";
+  const to = process.env.MAIL_TO_SUPPORT || "rabota@irr.by";
   return sendMail({
     identity: "support",
     to,

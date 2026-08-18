@@ -69,8 +69,8 @@ export default function ContactsPage() {
                     <div>
                       <p className="text-sm text-muted-foreground">Email</p>
 
-                      <a href="mailto:contact@myJOB.by" className="font-medium hover:underline">
-                        contact@myJOB.by
+                      <a href="mailto:  rabota@irr.by" className="font-medium hover:underline">
+                        rabota@irr.by
                       </a>
                     </div>
                   </div>
@@ -83,8 +83,8 @@ export default function ContactsPage() {
                     <div>
                       <p className="text-sm text-muted-foreground">Телефон</p>
 
-                      <a href="tel:+375291234567" className="font-medium hover:underline">
-                        +375 (29) 123-45-67
+                      <a href="tel:+375296651288" className="font-medium hover:underline">
+                        +375 (29) 665 12 88
                       </a>
                     </div>
                   </div>
@@ -97,7 +97,7 @@ export default function ContactsPage() {
                     <div>
                       <p className="text-sm text-muted-foreground">Адрес</p>
 
-                      <p className="font-medium">Минск, Беларусь</p>
+                      <p className="font-medium">Минск, пр. Победителей 89 к3</p>
                     </div>
                   </div>
 
@@ -127,7 +127,7 @@ export default function ContactsPage() {
                     <div>
                       <p className="text-sm text-muted-foreground">Время работы</p>
 
-                      <p className="font-medium">Пн–Пт • 09:00–18:00</p>
+                      <p className="font-medium">Пн–Пт • 09:00–17:00</p>
                     </div>
                   </div>
                 </div>
@@ -142,9 +142,12 @@ export default function ContactsPage() {
                   размещения.
                 </p>
 
-                <button className="mt-6 w-full rounded-2xl bg-white px-5 py-3 font-medium text-black transition hover:scale-[1.02]">
+                <a
+                  href="tel:+375296651288"
+                  className="mt-6 block w-full rounded-2xl bg-white px-5 py-3 text-center font-medium text-black transition hover:scale-[1.02]"
+                >
                   Связаться с отделом продаж
-                </button>
+                </a>
               </div>
             </aside>
           </div>

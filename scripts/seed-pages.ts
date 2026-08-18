@@ -115,7 +115,7 @@ const PAGES: PageSeed[] = [
       },
       {
         __component: "page.contact-info",
-        email: "support@myjob.by",      
+        email: "rabota@irr.by",      
         address: "г. Минск, пр. Поблемный, 89, к3",
         work_hours: "Пн-Пт: 9:00 - 18:00",
       },

@@ -4,13 +4,13 @@ import type { Transporter } from "nodemailer";
 /**
  * Идентификатор почтового ящика-отправителя.
  * - "no-reply" — транзакционные письма пользователям (верификация, сброс пароля)
- * - "support"  — письма из контактной формы (на support@myjob.by)
+ * - "support"  — письма из контактной формы (на rabota@irr.by)
  */
 export type MailIdentity = "no-reply" | "support";
 
 export const MAIL_FROM: Record<MailIdentity, string> = {
   "no-reply": process.env.SMTP_USER_NO_REPLY || "no-reply@myjob.by",
-  support: process.env.SMTP_USER_SUPPORT || "support@myjob.by",
+  support: process.env.SMTP_USER_SUPPORT || "rabota@irr.by",
 };
 
 const smtpConfig = {
