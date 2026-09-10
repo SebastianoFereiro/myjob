@@ -1,5 +1,9 @@
+#!/usr/bin/env node
 /**
  * Продакшен-сборка для PM2 с несколькими инстансами.
+ *
+ * Запуск: `pnpm build:prod` (или `node scripts/build-prod.mjs`).
+ * Напрямую `./scripts/build-prod.mjs` сработает только после `chmod +x`.
  *
  * `DEPLOYMENT_ID` и `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` обязаны быть заданы на
  * этапе `next build`:
@@ -19,14 +23,15 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const ENV_LOCAL_PATH = resolve(process.cwd(), ".env.production.local");
+const NEXT_BIN = resolve("node_modules/next/dist/bin/next");
 const KEY_NAME = "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY";
 const KEY_LINE = new RegExp(`^${KEY_NAME}=(.*)$`, "m");
 
-function sanitize(value: string | undefined): string {
+function sanitize(value) {
   return (value ?? "").trim().replace(/[^a-zA-Z0-9_-]/g, "");
 }
 
-function resolveDeploymentId(): string {
+function resolveDeploymentId() {
   const fromEnv = sanitize(process.env.DEPLOYMENT_ID) || sanitize(process.env.GIT_SHA);
   if (fromEnv) return fromEnv;
 
@@ -41,13 +46,13 @@ function resolveDeploymentId(): string {
   }
 }
 
-function readKeyFromEnvFile(): string {
+function readKeyFromEnvFile() {
   if (!existsSync(ENV_LOCAL_PATH)) return "";
   const match = readFileSync(ENV_LOCAL_PATH, "utf8").match(KEY_LINE);
   return match?.[1]?.trim() ?? "";
 }
 
-function ensureEncryptionKey(): string {
+function ensureEncryptionKey() {
   const fromEnv = process.env[KEY_NAME]?.trim();
   if (fromEnv) return fromEnv;
 
@@ -62,6 +67,11 @@ function ensureEncryptionKey(): string {
   return generated;
 }
 
+if (!existsSync(NEXT_BIN)) {
+  console.error("Не найден node_modules/next/dist/bin/next. Установите зависимости: pnpm install");
+  process.exit(1);
+}
+
 const deploymentId = resolveDeploymentId();
 if (!deploymentId) {
   console.error("Не удалось определить DEPLOYMENT_ID. Задайте DEPLOYMENT_ID или GIT_SHA.");
@@ -71,17 +81,13 @@ if (!deploymentId) {
 const encryptionKey = ensureEncryptionKey();
 console.log(`Сборка Next.js: DEPLOYMENT_ID=${deploymentId}`);
 
-const result = spawnSync(
-  process.execPath,
-  [resolve("node_modules/next/dist/bin/next"), "build"],
-  {
-    stdio: "inherit",
-    env: {
-      ...process.env,
-      DEPLOYMENT_ID: deploymentId,
-      [KEY_NAME]: encryptionKey,
-    },
+const result = spawnSync(process.execPath, [NEXT_BIN, "build"], {
+  stdio: "inherit",
+  env: {
+    ...process.env,
+    DEPLOYMENT_ID: deploymentId,
+    [KEY_NAME]: encryptionKey,
   },
-);
+});
 
 process.exit(result.status ?? 1);
