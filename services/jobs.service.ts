@@ -12,21 +12,12 @@ import type {
   JobFilters,
   JobListResult,
   PaginationMeta,
-  SubscriptionPayload,
 } from "@/types/jobs";
 import {
   EMPLOYMENT_OPTIONS,
   getOptionsMap,
   getReverseOptionsMap,
 } from "@/lib/enum-options";
-
-type NamedRecord = {
-  documentId?: string;
-  slug?: string;
-  name?: string;
-  title?: string;
-  description?: string;
-};
 
 type StrapiMediaField =
   | string
@@ -127,20 +118,6 @@ function slugify(value: string) {
     .toLowerCase()
     .replace(/[^a-zа-яё0-9]+/gi, "-")
     .replace(/^-+|-+$/g, "");
-}
-
-function getRecordName(value?: string | NamedRecord | null) {
-  if (!value) return "";
-  return typeof value === "string"
-    ? value
-    : value.name || value.title || value.slug || "";
-}
-
-function getRecordSlug(value?: string | NamedRecord | null) {
-  if (!value) return "";
-  if (typeof value === "string") return slugify(value);
-  const name = getRecordName(value);
-  return value.slug || (name ? slugify(name) : "");
 }
 
 function resolveMediaURL(media?: StrapiMediaField | StrapiMediaArray | null) {

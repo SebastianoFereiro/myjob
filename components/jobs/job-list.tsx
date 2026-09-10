@@ -4,8 +4,7 @@ import { PremiumSection } from '@/components/jobs/premium-section';
 import { FilterPanel } from '@/components/jobs/filter-panel';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { getCategoriesWithCounts, getCategoryBySlug } from '@/services/categories.service';
-import { getCompanyBySlug } from '@/services/companies.service';
+import { getCategoryBySlug } from '@/services/categories.service';
 import { getJobs, getPremiumJobs } from '@/services/jobs.service';
 import type { JobFilters } from '@/types/jobs';
 
@@ -73,24 +72,12 @@ export async function JobList({
   regionSlug,
   tags,
 }: JobListProps) {
-  const [{ jobs, pagination }, { jobs: premiumJobs }, categories, company, categoryData] =
+  const [{ jobs, pagination }, { jobs: premiumJobs }, categoryData] =
     await Promise.all([
       getJobs(filters),
       getPremiumJobs(filters),
-      getCategoriesWithCounts(),
-      filters.company ? getCompanyBySlug(filters.company) : null,
       categorySlug ? getCategoryBySlug(categorySlug) : null,
     ]);
-
-  const categoryName = categories.find((category) => category.slug === filters.category)?.name;
-
-  const companyName = company?.name;
-
-  const heading = companyName
-    ? `Вакансии: ${companyName}`
-    : categoryName
-      ? `Вакансии: ${categoryName}`
-      : 'Актуальные вакансии';
 
   // Подсчет активных фильтров
   const activeFiltersCount = [

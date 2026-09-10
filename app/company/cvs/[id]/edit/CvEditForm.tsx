@@ -56,7 +56,7 @@ export function CvEditForm({ cv, categories }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [cities, setCities] = useState<CityRef[]>([]);
-  const [loadingCities, setLoadingCities] = useState(true);
+  const [, setLoadingCities] = useState(true);
   const [error, setError] = useState('');
 
   const [formData, setFormData] = useState<CvVacancyFormData>({

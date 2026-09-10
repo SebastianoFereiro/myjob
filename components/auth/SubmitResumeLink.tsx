@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import Link from 'next/link';
 
 import { authClient } from '@/lib/auth-client';
@@ -10,6 +10,12 @@ type SubmitResumeLinkProps = {
   className?: string;
 };
 
+// Сессия и хранилище не дают событий подписки: снимок читается один раз,
+// а значение меняется только после монтирования на клиенте.
+function subscribe() {
+  return () => {};
+}
+
 /**
  * Умная ссылка «Разместить резюме»:
  * - неавторизованный пользователь -> /auth/login
@@ -17,12 +23,13 @@ type SubmitResumeLinkProps = {
  */
 export function SubmitResumeLink({ children, className }: SubmitResumeLinkProps) {
   const { data: session } = authClient.useSession();
-  // Флаг mounted гарантирует совпадение серверного и первого клиентского рендера,
-  // иначе href меняется при гидратации -> React hydration error.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // false на сервере и при гидратации, true после монтирования на клиенте,
+  // иначе href меняется между SSR и клиентом -> React hydration error.
+  const mounted = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
 
   const href = mounted && session ? '/dashboard' : '/auth/login';
 

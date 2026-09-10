@@ -131,10 +131,9 @@ export function getCompanyAdminURL(documentId: string): string {
 export async function sendCompanyModerationMail(
   input: CompanyModerationMailInput,
 ): Promise<boolean> {
-  const to =
-    process.env.MAIL_TO_MODERATION ||
-    process.env.MAIL_TO_SUPPORT ||
-    "rabota@irr.by";
+  // Важно: получатель по умолчанию именно rabota@irr.by, а не MAIL_TO_SUPPORT
+  // (в .env MAIL_TO_SUPPORT может указывать на support@myjob.by).
+  const to = process.env.MAIL_TO_MODERATION || "rabota@irr.by";
 
   const registeredAt = new Date().toLocaleString("ru-RU", {
     timeZone: "Europe/Minsk",

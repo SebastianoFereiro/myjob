@@ -20,9 +20,8 @@ export function CompanySettingsForm({ company: initialCompany }: CompanySettings
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const [company, setCompany] = useState<CompanyPublic | null>(initialCompany ?? null);
-  const [loadingCompany, setLoadingCompany] = useState(!initialCompany);
-  if (loadingCompany) return <div className="flex justify-center py-8"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>;
-  if (!company) return <p className="text-center text-muted-foreground py-8">Данные компании не найдены</p>;
+  const [loadFailed, setLoadFailed] = useState(false);
+  const companyId = (session?.user as { companyId?: string } | undefined)?.companyId;
 
   const [name, setName] = useState(initialCompany?.name || "");
   const [description, setDescription] = useState(initialCompany?.description || "");
@@ -36,15 +35,12 @@ export function CompanySettingsForm({ company: initialCompany }: CompanySettings
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    if (initialCompany) return;
-    const companyId = (session?.user as { companyId?: string } | undefined)?.companyId;
-    if (!companyId) {
-      setLoadingCompany(false);
-      return;
-    }
+    if (initialCompany || !companyId) return;
+    let cancelled = false;
     fetch(`/api/strapi/companies/${companyId}`)
       .then((r) => r.json())
       .then((data) => {
+        if (cancelled) return;
         setCompany(data);
         setName(data.name || "");
         setDescription(data.description || "");
@@ -53,9 +49,18 @@ export function CompanySettingsForm({ company: initialCompany }: CompanySettings
         setPhone(data.phone || "");
         setEmail(data.email || "");
       })
-      .catch(() => {})
-      .finally(() => setLoadingCompany(false));
-  }, [initialCompany, session]);
+      .catch(() => {
+        if (!cancelled) setLoadFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [initialCompany, companyId]);
+
+  const loadingCompany = !initialCompany && !company && !loadFailed && Boolean(companyId);
+
+  if (loadingCompany) return <div className="flex justify-center py-8"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>;
+  if (!company) return <p className="text-center text-muted-foreground py-8">Данные компании не найдены</p>;
 
   function resetForm() {
     if (!company) return;

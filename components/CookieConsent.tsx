@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState, useSyncExternalStore } from 'react';
 import { Button } from '@/components/ui/button';
 
 const STORAGE_KEY = 'cookie_consent';
@@ -32,20 +32,26 @@ function setConsent() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-export function CookieConsent() {
-  const [visible, setVisible] = useState(false);
+// localStorage не генерирует событий подписки: снимок читается один раз при
+// монтировании, а изменения после принятия отслеживаются локальным состоянием.
+function subscribe() {
+  return () => {};
+}
 
-  useEffect(() => {
-    const existing = getConsent();
-    if (!existing) setVisible(true);
-  }, []);
+export function CookieConsent() {
+  const hasStoredConsent = useSyncExternalStore(
+    subscribe,
+    () => getConsent() !== null,
+    () => true,
+  );
+  const [accepted, setAccepted] = useState(false);
 
   const handleAccept = useCallback(() => {
     setConsent();
-    setVisible(false);
+    setAccepted(true);
   }, []);
 
-  if (!visible) return null;
+  if (accepted || hasStoredConsent) return null;
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6">

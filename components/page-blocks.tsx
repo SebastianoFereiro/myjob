@@ -195,27 +195,33 @@ function CtaBlock({ block }: { block: Extract<PageBlock, { __component: 'page.ct
   );
 }
 
-const blockRenderers: Record<
-  PageBlock['__component'],
-  (props: { block: PageBlock }) => React.ReactNode
-> = {
-  'page.hero': (props) => <HeroBlock block={props.block as any} />,
-  'page.rich-text': (props) => <RichTextBlock block={props.block as any} />,
-  'page.faq': (props) => <FaqBlock block={props.block as any} />,
-  'page.contact-info': (props) => <ContactInfoBlock block={props.block as any} />,
-  'page.pricing-table': (props) => <PricingTableBlock block={props.block as any} />,
-  'page.team': (props) => <TeamBlock block={props.block as any} />,
-  'page.cta': (props) => <CtaBlock block={props.block as any} />,
-};
+function renderBlock(block: PageBlock): React.ReactNode {
+  switch (block.__component) {
+    case 'page.hero':
+      return <HeroBlock block={block} />;
+    case 'page.rich-text':
+      return <RichTextBlock block={block} />;
+    case 'page.faq':
+      return <FaqBlock block={block} />;
+    case 'page.contact-info':
+      return <ContactInfoBlock block={block} />;
+    case 'page.pricing-table':
+      return <PricingTableBlock block={block} />;
+    case 'page.team':
+      return <TeamBlock block={block} />;
+    case 'page.cta':
+      return <CtaBlock block={block} />;
+    default:
+      return null;
+  }
+}
 
 export function PageBlocks({ blocks }: { blocks: PageBlock[] }) {
   return (
     <>
-      {blocks.map((block, index) => {
-        const renderer = blockRenderers[block.__component];
-        if (!renderer) return null;
-        return <div key={`${block.__component}-${block.id}-${index}`}>{renderer({ block })}</div>;
-      })}
+      {blocks.map((block, index) => (
+        <div key={`${block.__component}-${block.id}-${index}`}>{renderBlock(block)}</div>
+      ))}
     </>
   );
 }

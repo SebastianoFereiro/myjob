@@ -27,14 +27,6 @@ export async function generateMetadata({
 
 const PAGE_SIZE = 20;
 
-function formatDate(date: string) {
-  return new Intl.DateTimeFormat('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date(date));
-}
-
 export default async function BlogPage({
   searchParams,
 }: {

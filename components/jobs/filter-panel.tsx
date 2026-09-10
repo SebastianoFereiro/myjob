@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { TagFilter } from '@/components/jobs/tag-filter';
 import { Button } from '@/components/ui/button';
@@ -169,11 +169,14 @@ export function FilterPanel({
   const [sheetOpen, setSheetOpen] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
 
-  // Закрывать окно/поповер после любого изменения фильтров (теги, сброс)
+  // Закрывать окно/поповер после любого изменения фильтров (теги, сброс).
+  // Синхронизация с внешним состоянием навигации — setState здесь оправдан.
   const searchParams = useSearchParams();
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     setSheetOpen(false);
     setPopoverOpen(false);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [searchParams]);
 
   const trigger = (

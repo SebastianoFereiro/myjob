@@ -109,7 +109,7 @@ export function RegisterForm() {
           return;
         }
 
-        window.location.href = `/auth/callback?redirect=${encodeURIComponent("/company/dashboard")}`;
+        window.location.assign(`/auth/callback?redirect=${encodeURIComponent("/company/dashboard")}`);
         return;
       }
 
@@ -133,7 +133,7 @@ export function RegisterForm() {
       }
 
       // Редирект через публичный callback для избежания middleware redirect
-      window.location.href = `/auth/callback?redirect=${encodeURIComponent("/dashboard")}`;
+      window.location.assign(`/auth/callback?redirect=${encodeURIComponent("/dashboard")}`);
     } catch {
       setError("Ошибка при регистрации. Попробуйте позже.");
     }

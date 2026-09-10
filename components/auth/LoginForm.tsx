@@ -56,7 +56,7 @@ export function LoginForm() {
         const role = (data.user as { role?: string }).role || "user";
         const redirectTo = role === "company" ? "/company/dashboard" : "/dashboard";
         // Редирект через публичный callback для избежания middleware redirect
-        window.location.href = `/auth/callback?redirect=${encodeURIComponent(redirectTo)}`;
+        window.location.assign(`/auth/callback?redirect=${encodeURIComponent(redirectTo)}`);
       }
     } catch {
       setServerError("Ошибка при входе. Попробуйте позже.");

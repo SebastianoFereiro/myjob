@@ -34,7 +34,6 @@ import {
   LEVEL_OPTIONS,
   EXPERIENCE_OPTIONS,
   EDUCATION_OPTIONS,
-  CURRENCY_OPTIONS,
 } from '@/lib/enum-options';
 
 const employmentOptions: { value: CvEmploymentType; label: string }[] =
@@ -59,7 +58,6 @@ export function CvForm({ company: initialCompany }: Props) {
   const [company] = useState<CompanyRef | null>(
     initialCompany ?? ((session?.user as { company?: CompanyRef } | undefined)?.company ?? null),
   );
-  if (!company) return <div className="flex justify-center py-8"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -84,7 +82,7 @@ export function CvForm({ company: initialCompany }: Props) {
     education_job: '',
     deadline: '',
     isActive: true,
-    companyDocumentId: company!.documentId,
+    companyDocumentId: company?.documentId ?? null,
     categoryDocumentId: null,
   });
 
@@ -126,6 +124,8 @@ export function CvForm({ company: initialCompany }: Props) {
 
     loadRefs();
   }, []);
+
+  if (!company) return <div className="flex justify-center py-8"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>;
 
   function updateField<K extends keyof CvVacancyFormData>(key: K, value: CvVacancyFormData[K]) {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -188,7 +188,7 @@ export function CvForm({ company: initialCompany }: Props) {
             >
               <Building2 className="size-4 shrink-0" />
               <span className="font-medium text-foreground">
-                {company!.name || 'Загрузка...'}
+                {company.name || 'Загрузка...'}
               </span>
             </div>
             <p className="text-xs text-muted-foreground">
