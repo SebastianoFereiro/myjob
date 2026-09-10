@@ -11,6 +11,7 @@
  * поведению — уберите cacheHandler и cacheMaxMemorySize из конфига.
  */
 const { Pool } = require("pg");
+const v8 = require("node:v8");
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -51,6 +52,31 @@ function toArray(tags) {
   return Array.isArray(tags) ? tags : [tags];
 }
 
+// Значение кэша содержит Map (segmentData) и Buffer (rscData), которые нельзя
+// безопасно прогонять через JSON: Map станет {}, Buffer станет {type:"Buffer"},
+// после чего Next.js падает на segmentData.get. Поэтому пишем v8-сериализацию.
+const CACHE_FORMAT = 2;
+
+function encodeValue(data) {
+  return JSON.stringify({
+    __cacheFormat: CACHE_FORMAT,
+    payload: v8.serialize(data).toString("base64"),
+  });
+}
+
+// undefined = запись сделана старым/несовместимым форматом, её нужно считать промахом.
+function decodeValue(stored) {
+  if (
+    stored &&
+    typeof stored === "object" &&
+    stored.__cacheFormat === CACHE_FORMAT &&
+    typeof stored.payload === "string"
+  ) {
+    return v8.deserialize(Buffer.from(stored.payload, "base64"));
+  }
+  return undefined;
+}
+
 module.exports = class CacheHandler {
   constructor(options) {
     this.options = options;
@@ -81,8 +107,14 @@ module.exports = class CacheHandler {
         }
       }
 
+      const value = decodeValue(row.value);
+      if (value === undefined) {
+        await pool.query("DELETE FROM next_cache_entries WHERE key = $1", [key]);
+        return null;
+      }
+
       return {
-        value: row.value,
+        value,
         lastModified: Number(row.last_modified),
         tags,
       };
@@ -108,7 +140,7 @@ module.exports = class CacheHandler {
            SET value = EXCLUDED.value,
                tags = EXCLUDED.tags,
                last_modified = EXCLUDED.last_modified`,
-        [key, JSON.stringify(data), tags, Date.now()],
+        [key, encodeValue(data), tags, Date.now()],
       );
     } catch (err) {
       console.error("[cache-handler] set failed:", err);
