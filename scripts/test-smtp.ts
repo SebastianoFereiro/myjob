@@ -4,12 +4,12 @@
  * Запуск:
  *   node --env-file=.env --import tsx scripts/test-smtp.ts [email]
  *
- * По умолчанию письма уходят на support@myjob.by (SMOKE-TEST).
+ * По умолчанию письма уходят на rabota@irr.by (SMOKE-TEST).
  */
 import { sendContactMail, sendResetPasswordMail, sendVerificationMail } from "../lib/mail/send";
 
 async function main() {
-  const to = process.argv[2] || process.env.SMTP_USER_SUPPORT || "support@myjob.by";
+  const to = process.argv[2] || process.env.SMTP_USER_SUPPORT || "rabota@irr.by";
 
   console.log(`[SMTP] Тест на адрес: ${to}`);
 

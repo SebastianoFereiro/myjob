@@ -1,5 +1,9 @@
 import { MAIL_FROM, getTransporter, type MailIdentity } from "./transporter";
 import {
+  companyApprovedEmailHtml,
+  companyApprovedEmailText,
+  companyModerationRequestHtml,
+  companyModerationRequestText,
   contactNotificationHtml,
   contactNotificationText,
   resetPasswordEmailHtml,
@@ -90,5 +94,92 @@ export async function sendContactMail(input: ContactMailInput): Promise<boolean>
     html: contactNotificationHtml(input),
     text: contactNotificationText(input),
     replyTo: input.email,
+  });
+}
+
+export type CompanyModerationMailInput = {
+  companyName: string;
+  companySlug: string;
+  ynp: string;
+  ownerEmail: string;
+  documentId: string;
+};
+
+/**
+ * База админки Strapi для ссылок в письмах модераторам.
+ * По умолчанию — публичный https://atlantis.myjob.by. Внутренний хост вида
+ * http://10.0.15.202:1337 в письмах использовать не стоит: он недоступен извне.
+ * Допускается указание базы как с суффиксом /admin, так и без него.
+ */
+function getStrapiAdminURL(): string {
+  const raw =
+    process.env.STRAPI_ADMIN_URL ||
+    process.env.STRAPI_URL ||
+    "https://atlantis.myjob.by";
+  return raw.replace(/\/+$/, "").replace(/\/admin$/, "");
+}
+
+/** Ссылка на запись компании в content-manager админки Strapi. */
+export function getCompanyAdminURL(documentId: string): string {
+  return `${getStrapiAdminURL()}/admin/content-manager/collection-types/api::company.company/${documentId}`;
+}
+
+/**
+ * Заявка на модерацию новой компании (модераторам, от rabota@irr.by,
+ * Reply-To = email владельца компании).
+ */
+export async function sendCompanyModerationMail(
+  input: CompanyModerationMailInput,
+): Promise<boolean> {
+  const to =
+    process.env.MAIL_TO_MODERATION ||
+    process.env.MAIL_TO_SUPPORT ||
+    "rabota@irr.by";
+
+  const registeredAt = new Date().toLocaleString("ru-RU", {
+    timeZone: "Europe/Minsk",
+  });
+
+  const payload = {
+    ...input,
+    registeredAt,
+    adminUrl: getCompanyAdminURL(input.documentId),
+  };
+
+  return sendMail({
+    identity: "support",
+    to,
+    subject: `Новая компания на модерацию: ${input.companyName}`,
+    html: companyModerationRequestHtml(payload),
+    text: companyModerationRequestText(payload),
+    replyTo: input.ownerEmail,
+  });
+}
+
+/** Уведомление компании о прохождении модерации (владельцу, от no-reply@myjob.by). */
+export async function sendCompanyApprovedMail(input: {
+  companyName: string;
+  email: string;
+}): Promise<boolean> {
+  const appUrl = (
+    process.env.BETTER_AUTH_URL ||
+    process.env.APP_URL ||
+    "https://myjob.by"
+  ).replace(/\/$/, "");
+
+  const dashboardUrl = `${appUrl}/company/dashboard`;
+
+  return sendMail({
+    identity: "no-reply",
+    to: input.email,
+    subject: "Компания прошла модерацию — MyJOB",
+    html: companyApprovedEmailHtml({
+      companyName: input.companyName,
+      dashboardUrl,
+    }),
+    text: companyApprovedEmailText({
+      companyName: input.companyName,
+      dashboardUrl,
+    }),
   });
 }

@@ -141,3 +141,79 @@ export function contactNotificationText(input: {
     `Сообщение:\n${input.message}`,
   ].join("\n");
 }
+
+type CompanyModerationInput = {
+  companyName: string;
+  companySlug: string;
+  ynp: string;
+  ownerEmail: string;
+  documentId: string;
+  registeredAt: string;
+  adminUrl: string;
+};
+
+/** Заявка на модерацию новой компании (модераторам, на rabota@irr.by). */
+export function companyModerationRequestHtml(input: CompanyModerationInput): string {
+  const title = `Новая компания на модерацию: ${input.companyName}`;
+  return layoutHtml(
+    title,
+    contentHtml(
+      [
+        "Зарегистрирована новая компания. Требуется проверка данных и модерация.",
+        `<strong>Название:</strong> ${escapeHtml(input.companyName)}`,
+        `<strong>Slug:</strong> ${escapeHtml(input.companySlug)}`,
+        `<strong>УНП:</strong> ${escapeHtml(input.ynp)}`,
+        `<strong>Email владельца:</strong> ${escapeHtml(input.ownerEmail)}`,
+        `<strong>Strapi documentId:</strong> ${escapeHtml(input.documentId)}`,
+        `<strong>Дата регистрации:</strong> ${escapeHtml(input.registeredAt)}`,
+        "<strong>Статус:</strong> isActive = false. До активации компания не публикует вакансии и не видна в каталоге.",
+      ],
+      { label: "Открыть в админке Strapi", url: input.adminUrl },
+    ),
+  );
+}
+
+export function companyModerationRequestText(input: CompanyModerationInput): string {
+  return [
+    "Зарегистрирована новая компания. Требуется проверка данных и модерация.",
+    `Название: ${input.companyName}`,
+    `Slug: ${input.companySlug}`,
+    `УНП: ${input.ynp}`,
+    `Email владельца: ${input.ownerEmail}`,
+    `Strapi documentId: ${input.documentId}`,
+    `Дата регистрации: ${input.registeredAt}`,
+    "Статус: isActive = false. До активации компания не публикует вакансии и не видна в каталоге.",
+    `Админка Strapi: ${input.adminUrl}`,
+  ].join("\n");
+}
+
+/** Уведомление компании об успешном прохождении модерации. */
+export function companyApprovedEmailHtml(input: {
+  companyName: string;
+  dashboardUrl: string;
+}): string {
+  const title = "Компания прошла модерацию — MyJOB";
+  return layoutHtml(
+    title,
+    contentHtml(
+      [
+        `Здравствуйте, ${escapeHtml(input.companyName)}!`,
+        "Ваша компания успешно прошла модерацию, аккаунт активирован. Теперь вы можете публиковать вакансии и получать отклики соискателей.",
+        "Если данные компании изменились, обновите их в настройках кабинета.",
+      ],
+      { label: "Перейти в кабинет", url: input.dashboardUrl },
+    ),
+  );
+}
+
+export function companyApprovedEmailText(input: {
+  companyName: string;
+  dashboardUrl: string;
+}): string {
+  return [
+    `Здравствуйте, ${input.companyName}!`,
+    "Ваша компания успешно прошла модерацию, аккаунт активирован. Теперь вы можете публиковать вакансии и получать отклики соискателей.",
+    "Если данные компании изменились, обновите их в настройках кабинета:",
+    input.dashboardUrl,
+  ].join("\n\n");
+}

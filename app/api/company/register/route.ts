@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -5,6 +7,8 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema/auth";
+import { companyModerationNotice } from "@/lib/db/schema/notifications";
+import { sendCompanyModerationMail } from "@/lib/mail/send";
 import { fetchAPI } from "@/lib/strapi-client";
 
 // ---------------------------------------------------------------------------
@@ -130,7 +134,8 @@ export async function POST(request: Request) {
     const created = await fetchAPI<StrapiCreateCompany>("/companies", {
       method: "POST",
       body: JSON.stringify({
-        data: { name, slug, ynp, isActive: false },
+        // email владельца сохраняем в компании: он нужен модератору для связи
+        data: { name, slug, ynp, email, isActive: false },
       }),
     });
     if (!created?.data?.documentId) {
@@ -193,7 +198,34 @@ export async function POST(request: Request) {
   }
 
   // -------------------------------------------------------------------------
-  // 5. Ответ: проксируем куки сессии Better-Auth + данные
+  // 5. Заявка на модерацию: запись в БД + письмо модераторам на rabota@irr.by
+  // -------------------------------------------------------------------------
+  await createModerationNotice({
+    companyDocumentId,
+    companyName: name,
+    ownerEmail: email,
+  });
+
+  try {
+    const moderatorNotified = await sendCompanyModerationMail({
+      companyName: name,
+      companySlug: slug,
+      ynp,
+      ownerEmail: email,
+      documentId: companyDocumentId,
+    });
+    if (!moderatorNotified) {
+      console.error(
+        "[company/register] moderation mail was not sent:",
+        companyDocumentId,
+      );
+    }
+  } catch (err) {
+    console.error("[company/register] moderation mail error:", err);
+  }
+
+  // -------------------------------------------------------------------------
+  // 6. Ответ: проксируем куки сессии Better-Auth + данные
   // -------------------------------------------------------------------------
   const response = NextResponse.json({
     success: true,
@@ -222,5 +254,30 @@ async function deleteCompany(documentId: string): Promise<void> {
     await fetchAPI(`/companies/${documentId}`, { method: "DELETE" });
   } catch (err) {
     console.error("[company/register] rollback delete failed:", err);
+  }
+}
+
+/**
+ * Ставит компанию в очередь на проверку модерации (status = "pending").
+ * Сбой записи не должен ломать регистрацию — только логируется.
+ */
+async function createModerationNotice(input: {
+  companyDocumentId: string;
+  companyName: string;
+  ownerEmail: string;
+}): Promise<void> {
+  try {
+    await db
+      .insert(companyModerationNotice)
+      .values({
+        id: randomUUID(),
+        companyId: input.companyDocumentId,
+        companyName: input.companyName,
+        ownerEmail: input.ownerEmail,
+        status: "pending",
+      })
+      .onConflictDoNothing();
+  } catch (err) {
+    console.error("[company/register] failed to create moderation notice:", err);
   }
 }

@@ -3,8 +3,8 @@
 ## 1. Цель
 
 1. Подключить отправку транзакционных писем через почтовый сервер **Stalwart v0.16** (`mail.myjob.by`, порт 587 STARTTLS):
-   - `no-reply@myjob.by` — письма пользователям (верификация email, восстановление пароля);
-   - `support@myjob.by` — уведомления из контактной формы.
+   - `no-reply@myjob.by` — письма пользователям (верификация email, восстановление пароля, прохождение модерации компании);
+   - `rabota@irr.by` — уведомления из контактной формы и заявки на модерацию компаний.
 2. Включить flow восстановления пароля и верификации email на стороне Better-Auth.
 3. Починить формы (контактная, регистрация, вход, восстановление) и перевести валидацию на **zod v4 + react-hook-form** (сейчас — ручные проверки через `useState`, zod не используется).
 
@@ -14,8 +14,8 @@
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | SMTP                        | `mail.myjob.by:587`, STARTTLS (`secure:false`, `requireTLS:true`), AUTH PLAIN                                                    |
 | Sender (пользователям)      | `no-reply@myjob.by` (пароль `1704/int0408`)                                                                                      |
-| Sender (контактная форма)   | `support@myjob.by` (пароль `1704/int0408`)                                                                                       |
-| Получатель контактной формы | `support@myjob.by`, `Reply-To` = email отправителя                                                                               |
+| Sender (контактная форма)   | `rabota@irr.by` (пароль `1704/int0408`)                                                                                          |
+| Получатель контактной формы | `rabota@irr.by`, `Reply-To` = email отправителя                                                                                  |
 | baseURL / домен ссылок      | `https://myjob.by` (заменить устаревший `m.izrukvruki.by` в `lib/auth.ts`)                                                       |
 | Верификация email           | Флаг `AUTH_REQUIRE_EMAIL_VERIFICATION` (default `true` = полный сценарий «проверьте почту»; `false` = вход сразу, письмо в фоне) |
 | Библиотека почты            | `nodemailer` (+ `@types/nodemailer`)                                                                                             |
@@ -35,7 +35,7 @@ graph LR
     ML --> TR[transporter.ts nodemailer]
     TR --> SMTP[Stalwart mail.myjob.by 587]
     SMTP --> U[Пользователь]
-    SMTP --> S[Support support@myjob.by]
+    SMTP --> S[Support rabota@irr.by]
     TS[templates.ts HTML] --> ML
     Z[lib/schemas auth.ts zod v4] --> F1
     Z --> F2
@@ -46,12 +46,12 @@ graph LR
 ## 4. Файлы: создать
 
 - `lib/mail/transporter.ts` — фабрика nodemailer-транспортера по identity (no-reply / support).
-- `lib/mail/templates.ts` — HTML-шаблоны (inline styles, русский): verification, reset-password, contact-notification, contact-auto-reply.
-- `lib/mail/send.ts` — обёртки `sendVerificationMail`, `sendResetPasswordMail`, `sendContactMail` + `sendMail` с try/catch и логированием.
+- `lib/mail/templates.ts` — HTML-шаблоны (inline styles, русский): verification, reset-password, contact-notification, contact-auto-reply, company-moderation-request, company-approved.
+- `lib/mail/send.ts` — обёртки `sendVerificationMail`, `sendResetPasswordMail`, `sendContactMail`, `sendCompanyModerationMail`, `sendCompanyApprovedMail` + `sendMail` с try/catch и логированием.
 - `lib/schemas/auth.ts` — zod v4 схемы: `registerSchema`, `loginSchema`, `forgotPasswordSchema`, `resetPasswordSchema`, `contactSchema`, `subscribeSchema`.
 - `app/verify-email/page.tsx` + `components/auth/VerifyEmailClient.tsx` — подтверждение email (`authClient.verifyEmail`) + повторная отправка (`authClient.sendVerificationEmail`).
 - `app/reset-password/page.tsx` + `components/auth/ResetPasswordForm.tsx` — сброс пароля (`authClient.resetPassword`), `token` из `searchParams` (Promise в Next.js 16, `await searchParams`).
-- `app/api/contact/route.ts` — POST: `contactSchema.safeParseAsync`, отправка на `support@myjob.by`, ответ `{ ok: true }` / 400.
+- `app/api/contact/route.ts` — POST: `contactSchema.safeParseAsync`, отправка на `rabota@irr.by`, ответ `{ ok: true }` / 400.
 - `components/contacts/ContactForm.tsx` — Client Component (react-hook-form + zodResolver), заменяет инертную форму.
 - `.env.example` — SMTP + auth переменные.
 
@@ -76,14 +76,33 @@ SMTP_STARTTLS=true
 # Отправители
 SMTP_USER_NO_REPLY=no-reply@myjob.by
 SMTP_PASS_NO_REPLY=1704/int0408
-SMTP_USER_SUPPORT=support@myjob.by
+SMTP_USER_SUPPORT=rabota@irr.by
 SMTP_PASS_SUPPORT=1704/int0408
-MAIL_TO_SUPPORT=support@myjob.by
+MAIL_TO_SUPPORT=rabota@irr.by
+
+# Модерация компаний: получатель заявок и база админки Strapi для ссылок.
+# Публичная админка прод: https://atlantis.myjob.by/admin/
+# Внутренний http://10.0.15.202:1337 в письмах не использовать, недоступен извне.
+MAIL_TO_MODERATION=rabota@irr.by
+STRAPI_ADMIN_URL=https://atlantis.myjob.by
+
+# Секрет для cron-роутов (/api/cron/auto-push, /api/cron/company-moderation)
+CRON_SECRET=change-me
 
 # Приложение
 APP_URL=https://myjob.by
 AUTH_REQUIRE_EMAIL_VERIFICATION=false
 ```
+
+### 6.1 Cron уведомлений о модерации
+
+Роут `GET /api/cron/company-moderation` запускается раз в 1 час и проверяет `isActive` компаний из очереди `company_moderation_notice` со статусом `pending`. Вызов с секретом:
+
+```bash
+curl -H "Authorization: Bearer %CRON_SECRET%" https://myjob.by/api/cron/company-moderation
+```
+
+Расписание задаётся внешним планировщиком хостинга, например crontab `0 * * * *`, и меняется без правок кода. Уведомление компании отправляется один раз: статус `pending` переводится в `notified` только после успешной отправки письма.
 
 ## 7. Better-Auth: целевая конфигурация
 
@@ -129,7 +148,8 @@ registerSchema = z
 - Пароли в `.env` — не коммитить; `.env.example` — только заглушки.
 - Если `AUTH_REQUIRE_EMAIL_VERIFICATION=false`, страницы verify/reset остаются рабочими, но вход не блокируется до верификации.
 - Контактная форма: ответить 200 даже при ошибке отправки SMTP не рекомендуется — вернуть 500 и показать «Не удалось отправить, попробуйте позже».
-- Контактный email на странице (`contact@myJOB.by`) согласовать: рабочий получатель — `support@myjob.by`.
+- Контактный email на странице (`contact@myJOB.by`) согласовать: рабочий получатель — `rabota@irr.by`.
+- Письма модерации компаний: заявка уходит сразу при регистрации, уведомление о прохождении модерации — из cron раз в час, детали в `plans/company-moderation-email-plan.md`.
 
 ## 10. Порядок реализации
 
@@ -141,3 +161,4 @@ registerSchema = z
 6. Рефакторинг RegisterForm / LoginForm / ForgotPasswordForm.
 7. Контактная форма (route + компонент + страница).
 8. `pnpm lint`, `pnpm build`, ручной тест писем (verify/reset/contact).
+9. Письма модерации компаний: шаблоны, отправщики, таблица `company_moderation_notice`, cron `/api/cron/company-moderation`.
