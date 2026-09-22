@@ -14,7 +14,7 @@
 | Решение | Значение |
 | --- | --- |
 | Точка отправки письма модератору | `app/api/company/register/route.ts`, шаг 5, после привязки `companyId` к пользователю |
-| Отправитель письма модератору | identity `support` = `rabota@irr.by`, `to` = `MAIL_TO_MODERATION` или `MAIL_TO_SUPPORT` или `rabota@irr.by`, `Reply-To` = email владельца |
+| Отправитель письма модератору | identity `support` = `rabota@irr.by`, `to` = `MAIL_TO_MODERATION` или `rabota@irr.by` (MAIL_TO_SUPPORT не используется, там support@myjob.by), `Reply-To` = email владельца |
 | Детект прохождения модерации | Cron-роут в Next.js раз в 1 час по образцу `app/api/cron/auto-push/route.ts`: берёт `pending`-записи из `company_moderation_notice` и проверяет `isActive` каждой компании в Strapi |
 | Идемпотентность | Статус записи `pending` переводится в `notified` только после успешной отправки письма, повторный запуск cron обрабатывает лишь `pending` |
 | Источник списка компаний для проверки | Только таблица `company_moderation_notice`: компании без записи не опрашиваются и писем не получают |
@@ -92,7 +92,7 @@ graph TD
 ## 7. Переменные окружения
 
 ```dotenv
-# Получатель уведомлений о новых компаниях, по умолчанию MAIL_TO_SUPPORT или rabota@irr.by
+# Получатель уведомлений о новых компаниях. Если не задано, письмо уходит на rabota@irr.by
 MAIL_TO_MODERATION=rabota@irr.by
 
 # База админки Strapi для ссылок в письме, по умолчанию STRAPI_URL.
@@ -102,8 +102,18 @@ MAIL_TO_MODERATION=rabota@irr.by
 STRAPI_ADMIN_URL=https://atlantis.myjob.by
 
 # Секрет для cron-роутов, уже используется в /api/cron/auto-push
-CRON_SECRET=change-me
+CRON_SECRET=cronsecret
 ```
+
+### 7.1 Расписание cron
+
+Проверка модерации запускается раз в час только в рабочие часы: с 09:00 до 18:00, с понедельника по пятницу. Строка crontab:
+
+```cron
+0 9-18 * * 1-5 curl -s "http://localhost:3000/api/cron/company-moderation?secret=cronsecret"
+```
+
+Значение `secret` должно совпадать с `CRON_SECRET`. За пределами рабочего окна роут не вызывается, поэтому письма компании не уходят ночью и в выходные.
 
 ## 8. Порядок реализации
 

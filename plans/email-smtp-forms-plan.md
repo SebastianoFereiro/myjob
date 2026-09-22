@@ -80,11 +80,12 @@ SMTP_USER_SUPPORT=rabota@irr.by
 SMTP_PASS_SUPPORT=1704/int0408
 MAIL_TO_SUPPORT=rabota@irr.by
 
-# Модерация компаний: получатель заявок и база админки Strapi для ссылок.
-# Публичная админка прод: https://atlantis.myjob.by/admin/
-# Внутренний http://10.0.15.202:1337 в письмах не использовать, недоступен извне.
+# Модерация компаний: получатель заявок (если не задано, письмо уходит на rabota@irr.by)
+# и база админки Strapi для ссылок в письме.
+# Прод: STRAPI_ADMIN_URL=http://10.0.15.202:1337 (совпадает со STRAPI_URL)
+# Публичный вариант админки: https://atlantis.myjob.by/admin/
 MAIL_TO_MODERATION=rabota@irr.by
-STRAPI_ADMIN_URL=https://atlantis.myjob.by
+STRAPI_ADMIN_URL=http://10.0.15.202:1337
 
 # Секрет для cron-роутов (/api/cron/auto-push, /api/cron/company-moderation)
 CRON_SECRET=change-me
@@ -96,13 +97,13 @@ AUTH_REQUIRE_EMAIL_VERIFICATION=false
 
 ### 6.1 Cron уведомлений о модерации
 
-Роут `GET /api/cron/company-moderation` запускается раз в 1 час и проверяет `isActive` компаний из очереди `company_moderation_notice` со статусом `pending`. Вызов с секретом:
+Роут `GET /api/cron/company-moderation` запускается раз в 1 час в рабочие часы и проверяет `isActive` компаний из очереди `company_moderation_notice` со статусом `pending`. Строка crontab (понедельник-пятница, 09:00-18:00):
 
-```bash
-curl -H "Authorization: Bearer %CRON_SECRET%" https://myjob.by/api/cron/company-moderation
+```cron
+0 9-18 * * 1-5 curl -s "http://localhost:3000/api/cron/company-moderation?secret=cronsecret"
 ```
 
-Расписание задаётся внешним планировщиком хостинга, например crontab `0 * * * *`, и меняется без правок кода. Уведомление компании отправляется один раз: статус `pending` переводится в `notified` только после успешной отправки письма.
+Секрет можно передавать и заголовком: `curl -H "Authorization: Bearer <CRON_SECRET>"`. Расписание задаётся внешним планировщиком хостинга и меняется без правок кода. Уведомление компании отправляется один раз: статус `pending` переводится в `notified` только после успешной отправки письма.
 
 ## 7. Better-Auth: целевая конфигурация
 

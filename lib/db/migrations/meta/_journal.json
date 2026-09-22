@@ -15,6 +15,20 @@
       "when": 1789048236522,
       "tag": "0001_fixed_lilandra",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790083990981,
+      "tag": "0002_product_assignment_audit",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790086926015,
+      "tag": "0003_account_issuer",
+      "breakpoints": true
     }
   ]
 }

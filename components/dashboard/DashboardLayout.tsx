@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { Loader2, LogOut, Menu, Settings, UserCircle } from 'lucide-react';
-import { BriefcaseBusiness, FileText } from 'lucide-react';
+import { BriefcaseBusiness, FileText, History } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -141,6 +141,7 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
       ? [
           { name: 'Мои вакансии', href: '/company/dashboard', icon: BriefcaseBusiness },
           { name: 'Создать вакансию', href: '/company/cvs/new', icon: BriefcaseBusiness },
+          { name: 'История продуктов', href: '/company/products-history', icon: History },
         ]
       : []),
     { name: 'Настройки', href: '/company/settings', icon: Settings },
