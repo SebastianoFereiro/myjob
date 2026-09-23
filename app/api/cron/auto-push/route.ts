@@ -22,19 +22,39 @@ const MAX_PAGES = 50;
 /** Ключ advisory-lock: одновременно аудит может писать только один запуск крона. */
 const AUDIT_LOCK_KEY = 918273645;
 
-/** Поля вакансии, необходимые для записи аудита: компания, название, slug. */
-const CV_AUDIT_FIELDS = "populate[company]=true&fields[0]=title&fields[1]=slug";
+/**
+ * Поля вакансии, необходимые для записи аудита: компания, название, slug и
+ * периоды продуктов. Параметр `fields` ограничивает набор атрибутов в ответе
+ * Strapi, поэтому периоды нужно перечислять явно: иначе period_start и
+ * period_end приходят пустыми и ни одно событие не записывается.
+ */
+const CV_AUDIT_FIELDS = [
+  "populate[company]=true",
+  "fields[0]=title",
+  "fields[1]=slug",
+  "fields[2]=premium_from",
+  "fields[3]=premium_to",
+  "fields[4]=push_from",
+  "fields[5]=push_to",
+].join("&");
 
 /**
- * Момент внедрения аудита.
+ * Необязательный порог отсечения истории (ISO 8601, UTC).
  *
- * Продукты, назначенные раньше этой даты, в истории не отражаются
- * (бэкфилл не выполняется): для них не создаётся событие activated.
- * Переопределяется переменной окружения PRODUCT_AUDIT_TRACKING_SINCE.
+ * Если переменная не задана, при первом запуске крона текущие активные
+ * продукты фиксируются в истории как базовые события `activated`: иначе
+ * история компании остаётся пустой для всех продуктов, назначенных раньше
+ * внедрения аудита. Заданный порог отключает такую фиксацию для старых
+ * продуктов (бэкфилл не выполняется).
  */
-const AUDIT_TRACKING_SINCE = new Date(
-  process.env.PRODUCT_AUDIT_TRACKING_SINCE || "2026-09-22T00:00:00.000Z",
-);
+function parseTrackingSince(): Date | null {
+  const raw = process.env.PRODUCT_AUDIT_TRACKING_SINCE;
+  if (!raw) return null;
+  const date = new Date(raw);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+const AUDIT_TRACKING_SINCE = parseTrackingSince();
 
 type CronError = { stage: string; id: string; error: string };
 
@@ -205,8 +225,18 @@ async function collectProductAuditEvents(
 
   for (const item of active) {
     if (openKeys.has(pairKey(item.vacancyId, item.productType))) continue;
-    // Продукты, назначенные до внедрения аудита, не бэкфиллятся.
-    if (!item.periodStart || item.periodStart.getTime() < AUDIT_TRACKING_SINCE.getTime()) continue;
+
+    // Продукт попал в выборку по периоду, но сам период не пришёл из Strapi:
+    // фиксируем ошибку, чтобы запись не терялась молча.
+    if (!item.periodStart) {
+      errors.push({ stage: "audit", id: item.vacancyId, error: "Не найден periodStart" });
+      continue;
+    }
+
+    // Явно заданный порог отсекает продукты, назначенные до внедрения аудита.
+    if (AUDIT_TRACKING_SINCE && item.periodStart.getTime() < AUDIT_TRACKING_SINCE.getTime()) {
+      continue;
+    }
 
     events.push({
       companyId: item.companyId,
